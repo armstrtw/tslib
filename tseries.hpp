@@ -6,25 +6,25 @@
 typedef long TSDIM;
 
 template <typename TDATE,typename TDATA>
-class tseries {
+class TSeries {
 private:
   TSDIM rows_;
   TSDIM cols_;
   TDATE* dates_;
   TDATA* data_;
 public:
-  tseries();
-  tseries(const TSDIM rows, const TSDIM cols);
-  ~tseries();
+  TSeries();
+  TSeries(const TSDIM rows, const TSDIM cols);
+  ~TSeries();
 
 };
 
 template <typename TDATE,typename TDATA>
-tseries<TDATE,TDATA>::tseries() : rows_(0), cols_(0), dates_(NULL), data_(NULL) {
+TSeries<TDATE,TDATA>::TSeries() : rows_(0), cols_(0), dates_(NULL), data_(NULL) {
 }
 
 template <typename TDATE,typename TDATA>
-tseries<TDATE,TDATA>::tseries(const TSDIM rows, const TSDIM cols) : rows_(rows), cols_(cols), dates_(NULL), data_(NULL) {
+TSeries<TDATE,TDATA>::TSeries(const TSDIM rows, const TSDIM cols) : rows_(rows), cols_(cols), dates_(NULL), data_(NULL) {
   data_ = new TDATA[rows*cols];
   dates_ = new TDATE[rows];
   
@@ -37,7 +37,7 @@ tseries<TDATE,TDATA>::tseries(const TSDIM rows, const TSDIM cols) : rows_(rows),
 }
 
 template <typename TDATE,typename TDATA>
-tseries<TDATE,TDATA>::~tseries() {
+TSeries<TDATE,TDATA>::~TSeries() {
   delete[] data_;
   delete[] dates_;
 }

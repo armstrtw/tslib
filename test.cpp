@@ -1,7 +1,7 @@
 #include "tseries.hpp"
 
 int main() {
-  tseries<double,double> x;
+  TSeries<double,double> x;
 
   return 1;
 }
