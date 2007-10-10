@@ -2,44 +2,104 @@
 #define TSERIES_HPP
 
 #include <iostream>
-
-typedef long TSDIM;
+#include "tseries.data.hpp"
+#include "utils/copyVector.hpp"
 
 template <typename TDATE,typename TDATA>
 class TSeries {
 private:
-  TSDIM rows_;
-  TSDIM cols_;
-  TDATE* dates_;
-  TDATA* data_;
+  TSdata<TDATE,TDATA>* tsdata_;
+
+  TDATA* getData() const;
+  TDATE* getDates() const;
 public:
+  ~TSeries();
   TSeries();
   TSeries(const TSDIM rows, const TSDIM cols);
-  ~TSeries();
+  TSeries(const TSeries& T);
 
+  TSeries<TDATE,TDATA> copy() const;
+
+  // accessors
+  vector<string> getColnames() const;
+  TSDIM nrow() const;
+  TSDIM ncol() const;
+
+  // mutators
+  void setColnames(const vector<string>& cnames);
 };
 
 template <typename TDATE,typename TDATA>
-TSeries<TDATE,TDATA>::TSeries() : rows_(0), cols_(0), dates_(NULL), data_(NULL) {
-}
-
-template <typename TDATE,typename TDATA>
-TSeries<TDATE,TDATA>::TSeries(const TSDIM rows, const TSDIM cols) : rows_(rows), cols_(cols), dates_(NULL), data_(NULL) {
-  data_ = new TDATA[rows*cols];
-  dates_ = new TDATE[rows];
-  
-  if(data_ == NULL || dates_ == NULL) {
-    delete[] data_;
-    delete[] dates_;
-    rows = 0;
-    cols = 0;
-  }
-}
-
-template <typename TDATE,typename TDATA>
 TSeries<TDATE,TDATA>::~TSeries() {
-  delete[] data_;
-  delete[] dates_;
+  tsdata_->detach();
+}
+
+template <typename TDATE,typename TDATA>
+TSeries<TDATE,TDATA>::TSeries() {
+  tsdata_ = TSdata<TDATE,TDATA>::init();
+}
+
+template <typename TDATE,typename TDATA>
+TSeries<TDATE,TDATA>::TSeries(const TSDIM rows, const TSDIM cols) {
+  tsdata_ = TSdata<TDATA,TDATA>::init(rows,cols);
+}
+
+template <typename TDATE,typename TDATA>
+TSeries<TDATE,TDATA>::TSeries(const TSeries& T) {
+  tsdata_ = T.tsdata_;
+  tsdata_->attach();
+}
+
+template <typename TDATE,typename TDATA>
+TSeries<TDATE,TDATA> TSeries<TDATE,TDATA>::copy() const {
+  TSeries ans(nrow(),ncol());
+  ans.setColnames(getColnames());
+
+  copyVector(ans.getDates(), getDates(),nrow());
+  copyVector(ans.getData(), getData(), nrow() * ncol() );
+
+  return ans;
+}
+
+template <typename TDATE,typename TDATA>
+inline
+TDATE* TSeries<TDATE,TDATA>::getDates() const {
+  return tsdata_->getDates();
+}
+
+template <typename TDATE,typename TDATA>
+inline
+TDATA* TSeries<TDATE,TDATA>::getData() const {
+  return tsdata_->getData();
+}
+
+
+template <typename TDATE,typename TDATA>
+inline
+TSDIM TSeries<TDATE,TDATA>::nrow() const {
+  return tsdata_->nrow();
+}
+
+template <typename TDATE,typename TDATA>
+inline
+TSDIM TSeries<TDATE,TDATA>::ncol() const {
+  return tsdata_->ncol();
+}
+
+template <typename TDATE,typename TDATA>
+inline
+vector<string> TSeries<TDATE,TDATA>::getColnames() const {
+  return tsdata_->getColnames();
+}
+
+template <typename TDATE,typename TDATA>
+inline
+void TSeries<TDATE,TDATA>::setColnames(const vector<string>& cnames) {
+  if(cnames.size() == ncol()) {
+    tsdata_->setColnames(cnames);
+  } else {
+    // FIXME
+  }
 }
 
 
