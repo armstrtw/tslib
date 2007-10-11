@@ -93,7 +93,6 @@ vector<string> TSeries<TDATE,TDATA>::getColnames() const {
 }
 
 template <typename TDATE,typename TDATA>
-inline
 void TSeries<TDATE,TDATA>::setColnames(const vector<string>& cnames) {
   if(cnames.size() == ncol()) {
     tsdata_->setColnames(cnames);

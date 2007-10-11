@@ -169,31 +169,37 @@ void TSdata<TDATE,TDATA>::setColnames(const vector<string>& cnames) {
 }
 
 template <typename TDATE,typename TDATA>
+inline
 vector<string> TSdata<TDATE,TDATA>::getColnames() const {
   return colnames;
 }
 
 template <typename TDATE,typename TDATA>
+inline
 const size_t TSdata<TDATE,TDATA>::getColnamesSize() const {
   return colnames.size();
 }
 
 template <typename TDATE,typename TDATA>
+inline
 TDATA* TSdata<TDATE,TDATA>::getData() const {
   return data_;
 }
 
 template <typename TDATE,typename TDATA>
+inline
 TDATE* TSdata<TDATE,TDATA>::getDates() const {
   return dates_;
 }
 
 template <typename TDATE,typename TDATA>
+inline
 TSDIM TSdata<TDATE,TDATA>::nrow() const {
   return rows_;
 }
 
 template <typename TDATE,typename TDATA>
+inline
 TSDIM TSdata<TDATE,TDATA>::ncol() const {
   return cols_;
 }
