@@ -12,9 +12,9 @@ typedef long TSDIM;
 template <typename TDATE,typename TDATA>
 class TSdata {
 private:
-  int refcount;
-  bool release_data;
-  vector<string> colnames;
+  int refcount_;
+  bool release_data_;
+  vector<string> colnames_;
   TSDIM rows_;
   TSDIM cols_;
   TDATE* dates_;
@@ -61,7 +61,7 @@ public:
 
 template <typename TDATE,typename TDATA>
 TSdata<TDATE,TDATA>::~TSdata() {
-  if(release_data) {
+  if(release_data_) {
     delete []dates_;
     delete []data_;
   }
@@ -69,8 +69,8 @@ TSdata<TDATE,TDATA>::~TSdata() {
 
 template <typename TDATE,typename TDATA>
 TSdata<TDATE,TDATA>::TSdata() {
-  refcount = 1;
-  release_data = true;
+  refcount_ = 1;
+  release_data_ = true;
   rows_ = 0;
   cols_ = 0;
   dates_ = NULL;
@@ -79,8 +79,8 @@ TSdata<TDATE,TDATA>::TSdata() {
 
 template <typename TDATE,typename TDATA>
 TSdata<TDATE,TDATA>::TSdata(const TSDIM rows, const TSDIM cols) {
-  refcount = 1;
-  release_data = true;
+  refcount_ = 1;
+  release_data_ = true;
   rows_ = rows;
   cols_ = cols;
 
@@ -107,15 +107,15 @@ TSdata<TDATE,TDATA>::TSdata(TDATA* external_data,
 
   // make null series if some data is null
   if(external_data==NULL || external_dates==NULL) {
-    refcount = 1;
-    release_data = release;
+    refcount_ = 1;
+    release_data_ = release;
     data_ = NULL;
     dates_ = NULL;
     rows_ = 0;
     cols_ = 0;
   } else {
-    refcount = 1;
-    release_data = release;
+    refcount_ = 1;
+    release_data_ = release;
     data_ = external_data;
     dates_ = external_dates;
     rows_ = nrows;
@@ -150,34 +150,34 @@ TSdata<TDATE,TDATA>* TSdata<TDATE,TDATA>::init(TDATA* external_data,
 
 template <typename TDATE,typename TDATA>
 void TSdata<TDATE,TDATA>::attach() {
-  ++refcount;
-  //cout << "attach, new refcount: " << refcount << endl;
+  ++refcount_;
+  //cout << "attach, new refcount_: " << refcount_ << endl;
 }
 
 template <typename TDATE,typename TDATA>
 void TSdata<TDATE,TDATA>::detach() {
-  refcount--;
-  //cout << "detach, refcount: " << refcount << endl;
-  if(refcount == 0) {
+  refcount_--;
+  //cout << "detach, refcount_: " << refcount_ << endl;
+  if(refcount_ == 0) {
     delete this;
   }
 }
 
 template <typename TDATE,typename TDATA>
 void TSdata<TDATE,TDATA>::setColnames(const vector<string>& cnames) {
-  colnames = cnames;
+  colnames_ = cnames;
 }
 
 template <typename TDATE,typename TDATA>
 inline
 vector<string> TSdata<TDATE,TDATA>::getColnames() const {
-  return colnames;
+  return colnames_;
 }
 
 template <typename TDATE,typename TDATA>
 inline
 const size_t TSdata<TDATE,TDATA>::getColnamesSize() const {
-  return colnames.size();
+  return colnames_.size();
 }
 
 template <typename TDATE,typename TDATA>
