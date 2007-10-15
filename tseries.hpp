@@ -1,6 +1,7 @@
 #ifndef TSERIES_HPP
 #define TSERIES_HPP
 
+#include <cstdlib>
 #include <iostream>
 #include "tseries.data.hpp"
 #include "utils/copyVector.hpp"
@@ -10,8 +11,6 @@ class TSeries {
 private:
   TSdata<TDATE,TDATA>* tsdata_;
 
-  TDATA* getData() const;
-  TDATE* getDates() const;
 public:
   ~TSeries();
   TSeries();
@@ -24,9 +23,11 @@ public:
   vector<string> getColnames() const;
   TSDIM nrow() const;
   TSDIM ncol() const;
+  TDATA* getData() const;
+  TDATE* getDates() const;
 
   // mutators
-  void setColnames(const vector<string>& cnames);
+  int setColnames(const vector<string>& cnames);
 };
 
 template <typename TDATE,typename TDATA>
@@ -93,11 +94,12 @@ vector<string> TSeries<TDATE,TDATA>::getColnames() const {
 }
 
 template <typename TDATE,typename TDATA>
-void TSeries<TDATE,TDATA>::setColnames(const vector<string>& cnames) {
+int TSeries<TDATE,TDATA>::setColnames(const vector<string>& cnames) {
   if(cnames.size() == ncol()) {
     tsdata_->setColnames(cnames);
+    return EXIT_SUCCESS;
   } else {
-    // FIXME
+    return EXIT_FAILURE;
   }
 }
 
