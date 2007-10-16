@@ -5,6 +5,9 @@
 
 using namespace boost::unit_test_framework;
 
+// seed random number generator
+// srand((unsigned)time(0));
+
 void null_constructor_test() {
   TSeries<double,double> x;
 
@@ -14,6 +17,20 @@ void null_constructor_test() {
   BOOST_CHECK_EQUAL( x.ncol(), zero );
   BOOST_CHECK_EQUAL( x.getData(), static_cast<double*>(NULL) );
   BOOST_CHECK_EQUAL( x.getDates(), static_cast<double*>(NULL) );
+  BOOST_CHECK_EQUAL( x.getColnames().size(), zero );
+}
+
+void std_constructor_test() {
+  TSDIM nr = 1000;
+  TSDIM nc = 10;
+  TSDIM zero = 0;
+
+  TSeries<double,double> x(nr,nc);
+
+  BOOST_CHECK_EQUAL( x.nrow(), nr );
+  BOOST_CHECK_EQUAL( x.ncol(), nc );
+  BOOST_CHECK( x.getData() != static_cast<double*>(NULL) );
+  BOOST_CHECK( x.getDates() != static_cast<double*>(NULL) );
   BOOST_CHECK_EQUAL( x.getColnames().size(), zero );
 }
 
@@ -42,6 +59,7 @@ init_unit_test_suite( int argc, char* argv[] ) {
   test_suite* test= BOOST_TEST_SUITE("tslib test");
 
   test->add( BOOST_TEST_CASE( &null_constructor_test ) );
+  test->add( BOOST_TEST_CASE( &std_constructor_test ) );
   test->add( BOOST_TEST_CASE( &set_colnames_test ) );
   return test;
 }
