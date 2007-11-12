@@ -1,7 +1,7 @@
 #include <boost/test/included/unit_test_framework.hpp>
 #include <boost/test/unit_test.hpp>
 #include <ctime>
-#include "tseries.hpp"
+#include <tseries.hpp>
 
 using namespace boost::unit_test_framework;
 
@@ -54,6 +54,20 @@ void set_colnames_test() {
   BOOST_CHECK_EQUAL(y.getColnames()==newColnames, 1);
 }
 
+void operators_test() {
+  TSDIM nr = 100;
+  TSDIM nc = 10;
+
+  TSeries<double,double> x(nr,nc);
+  TSeries<double,double> y(nr,nc);
+
+  TSeries<double,double> z = x + y;
+
+  BOOST_CHECK_EQUAL( z.nrow(), 0 );
+  BOOST_CHECK_EQUAL( z.ncol(), 0 );
+}
+
+
 test_suite*
 init_unit_test_suite( int argc, char* argv[] ) {
   test_suite* test= BOOST_TEST_SUITE("tslib test");
@@ -61,6 +75,8 @@ init_unit_test_suite( int argc, char* argv[] ) {
   test->add( BOOST_TEST_CASE( &null_constructor_test ) );
   test->add( BOOST_TEST_CASE( &std_constructor_test ) );
   test->add( BOOST_TEST_CASE( &set_colnames_test ) );
+  
+  test->add( BOOST_TEST_CASE( &operators_test ) );
   return test;
 }
 

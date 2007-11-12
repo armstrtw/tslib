@@ -6,6 +6,12 @@
 #include "tseries.data.hpp"
 #include "utils/copyVector.hpp"
 
+
+// pre-declare template friends
+template<typename TDATE, typename TDATA> class TSeries;
+template<typename TDATE, typename TDATA> TSeries<TDATE,TDATA> operator+ (const TSeries<TDATE,TDATA>& lhs, const TSeries<TDATE,TDATA>& rhs);
+
+
 template <typename TDATE,typename TDATA>
 class TSeries {
 private:
@@ -28,7 +34,16 @@ public:
 
   // mutators
   int setColnames(const vector<string>& cnames);
+
+  //operators
+  friend TSeries<TDATE,TDATA> operator+ <> (const TSeries<TDATE,TDATA>& lhs, const TSeries<TDATE,TDATA>& rhs);
 };
+
+template <typename TDATE, typename TDATA>
+TSeries<TDATE,TDATA> operator+(const TSeries<TDATE,TDATA>& lhs, const TSeries<TDATE,TDATA>& rhs) {
+  TSeries<TDATE,TDATA> ans;
+  return ans;
+}
 
 template <typename TDATE,typename TDATA>
 TSeries<TDATE,TDATA>::~TSeries() {
