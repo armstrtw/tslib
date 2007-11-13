@@ -4,14 +4,16 @@
 using std::cout;
 using std::cerr;
 using std::endl;
+using std::distance;
+using std::set_intersection;
 
-template<class T>
+template<typename T, typename U>
 class RangeSpecifier {
 private:
-  T* dates;             // intersection dates
-  unsigned int* arg1;   // index of intersections of arg1
-  unsigned int* arg2;   // index of intersections of arg2
-  unsigned int size;    // also the length of all the internal vectors: dates, arg1, arg2
+  T* dates;  // intersection dates
+  U* arg1;   // index of intersections of arg1
+  U* arg2;   // index of intersections of arg2
+  U size;    // also the length of all the internal vectors: dates, arg1, arg2
 
 public:
   ~RangeSpecifier();
@@ -19,41 +21,42 @@ public:
   RangeSpecifier();
   RangeSpecifier(T *dates1,
 		 T *dates2,
-		 const unsigned int length_arg1,
-		 const unsigned int length_arg2);
+		 const U length_arg1,
+		 const U length_arg2);
 
 
-  const unsigned int getSize();
-  const unsigned int getArg1();
-  const unsigned int getArg2();
-
-  void extractArg1(double* dest, double* source);
-  void extractArg2(double* dest, double* source);
+  const U getSize();
+  const U* getArg1();
+  const U* getArg2();
+  void print();
+  
+  template<typename D, typename BinaryOpp>
+  void applyOpp(D* ans, D* arg1Data, D* arg2Data, BinaryOpp opp);
 };
 
-template<typename T>
-RangeSpecifier<T>::~RangeSpecifier() {
+template<typename T, typename U>
+RangeSpecifier<T,U>::~RangeSpecifier() {
   delete []dates;
   delete []arg1;
   delete []arg2;
 }
 
-template<typename T>
-RangeSpecifier<T>::RangeSpecifier() {
+template<typename T, typename U>
+RangeSpecifier<T,U>::RangeSpecifier() {
   dates = NULL;
   arg1 = NULL;
   arg2 = NULL;
   size = 0;
 }
 
-template<typename T>
-RangeSpecifier<T>::RangeSpecifier(T *dates1,
-				  T *dates2,
-				  const unsigned int length_arg1,
-				  const unsigned int length_arg2) {
+template<typename T, typename U>
+RangeSpecifier<T,U>::RangeSpecifier(T *dates1,
+                                    T *dates2,
+                                    const U length_arg1,
+                                    const U length_arg2) {
 
   // find size of smaller of the two arguments
-  const unsigned int bufferSize = length_arg1 < length_arg2 ? length_arg1 : length_arg2;
+  const U bufferSize = length_arg1 < length_arg2 ? length_arg1 : length_arg2;
 
   // alloc new buffer for dates, size is smallest of the two arguments
   dates = new T[bufferSize];
@@ -85,8 +88,8 @@ RangeSpecifier<T>::RangeSpecifier(T *dates1,
 
   // since we have some dates in the intersection
   // we can alloc space for the intersection points
-  arg1 = new unsigned int[size];
-  arg2 = new unsigned int[size];
+  arg1 = new U[size];
+  arg2 = new U[size];
 	
   // if we cannot get memory, then print error, release any memory that was allocated and return
   if(arg1==NULL || arg2==NULL) {
@@ -103,9 +106,9 @@ RangeSpecifier<T>::RangeSpecifier(T *dates1,
   }
 
   // placeholders to find intersecting dates
-  unsigned int date1_index = 0;
-  unsigned int date2_index = 0;
-  unsigned int dates_index = 0;
+  U date1_index = 0;
+  U date2_index = 0;
+  U dates_index = 0;
 
   // go through all the dates in the intersection
   while(dates_index < size) {
@@ -131,32 +134,32 @@ RangeSpecifier<T>::RangeSpecifier(T *dates1,
   }
 }
 
-template<typename T>
-const unsigned int RangeSpecifier<T>::getSize() {
+template<typename T, typename U>
+const U RangeSpecifier<T,U>::getSize() {
   return size;
 }
 
-template<typename T>
-const unsigned int RangeSpecifier<T>::getArg1() {
+template<typename T, typename U>
+const U* RangeSpecifier<T,U>::getArg1() {
   return arg1;
 }
 
-template<typename T>
-const unsigned int RangeSpecifier<T>::getArg2() {
+template<typename T, typename U>
+const U* RangeSpecifier<T,U>::getArg2() {
   return arg2;
 }
 
-template<typename T>
-void RangeSpecifier<T>::extractArg1(double* dest, double* source) {
-  for(unsigned int i=0; i < size; i++) {
-    dest[i] = source[ arg1[i] ];
-  }
+template<typename T, typename U>
+template<typename D, typename BinaryOpp>
+void RangeSpecifier<T,U>::applyOpp(D* ans, D* arg1Data, D* arg2Data, BinaryOpp opp) {
+  for(U i = 0; i < size; i++)
+    ans[i] = opp( arg1Data[ arg1[i] ] , arg2Data[ arg2[i] ] );
 }
 
-template<typename T>
-void RangeSpecifier<T>::extractArg2(double* dest, double* source) {
-  for(unsigned int i=0; i < size; i++) {
-    dest[i] = source[ arg2[i] ];
+template<typename T, typename U>
+void RangeSpecifier<T,U>::print() {
+  for(U i = 0; i < size; i++) {
+    cout << dates[i] << ":" << arg1[i] << ":" << arg2[i] << endl;
   }
 }
 
