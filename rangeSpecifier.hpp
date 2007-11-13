@@ -7,13 +7,13 @@ using std::endl;
 
 template<class T>
 class RangeSpecifier {
-
-public:
+private:
   T* dates;             // intersection dates
   unsigned int* arg1;   // index of intersections of arg1
   unsigned int* arg2;   // index of intersections of arg2
   unsigned int size;    // also the length of all the internal vectors: dates, arg1, arg2
 
+public:
   ~RangeSpecifier();
   RangeSpecifier(const RangeSpecifier &r); // not allowed!!
   RangeSpecifier();
@@ -21,6 +21,11 @@ public:
 		 T *dates2,
 		 const unsigned int length_arg1,
 		 const unsigned int length_arg2);
+
+
+  const unsigned int getSize();
+  const unsigned int getArg1();
+  const unsigned int getArg2();
 
   void extractArg1(double* dest, double* source);
   void extractArg2(double* dest, double* source);
@@ -124,6 +129,21 @@ RangeSpecifier<T>::RangeSpecifier(T *dates1,
       date2_index++;
     }
   }
+}
+
+template<typename T>
+const unsigned int RangeSpecifier<T>::getSize() {
+  return size;
+}
+
+template<typename T>
+const unsigned int RangeSpecifier<T>::getArg1() {
+  return arg1;
+}
+
+template<typename T>
+const unsigned int RangeSpecifier<T>::getArg2() {
+  return arg2;
 }
 
 template<typename T>
