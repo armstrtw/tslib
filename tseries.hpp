@@ -7,7 +7,7 @@
 #include <numeric>
 #include <functional>
 #include "tseries.data.hpp"
-#include "rangeSpecifier.hpp"
+#include "utils/rangeSpecifier.hpp"
 #include "utils/copyVector.hpp"
 #include "utils/ts.ts.opp.hpp"
 using namespace std;
