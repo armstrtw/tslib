@@ -24,10 +24,10 @@ public:
 		 const U length_arg1,
 		 const U length_arg2);
 
-
-  const U getSize();
+  const T* getDates();
   const U* getArg1();
   const U* getArg2();
+  const U getSize();
   void print();
   
   template<typename D, typename BinaryOpp>
@@ -137,6 +137,11 @@ RangeSpecifier<T,U>::RangeSpecifier(T *dates1,
 template<typename T, typename U>
 const U RangeSpecifier<T,U>::getSize() {
   return size;
+}
+
+template<typename T, typename U>
+const T* RangeSpecifier<T,U>::getDates() {
+  return dates;
 }
 
 template<typename T, typename U>
