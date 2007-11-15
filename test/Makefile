@@ -7,3 +7,4 @@ FXX      = g77
 
 test: ../tseries.hpp ../tseries.data.hpp
 	$(CXX) test.cpp -o $@ -I..
+	./test

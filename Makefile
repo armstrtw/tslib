@@ -2,10 +2,15 @@ CFLAGS = -Wall -O0 -g -fpic
 CXXFLAGS = $(CFLAGS)
 LDFLAGS =
 CXX      = g++
-FXX      = g77
 
+SUBDIRS = test
 
-test:
-	cd ./test; make
+.PHONY: subdirs $(SUBDIRS)
+
+subdirs: $(SUBDIRS)
+
+$(SUBDIRS):
+	$(MAKE) -C $@
+
 
 
