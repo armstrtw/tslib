@@ -3,9 +3,14 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <algorithm>
+#include <numeric>
+#include <functional>
 #include "tseries.data.hpp"
+#include "rangeSpecifier.hpp"
 #include "utils/copyVector.hpp"
-
+#include "utils/ts.ts.opp.hpp"
+using namespace std;
 
 // pre-declare template friends
 template<typename TDATE, typename TDATA> class TSeries;
@@ -27,8 +32,8 @@ public:
 
   // accessors
   vector<string> getColnames() const;
-  TSDIM nrow() const;
-  TSDIM ncol() const;
+  const TSDIM nrow() const;
+  const TSDIM ncol() const;
   TDATA* getData() const;
   TDATE* getDates() const;
 
@@ -41,8 +46,7 @@ public:
 
 template <typename TDATE, typename TDATA>
 TSeries<TDATE,TDATA> operator+(const TSeries<TDATE,TDATA>& lhs, const TSeries<TDATE,TDATA>& rhs) {
-  TSeries<TDATE,TDATA> ans;
-  return ans;
+  return apply_opp(lhs,rhs,plus<TDATA>());
 }
 
 template <typename TDATE,typename TDATA>
@@ -92,13 +96,13 @@ TDATA* TSeries<TDATE,TDATA>::getData() const {
 
 template <typename TDATE,typename TDATA>
 inline
-TSDIM TSeries<TDATE,TDATA>::nrow() const {
+const TSDIM TSeries<TDATE,TDATA>::nrow() const {
   return tsdata_->nrow();
 }
 
 template <typename TDATE,typename TDATA>
 inline
-TSDIM TSeries<TDATE,TDATA>::ncol() const {
+const TSDIM TSeries<TDATE,TDATA>::ncol() const {
   return tsdata_->ncol();
 }
 
