@@ -103,10 +103,23 @@ void operators_test() {
   for(TSDIM yi = 0; yi < y.nrow(); yi++)
     y.getDates()[yi] = yi;
     
-  TSeries<double,double> z = x + y;
+  TSeries<double,double> Zplus = x + y;
+  TSeries<double,double> Zminus = x - y;
+  TSeries<double,double> Zmultiplies = x * y;
+  TSeries<double,double> Zdivides = x / y;
 
-  BOOST_CHECK_EQUAL( z.nrow(), y.nrow() );
-  BOOST_CHECK_EQUAL( z.ncol(), 10 );
+  BOOST_CHECK_EQUAL( Zplus.nrow(), y.nrow() );
+  BOOST_CHECK_EQUAL( Zplus.ncol(), 10 );
+
+  BOOST_CHECK_EQUAL( Zminus.nrow(), y.nrow() );
+  BOOST_CHECK_EQUAL( Zminus.ncol(), 10 );
+
+  BOOST_CHECK_EQUAL( Zmultiplies.nrow(), y.nrow() );
+  BOOST_CHECK_EQUAL( Zmultiplies.ncol(), 10 );
+
+  BOOST_CHECK_EQUAL( Zdivides.nrow(), y.nrow() );
+  BOOST_CHECK_EQUAL( Zdivides.ncol(), 10 );
+
 }
 
 
