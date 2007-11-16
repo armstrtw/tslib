@@ -14,20 +14,23 @@ using namespace std;
 
 // pre-declare template friends
 template<typename TDATE, typename TDATA> class TSeries;
-template<typename TDATE, typename TDATA> TSeries<TDATE,TDATA> operator+ (const TSeries<TDATE,TDATA>& lhs, const TSeries<TDATE,TDATA>& rhs);
-template<typename TDATE, typename TDATA> TSeries<TDATE,TDATA> operator- (const TSeries<TDATE,TDATA>& lhs, const TSeries<TDATE,TDATA>& rhs);
-template<typename TDATE, typename TDATA> TSeries<TDATE,TDATA> operator* (const TSeries<TDATE,TDATA>& lhs, const TSeries<TDATE,TDATA>& rhs);
-template<typename TDATE, typename TDATA> TSeries<TDATE,TDATA> operator/ (const TSeries<TDATE,TDATA>& lhs, const TSeries<TDATE,TDATA>& rhs);
+template<typename TDATE, typename TDATA> TSeries<TDATE,TDATA> operator+(const TSeries<TDATE,TDATA>& lhs, const TSeries<TDATE,TDATA>& rhs);
+template<typename TDATE, typename TDATA> TSeries<TDATE,TDATA> operator-(const TSeries<TDATE,TDATA>& lhs, const TSeries<TDATE,TDATA>& rhs);
+template<typename TDATE, typename TDATA> TSeries<TDATE,TDATA> operator*(const TSeries<TDATE,TDATA>& lhs, const TSeries<TDATE,TDATA>& rhs);
+template<typename TDATE, typename TDATA> TSeries<TDATE,TDATA> operator/(const TSeries<TDATE,TDATA>& lhs, const TSeries<TDATE,TDATA>& rhs);
 
-template<typename TDATE, typename TDATA> TSeries<TDATE,TDATA> operator+ (const TDATA lhs, const TSeries<TDATE,TDATA>& rhs);
-template<typename TDATE, typename TDATA> TSeries<TDATE,TDATA> operator- (const TDATA lhs, const TSeries<TDATE,TDATA>& rhs);
-template<typename TDATE, typename TDATA> TSeries<TDATE,TDATA> operator* (const TDATA lhs, const TSeries<TDATE,TDATA>& rhs);
-template<typename TDATE, typename TDATA> TSeries<TDATE,TDATA> operator/ (const TDATA lhs, const TSeries<TDATE,TDATA>& rhs);
+template<typename TDATE, typename TDATA> TSeries<TDATE,TDATA> operator+(const TDATA lhs, const TSeries<TDATE,TDATA>& rhs);
+template<typename TDATE, typename TDATA> TSeries<TDATE,TDATA> operator-(const TDATA lhs, const TSeries<TDATE,TDATA>& rhs);
+template<typename TDATE, typename TDATA> TSeries<TDATE,TDATA> operator*(const TDATA lhs, const TSeries<TDATE,TDATA>& rhs);
+template<typename TDATE, typename TDATA> TSeries<TDATE,TDATA> operator/(const TDATA lhs, const TSeries<TDATE,TDATA>& rhs);
 
-template<typename TDATE, typename TDATA> TSeries<TDATE,TDATA> operator+ (const TSeries<TDATE,TDATA>& lhs, const TDATA rhs);
-template<typename TDATE, typename TDATA> TSeries<TDATE,TDATA> operator- (const TSeries<TDATE,TDATA>& lhs, const TDATA rhs);
-template<typename TDATE, typename TDATA> TSeries<TDATE,TDATA> operator* (const TSeries<TDATE,TDATA>& lhs, const TDATA rhs);
-template<typename TDATE, typename TDATA> TSeries<TDATE,TDATA> operator/ (const TSeries<TDATE,TDATA>& lhs, const TDATA rhs);
+template<typename TDATE, typename TDATA> TSeries<TDATE,TDATA> operator+(const TSeries<TDATE,TDATA>& lhs, const TDATA rhs);
+template<typename TDATE, typename TDATA> TSeries<TDATE,TDATA> operator-(const TSeries<TDATE,TDATA>& lhs, const TDATA rhs);
+template<typename TDATE, typename TDATA> TSeries<TDATE,TDATA> operator*(const TSeries<TDATE,TDATA>& lhs, const TDATA rhs);
+template<typename TDATE, typename TDATA> TSeries<TDATE,TDATA> operator/(const TSeries<TDATE,TDATA>& lhs, const TDATA rhs);
+
+
+template<typename TDATE, typename TDATA> std::ostream& operator<<(std::ostream& os, const TSeries<TDATE,TDATA>& ts);
 
 template <typename TDATE,typename TDATA>
 class TSeries {
@@ -54,6 +57,11 @@ public:
 
   //operators
   friend TSeries<TDATE,TDATA> operator+ <> (const TSeries<TDATE,TDATA>& lhs, const TSeries<TDATE,TDATA>& rhs);
+  friend TSeries<TDATE,TDATA> operator- <> (const TSeries<TDATE,TDATA>& lhs, const TSeries<TDATE,TDATA>& rhs);
+  friend TSeries<TDATE,TDATA> operator* <> (const TSeries<TDATE,TDATA>& lhs, const TSeries<TDATE,TDATA>& rhs);
+  friend TSeries<TDATE,TDATA> operator/ <> (const TSeries<TDATE,TDATA>& lhs, const TSeries<TDATE,TDATA>& rhs);
+
+  friend std::ostream& operator<< <> (std::ostream& os, const TSeries<TDATE,TDATA>& ts);
 };
 
 template <typename TDATE, typename TDATA>
@@ -74,6 +82,33 @@ TSeries<TDATE,TDATA> operator*(const TSeries<TDATE,TDATA>& lhs, const TSeries<TD
 template <typename TDATE, typename TDATA>
 TSeries<TDATE,TDATA> operator/(const TSeries<TDATE,TDATA>& lhs, const TSeries<TDATE,TDATA>& rhs) {
   return apply_opp(lhs,rhs,divides<TDATA>());
+}
+
+template <typename TDATE, typename TDATA>
+std::ostream& operator<< (std::ostream& os, const TSeries<TDATE,TDATA>& ts) {
+  vector<string> cnames(ts.getColnames());
+  
+  if(cnames.size()) {
+    // shift out to be in line w/ first column of values (space is for dates column)
+    os << "\t";
+    for(vector<string>::const_iterator iter = cnames.begin(); iter != cnames.end(); iter++) {
+      os << *iter++ << " ";
+    }
+  }
+
+  TDATE* dates = ts.getDates();
+  TDATA* data = ts.getData();
+  TSDIM nr  = ts.nrow();
+  TSDIM nc  = ts.ncol();
+  
+  for(TSDIM row = 0; row < nr; row++) {
+    os << dates[row] << "\t";
+    for(TSDIM col = 0; col < nc; col++) {
+      os << data[row + col*nc] << " ";
+    }
+    os << std::endl;
+  }
+  return os;
 }
 
 template <typename TDATE,typename TDATA>

@@ -93,7 +93,7 @@ void operators_test() {
 
   // gernate data
   fill_n(x.getData(),x.nrow()*x.ncol(),100.0);
-  fill_n(y.getData(),y.nrow()*y.ncol(),1.0);
+  fill_n(y.getData(),y.nrow()*y.ncol(),5.0);
 
   // generate dates
   for(TSDIM xi = 0; xi < x.nrow(); xi++)
@@ -120,6 +120,7 @@ void operators_test() {
   BOOST_CHECK_EQUAL( Zdivides.nrow(), y.nrow() );
   BOOST_CHECK_EQUAL( Zdivides.ncol(), 10 );
 
+  std::cout << Zmultiplies;
 }
 
 
