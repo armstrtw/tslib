@@ -121,7 +121,21 @@ void operators_test() {
   BOOST_CHECK_EQUAL( Zdivides.ncol(), 10 );
 
   std::cout << Zmultiplies;
+
+  // add test for all== later
+  TSeries<double,double> XplusS = x + 100.0;
+  TSeries<double,double> SplusX = 100.0 + x;
+
+  TSeries<double,double> XminusS = x - 100.0;
+  TSeries<double,double> SminusX = 100.0 - x;
+
+  TSeries<double,double> XmultS = x * 100.0;
+  TSeries<double,double> SmultX = 100.0 * x;
+
+  TSeries<double,double> XdivS = x / 100.0;
+  TSeries<double,double> SdivX = 100.0 * x;
 }
+
 
 
 test_suite*

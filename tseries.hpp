@@ -10,6 +10,7 @@
 #include "utils/rangeSpecifier.hpp"
 #include "utils/copyVector.hpp"
 #include "utils/ts.ts.opp.hpp"
+#include "utils/ts.scalar.opp.hpp"
 using namespace std;
 
 // pre-declare template friends
@@ -61,6 +62,17 @@ public:
   friend TSeries<TDATE,TDATA> operator* <> (const TSeries<TDATE,TDATA>& lhs, const TSeries<TDATE,TDATA>& rhs);
   friend TSeries<TDATE,TDATA> operator/ <> (const TSeries<TDATE,TDATA>& lhs, const TSeries<TDATE,TDATA>& rhs);
 
+  friend TSeries<TDATE,TDATA> operator+ <> (const TDATA lhs, const TSeries<TDATE,TDATA>& rhs);
+  friend TSeries<TDATE,TDATA> operator- <> (const TDATA lhs, const TSeries<TDATE,TDATA>& rhs);
+  friend TSeries<TDATE,TDATA> operator* <> (const TDATA lhs, const TSeries<TDATE,TDATA>& rhs);
+  friend TSeries<TDATE,TDATA> operator/ <> (const TDATA lhs, const TSeries<TDATE,TDATA>& rhs);
+
+  friend TSeries<TDATE,TDATA> operator+ <> (const TSeries<TDATE,TDATA>& lhs, const TDATA rhs);
+  friend TSeries<TDATE,TDATA> operator- <> (const TSeries<TDATE,TDATA>& lhs, const TDATA rhs);
+  friend TSeries<TDATE,TDATA> operator* <> (const TSeries<TDATE,TDATA>& lhs, const TDATA rhs);
+  friend TSeries<TDATE,TDATA> operator/ <> (const TSeries<TDATE,TDATA>& lhs, const TDATA rhs);
+
+
   friend std::ostream& operator<< <> (std::ostream& os, const TSeries<TDATE,TDATA>& ts);
 };
 
@@ -81,6 +93,46 @@ TSeries<TDATE,TDATA> operator*(const TSeries<TDATE,TDATA>& lhs, const TSeries<TD
 
 template <typename TDATE, typename TDATA>
 TSeries<TDATE,TDATA> operator/(const TSeries<TDATE,TDATA>& lhs, const TSeries<TDATE,TDATA>& rhs) {
+  return apply_opp(lhs,rhs,divides<TDATA>());
+}
+
+template <typename TDATE, typename TDATA>
+TSeries<TDATE,TDATA> operator+(const TDATA lhs, const TSeries<TDATE,TDATA>& rhs) {
+  return apply_opp(lhs,rhs,plus<TDATA>());
+}
+
+template <typename TDATE, typename TDATA>
+TSeries<TDATE,TDATA> operator-(const TDATA lhs, const TSeries<TDATE,TDATA>& rhs) {
+  return apply_opp(lhs,rhs,minus<TDATA>());
+}
+
+template <typename TDATE, typename TDATA>
+TSeries<TDATE,TDATA> operator*(const TDATA lhs, const TSeries<TDATE,TDATA>& rhs) {
+  return apply_opp(lhs,rhs,multiplies<TDATA>());
+}
+
+template <typename TDATE, typename TDATA>
+TSeries<TDATE,TDATA> operator/(const TDATA lhs, const TSeries<TDATE,TDATA>& rhs) {
+  return apply_opp(lhs,rhs,divides<TDATA>());
+}
+
+template <typename TDATE, typename TDATA>
+TSeries<TDATE,TDATA> operator+(const TSeries<TDATE,TDATA>& lhs, const TDATA rhs) {
+  return apply_opp(lhs,rhs,plus<TDATA>());
+}
+
+template <typename TDATE, typename TDATA>
+TSeries<TDATE,TDATA> operator-(const TSeries<TDATE,TDATA>& lhs, const TDATA rhs) {
+  return apply_opp(lhs,rhs,minus<TDATA>());
+}
+
+template <typename TDATE, typename TDATA>
+TSeries<TDATE,TDATA> operator*(const TSeries<TDATE,TDATA>& lhs, const TDATA rhs) {
+  return apply_opp(lhs,rhs,multiplies<TDATA>());
+}
+
+template <typename TDATE, typename TDATA>
+TSeries<TDATE,TDATA> operator/(const TSeries<TDATE,TDATA>& lhs, const TDATA rhs) {
   return apply_opp(lhs,rhs,divides<TDATA>());
 }
 
