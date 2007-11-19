@@ -4,6 +4,8 @@
 #include <tseries.hpp>
 
 using namespace boost::unit_test_framework;
+using std::cout;
+using std::endl;
 
 // seed random number generator
 // srand((unsigned)time(0));
@@ -120,7 +122,7 @@ void operators_test() {
   BOOST_CHECK_EQUAL( Zdivides.nrow(), y.nrow() );
   BOOST_CHECK_EQUAL( Zdivides.ncol(), 10 );
 
-  std::cout << Zmultiplies;
+  cout << Zmultiplies << endl;
 
   // add test for all== later
   TSeries<double,double> XplusS = x + 100.0;
@@ -136,18 +138,59 @@ void operators_test() {
   TSeries<double,double> SdivX = 100.0 * x;
 }
 
+void assignment_test() {
+  TSDIM xnr = 10;
+  TSDIM xnc = 2;
+
+  TSDIM ynr = 10;
+  TSDIM ync = 2;
+
+  TSeries<double,double> x(xnr,xnc);
+  TSeries<double,double> y(ynr,ync);
+
+  // test self assignment
+  x = x;
+
+  BOOST_CHECK_EQUAL(x.nrow(),xnr);
+  BOOST_CHECK_EQUAL(x.ncol(),xnc);
+
+  y = x;
+  
+  BOOST_CHECK_EQUAL(y.nrow(),xnr);
+  BOOST_CHECK_EQUAL(y.ncol(),xnc);
+}
+
+void window_apply_test() {
+  TSDIM xnr = 10;
+  TSDIM xnc = 2;
+
+  TSeries<double,double> x(xnr,xnc);
+
+  // gernate data
+  generate_n(x.getData(),x.nrow()*x.ncol(),rand);
+  
+  // generate dates
+  for(TSDIM xi = 0; xi < x.nrow(); xi++)
+    x.getDates()[xi] = xi;
+
+  cout << x << endl;  
+  cout << x << endl;
+}
 
 
 test_suite*
 init_unit_test_suite( int argc, char* argv[] ) {
+  
   test_suite* test= BOOST_TEST_SUITE("tslib test");
+
 
   test->add( BOOST_TEST_CASE( &null_constructor_test ) );
   test->add( BOOST_TEST_CASE( &std_constructor_test ) );
-  test->add( BOOST_TEST_CASE( &set_colnames_test ) );
-  
+  test->add( BOOST_TEST_CASE( &set_colnames_test ) );  
   test->add( BOOST_TEST_CASE( &range_specifier_test ) );
   test->add( BOOST_TEST_CASE( &operators_test ) );
+  test->add( BOOST_TEST_CASE( &assignment_test ) );
+  //test->add( BOOST_TEST_CASE( &window_apply_test ) );
   return test;
 }
 
