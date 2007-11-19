@@ -39,11 +39,13 @@ private:
   TSdata<TDATE,TDATA>* tsdata_;
 
 public:
+  // ctors dtors
   ~TSeries();
   TSeries();
   TSeries(const TSDIM rows, const TSDIM cols);
   TSeries(const TSeries& T);
 
+  // copy an object
   TSeries<TDATE,TDATA> copy() const;
 
   // accessors
@@ -55,8 +57,10 @@ public:
 
   // mutators
   int setColnames(const vector<string>& cnames);
-
+  
   //operators
+  TSeries<TDATE,TDATA>& operator=(const TSeries<TDATE,TDATA>& x);
+
   friend TSeries<TDATE,TDATA> operator+ <> (const TSeries<TDATE,TDATA>& lhs, const TSeries<TDATE,TDATA>& rhs);
   friend TSeries<TDATE,TDATA> operator- <> (const TSeries<TDATE,TDATA>& lhs, const TSeries<TDATE,TDATA>& rhs);
   friend TSeries<TDATE,TDATA> operator* <> (const TSeries<TDATE,TDATA>& lhs, const TSeries<TDATE,TDATA>& rhs);
@@ -76,6 +80,23 @@ public:
   friend std::ostream& operator<< <> (std::ostream& os, const TSeries<TDATE,TDATA>& ts);
 };
 
+template <typename TDATE, typename TDATA>
+TSeries<TDATE,TDATA>& TSeries<TDATE,TDATA>::operator=(const TSeries<TDATE,TDATA>& rhs) {
+
+  // self assignment
+  if(tsdata_ == rhs.tsdata_) {
+    return *this;
+  }
+
+  // release old data
+  tsdata_->detach();
+
+  // attach to new data
+  tsdata_ = rhs.tsdata_;
+  tsdata_->attach();
+
+  return *this;
+}
 template <typename TDATE, typename TDATA>
 TSeries<TDATE,TDATA> operator+(const TSeries<TDATE,TDATA>& lhs, const TSeries<TDATE,TDATA>& rhs) {
   return apply_opp(lhs,rhs,plus<TDATA>());
