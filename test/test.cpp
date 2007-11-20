@@ -142,23 +142,43 @@ void assignment_test() {
   TSDIM xnr = 10;
   TSDIM xnc = 2;
 
-  TSDIM ynr = 10;
-  TSDIM ync = 2;
+  TSDIM ynr = 100;
+  TSDIM ync = 50;
 
   TSeries<double,double> x(xnr,xnc);
   TSeries<double,double> y(ynr,ync);
+
+  fill_n(x.getData(),x.nrow()*x.ncol(),1.0);
+  fill_n(y.getData(),y.nrow()*y.ncol(),2.0);
 
   // test self assignment
   x = x;
 
   BOOST_CHECK_EQUAL(x.nrow(),xnr);
   BOOST_CHECK_EQUAL(x.ncol(),xnc);
+  BOOST_CHECK_EQUAL(x.getData()[0],1.0);
 
+
+  // TS TS assignment
+  BOOST_CHECK_EQUAL(y.getData()[0],2.0);
   y = x;
   
   BOOST_CHECK_EQUAL(y.nrow(),xnr);
   BOOST_CHECK_EQUAL(y.ncol(),xnc);
+  BOOST_CHECK_EQUAL(y.getData()[0],1.0);
+
+  x = 100.0;
+
+  // check that dims are same as before
+  BOOST_CHECK_EQUAL(x.nrow(),xnr);
+  BOOST_CHECK_EQUAL(x.ncol(),xnc);
+
+  // now all values of x shoud be == 100.0
+  for(TSDIM i = 0; i < x.nrow()*x.ncol(); i++) {
+    BOOST_CHECK_EQUAL(x.getData()[i],100);
+  }
 }
+
 
 void window_apply_test() {
   TSDIM xnr = 10;

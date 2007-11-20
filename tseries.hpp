@@ -60,6 +60,7 @@ public:
   
   //operators
   TSeries<TDATE,TDATA>& operator=(const TSeries<TDATE,TDATA>& x);
+  TSeries<TDATE,TDATA>& operator=(const TDATA x);
 
   friend TSeries<TDATE,TDATA> operator+ <> (const TSeries<TDATE,TDATA>& lhs, const TSeries<TDATE,TDATA>& rhs);
   friend TSeries<TDATE,TDATA> operator- <> (const TSeries<TDATE,TDATA>& lhs, const TSeries<TDATE,TDATA>& rhs);
@@ -97,6 +98,15 @@ TSeries<TDATE,TDATA>& TSeries<TDATE,TDATA>::operator=(const TSeries<TDATE,TDATA>
 
   return *this;
 }
+
+template <typename TDATE, typename TDATA>
+TSeries<TDATE,TDATA>& TSeries<TDATE,TDATA>::operator=(const TDATA rhs) {
+  TDATA* data = getData();
+  for(TSDIM i = 0; i < nrow()*ncol(); i++) {
+    data[i] = rhs;
+  }
+}
+
 template <typename TDATE, typename TDATA>
 TSeries<TDATE,TDATA> operator+(const TSeries<TDATE,TDATA>& lhs, const TSeries<TDATE,TDATA>& rhs) {
   return apply_opp(lhs,rhs,plus<TDATA>());
