@@ -62,16 +62,19 @@ public:
   TSeries<TDATE,TDATA>& operator=(const TSeries<TDATE,TDATA>& x);
   TSeries<TDATE,TDATA>& operator=(const TDATA x);
 
+  // binary TS TS opps
   friend TSeries<TDATE,TDATA> operator+ <> (const TSeries<TDATE,TDATA>& lhs, const TSeries<TDATE,TDATA>& rhs);
   friend TSeries<TDATE,TDATA> operator- <> (const TSeries<TDATE,TDATA>& lhs, const TSeries<TDATE,TDATA>& rhs);
   friend TSeries<TDATE,TDATA> operator* <> (const TSeries<TDATE,TDATA>& lhs, const TSeries<TDATE,TDATA>& rhs);
   friend TSeries<TDATE,TDATA> operator/ <> (const TSeries<TDATE,TDATA>& lhs, const TSeries<TDATE,TDATA>& rhs);
 
+  // binary TDATA TS opps
   friend TSeries<TDATE,TDATA> operator+ <> (const TDATA lhs, const TSeries<TDATE,TDATA>& rhs);
   friend TSeries<TDATE,TDATA> operator- <> (const TDATA lhs, const TSeries<TDATE,TDATA>& rhs);
   friend TSeries<TDATE,TDATA> operator* <> (const TDATA lhs, const TSeries<TDATE,TDATA>& rhs);
   friend TSeries<TDATE,TDATA> operator/ <> (const TDATA lhs, const TSeries<TDATE,TDATA>& rhs);
 
+  // binary TS TDATA opps
   friend TSeries<TDATE,TDATA> operator+ <> (const TSeries<TDATE,TDATA>& lhs, const TDATA rhs);
   friend TSeries<TDATE,TDATA> operator- <> (const TSeries<TDATE,TDATA>& lhs, const TDATA rhs);
   friend TSeries<TDATE,TDATA> operator* <> (const TSeries<TDATE,TDATA>& lhs, const TDATA rhs);
