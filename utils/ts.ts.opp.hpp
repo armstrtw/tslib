@@ -29,6 +29,27 @@ const TSeries<TDATE,TDATA> apply_opp(const TSeries<TDATE,TDATA>& lhs,
 
   // copy over dates
   copyVector(ans.getDates(),range.getDates(),range.getSize());
+
+  // set new colnames
+  vector<string> lhs_cnames = lhs.getColnames();
+  vector<string> rhs_cnames = rhs.getColnames();
+  vector<string> ans_cnames;
+
+  if(lhs_cnames==rhs_cnames) {
+    ans_cnames = lhs_cnames;
+  } else {
+    // loop through and combine colnames from lhs and rhs
+    if(lhs_cnames.size() && rhs_cnames.size()) {
+      for(size_t i = 0; i < lhs_cnames.size(); i++) {
+        ans_cnames.push_back( lhs_cnames[i] + rhs_cnames[i] );
+      }
+    } else {
+      ans_cnames = lhs_cnames.size() ? lhs_cnames : rhs_cnames;
+    }
+  }
+
+  ans.setColnames(ans_cnames);
+
   TDATA* ans_data = ans.getData();
   TDATA* lhs_data = lhs.getData();
   TDATA* rhs_data = rhs.getData();
