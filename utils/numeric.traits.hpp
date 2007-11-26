@@ -14,6 +14,10 @@ public:
   static double NA() {
     return std::numeric_limits<double>::quiet_NaN();
   }
+
+  static double NAN() {
+    return std::numeric_limits<double>::quiet_NaN();
+  }
 };
 
 template<>
@@ -21,6 +25,10 @@ class numeric_traits<int> {
 public:
   static const bool has_NA = true;
   static int NA() {
+    return std::numeric_limits<int>::min();
+  }
+
+  static int NAN() {
     return std::numeric_limits<int>::min();
   }
 };
