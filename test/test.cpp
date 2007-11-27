@@ -2,6 +2,8 @@
 #include <boost/test/unit_test.hpp>
 #include <ctime>
 #include <tseries.hpp>
+#include <vector/window.apply.hpp>
+#include <vector/mean.hpp>
 
 using namespace boost::unit_test_framework;
 using std::cout;
@@ -180,6 +182,23 @@ void assignment_test() {
 }
 
 
+void vector_window_apply_test() {
+  
+  // define our answer type
+  typedef meanTraits<double>::ReturnType ansType;
+
+  // gernate data
+  int N = 100;
+  double* x = new double[N];
+  ansType* ans = new ansType[N];
+  generate_n(x,N,rand);
+
+  windowApply<ansType,Mean>::apply(ans,x,x+N,20);
+
+  copy(ans, ans+N,
+       ostream_iterator<ansType>(cout, "\n")); 
+}
+
 void window_apply_test() {
   TSDIM xnr = 10;
   TSDIM xnc = 2;
@@ -210,6 +229,7 @@ init_unit_test_suite( int argc, char* argv[] ) {
   test->add( BOOST_TEST_CASE( &range_specifier_test ) );
   test->add( BOOST_TEST_CASE( &operators_test ) );
   test->add( BOOST_TEST_CASE( &assignment_test ) );
+  test->add( BOOST_TEST_CASE( &vector_window_apply_test ) );
   //test->add( BOOST_TEST_CASE( &window_apply_test ) );
   return test;
 }
