@@ -4,7 +4,7 @@
 #include "copyVector.hpp"
 
 template<class TDATE, class TDATA, template<class U, class V> class TSeries, class <template> T windowOpp>
-const TSeries<typename windowOpp<TDATA>::ReturnType ,TDATA> windowApply(const TSeries<TDATE,TDATA>& x, const int window) {
+const TSeries<TDATE, typename windowOpp<TDATA>::ReturnType> windowApply(const TSeries<TDATE,TDATA>& x, const int window) {
   
   // allocate new answer
   TSeries<typename windowOpp<TDATA>::ReturnType,TDATA> ans(x.nrow(), x.ncol());
