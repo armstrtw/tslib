@@ -1,7 +1,7 @@
 #ifndef WINDOW_APPLY_HPP
 #define WINDOW_APPLY_HPP
 
-#include "numeric.traits.hpp"
+#include "../utils/numeric.traits.hpp"
 
 template<typename ReturnType,
          template<class> class F>
