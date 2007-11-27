@@ -191,29 +191,35 @@ void vector_window_apply_test() {
   int N = 100;
   double* x = new double[N];
   ansType* ans = new ansType[N];
-  generate_n(x,N,rand);
+  // gernate data
+  for(TSDIM vi = 0; vi < N; vi++)
+    x[vi] = vi+1;
 
   windowApply<ansType,Mean>::apply(ans,x,x+N,20);
 
-  copy(ans, ans+N,
-       ostream_iterator<ansType>(cout, "\n")); 
+  BOOST_CHECK_EQUAL(ans[19],10.5);
 }
 
 void window_apply_test() {
-  TSDIM xnr = 10;
-  TSDIM xnc = 2;
+  // define our answer type
+  typedef meanTraits<double>::ReturnType ansType;
+
+  TSDIM xnr = 50;
+  TSDIM xnc = 5;
 
   TSeries<double,double> x(xnr,xnc);
 
+
   // gernate data
-  generate_n(x.getData(),x.nrow()*x.ncol(),rand);
+  for(TSDIM vi = 0; vi < x.nrow()*x.ncol(); vi++)
+    x.getData()[vi] = vi+1;
   
   // generate dates
   for(TSDIM xi = 0; xi < x.nrow(); xi++)
-    x.getDates()[xi] = xi;
+    x.getDates()[xi] = xi+1;
 
-  cout << x << endl;  
-  cout << x << endl;
+  TSeries<double,ansType> ans = x.window<Mean>(5);
+  BOOST_CHECK_EQUAL(ans.getData()[4],3);
 }
 
 
@@ -221,8 +227,6 @@ test_suite*
 init_unit_test_suite( int argc, char* argv[] ) {
   
   test_suite* test= BOOST_TEST_SUITE("tslib test");
-
-
   test->add( BOOST_TEST_CASE( &null_constructor_test ) );
   test->add( BOOST_TEST_CASE( &std_constructor_test ) );
   test->add( BOOST_TEST_CASE( &set_colnames_test ) );  
@@ -230,7 +234,7 @@ init_unit_test_suite( int argc, char* argv[] ) {
   test->add( BOOST_TEST_CASE( &operators_test ) );
   test->add( BOOST_TEST_CASE( &assignment_test ) );
   test->add( BOOST_TEST_CASE( &vector_window_apply_test ) );
-  //test->add( BOOST_TEST_CASE( &window_apply_test ) );
+  test->add( BOOST_TEST_CASE( &window_apply_test ) );
   return test;
 }
 
