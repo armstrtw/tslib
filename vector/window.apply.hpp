@@ -9,7 +9,6 @@ class windowApply {
 public:
   template<typename T, typename U>
   static void apply(T ans, U beg, U end, const int window) {
-    T marker = beg;
 
     // if window is bigger than len, return all NA
     if(static_cast<int>(distance(beg,end)) < window) {
@@ -22,15 +21,14 @@ public:
     }
 
     // set 1st (N-1) to NA
-    for(int i = 0; i < (window-1); i++, beg++, ans++) {
+    for(int i = 1; i < window; i++, beg++, ans++) {
       *ans = numeric_traits<ReturnType>::NA();
     }
 
     // apply fun to rest
     while(beg != end) {
-      *ans = F<ReturnType>::apply(marker,beg);
+      *ans = F<ReturnType>::apply(beg-(window-1),beg+1);
       ++beg;
-      ++marker;
       ++ans;
     }
   }
