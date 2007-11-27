@@ -1,7 +1,7 @@
 #ifndef TS_WINDOW_APPLY_HPP
 #define TS_WINDOW_APPLY_HPP
 
-#include "copyVector.hpp"
+#include "../utils/copyVector.hpp"
 
 template<class TDATE, class TDATA, template<class U, class V> class TSeries, class <template> T windowOpp>
 const TSeries<TDATE, typename windowOpp<TDATA>::ReturnType> windowApply(const TSeries<TDATE,TDATA>& x, const int window) {
