@@ -11,6 +11,7 @@
 #include "utils/copyVector.hpp"
 #include "ts.opps/ts.ts.opp.hpp"
 #include "ts.opps/ts.scalar.opp.hpp"
+#include "vector/window.apply.hpp"
 using namespace std;
 
 // pre-declare template friends
@@ -82,6 +83,30 @@ public:
 
 
   friend std::ostream& operator<< <> (std::ostream& os, const TSeries<TDATE,TDATA>& ts);
+
+
+  template<template <class> class F>
+  const TSeries<TDATE, TDATA> window(const int window) {
+
+    // allocate new answer
+    TSeries<TDATE,TDATA> ans(nrow(), ncol());
+
+    // copy over dates
+    copyVector(ans.getDates(),getDates(),nrow());
+
+    // set new colnames
+    ans.setColnames(getColnames());
+
+    TDATA* ans_data = ans.getData();
+    TDATA* data = getData();
+
+    for(TSDIM col = 0; col < ncol(); col++) {
+      windowApply<TDATA,F>::apply(ans_data,data, data + nrow(), window);
+      ans_data += ans.nrow();
+      data += nrow();
+    }
+    return ans;
+  }
 };
 
 template <typename TDATE, typename TDATA>
@@ -190,7 +215,7 @@ std::ostream& operator<< (std::ostream& os, const TSeries<TDATE,TDATA>& ts) {
   for(TSDIM row = 0; row < nr; row++) {
     os << dates[row] << "\t";
     for(TSDIM col = 0; col < nc; col++) {
-      os << data[row + col*nc] << " ";
+      os << data[row + col*nr] << " ";
     }
     os << std::endl;
   }
@@ -269,6 +294,5 @@ int TSeries<TDATE,TDATA>::setColnames(const vector<string>& cnames) {
     return EXIT_FAILURE;
   }
 }
-
 
 #endif // TSERIES_HPP
