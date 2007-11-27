@@ -9,8 +9,8 @@
 #include "tseries.data.hpp"
 #include "utils/rangeSpecifier.hpp"
 #include "utils/copyVector.hpp"
-#include "utils/ts.ts.opp.hpp"
-#include "utils/ts.scalar.opp.hpp"
+#include "ts.opps/ts.ts.opp.hpp"
+#include "ts.opps/ts.scalar.opp.hpp"
 using namespace std;
 
 // pre-declare template friends

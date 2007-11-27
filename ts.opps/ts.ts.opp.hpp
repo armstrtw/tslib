@@ -2,8 +2,8 @@
 #define TS_TS_OPP_HPP
 
 #include "../tseries.data.hpp"
-#include "rangeSpecifier.hpp"
-#include "copyVector.hpp"
+#include "../utils/rangeSpecifier.hpp"
+#include "../utils/copyVector.hpp"
 
 //template<template<TDATE,TDATA> class TSeries>
 //template<typename TDATE, typename TDATA, template<TDATE,TDATA> class TSeries>

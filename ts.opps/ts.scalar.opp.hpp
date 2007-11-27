@@ -2,7 +2,7 @@
 #define TS_SCALAR_OPP_HPP
 
 #include "../tseries.data.hpp"
-#include "copyVector.hpp"
+#include "../utils/copyVector.hpp"
 
 template<class TDATE, class TDATA, template<class U, class V> class TSeries, class opptype>
 const TSeries<TDATE,TDATA> apply_opp(const TDATA lhs_scalar, 
