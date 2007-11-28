@@ -63,6 +63,9 @@ public:
   TSeries<TDATE,TDATA>& operator=(const TSeries<TDATE,TDATA>& x);
   TSeries<TDATE,TDATA>& operator=(const TDATA x);
 
+  template<typename ReturnType, template <class> class F>
+  const TSeries<TDATE, ReturnType> window(const int window);
+
   // binary TS TS opps
   friend TSeries<TDATE,TDATA> operator+ <> (const TSeries<TDATE,TDATA>& lhs, const TSeries<TDATE,TDATA>& rhs);
   friend TSeries<TDATE,TDATA> operator- <> (const TSeries<TDATE,TDATA>& lhs, const TSeries<TDATE,TDATA>& rhs);
@@ -83,30 +86,6 @@ public:
 
 
   friend std::ostream& operator<< <> (std::ostream& os, const TSeries<TDATE,TDATA>& ts);
-
-
-  template<typename ReturnType, template <class> class F>
-  const TSeries<TDATE, ReturnType> window(const int window) {
-
-    // allocate new answer
-    TSeries<TDATE,ReturnType> ans(nrow(), ncol());
-
-    // copy over dates
-    copyVector(ans.getDates(),getDates(),nrow());
-
-    // set new colnames
-    ans.setColnames(getColnames());
-
-    TDATA* ans_data = ans.getData();
-    TDATA* data = getData();
-
-    for(TSDIM col = 0; col < ncol(); col++) {
-      windowApply<ReturnType,F>::apply(ans_data,data, data + nrow(), window);
-      ans_data += ans.nrow();
-      data += nrow();
-    }
-    return ans;
-  }
 };
 
 template <typename TDATE, typename TDATA>
@@ -294,5 +273,30 @@ int TSeries<TDATE,TDATA>::setColnames(const vector<string>& cnames) {
     return EXIT_FAILURE;
   }
 }
+
+template <typename TDATE,typename TDATA>
+template<typename ReturnType, template <class> class F>
+const TSeries<TDATE, ReturnType> TSeries<TDATE,TDATA>::window(const int window) {
+
+  // allocate new answer
+  TSeries<TDATE,ReturnType> ans(nrow(), ncol());
+
+  // copy over dates
+  copyVector(ans.getDates(),getDates(),nrow());
+
+  // set new colnames
+  ans.setColnames(getColnames());
+
+  TDATA* ans_data = ans.getData();
+  TDATA* data = getData();
+
+  for(TSDIM col = 0; col < ncol(); col++) {
+    windowApply<ReturnType,F>::apply(ans_data,data, data + nrow(), window);
+    ans_data += ans.nrow();
+    data += nrow();
+  }
+  return ans;
+}
+
 
 #endif // TSERIES_HPP
