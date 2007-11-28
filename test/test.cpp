@@ -218,7 +218,7 @@ void window_apply_test() {
   for(TSDIM xi = 0; xi < x.nrow(); xi++)
     x.getDates()[xi] = xi+1;
 
-  TSeries<double,ansType> ans = x.window<Mean>(5);
+  TSeries<double,ansType> ans = x.window<ansType,Mean>(5);
   BOOST_CHECK_EQUAL(ans.getData()[4],3);
 }
 

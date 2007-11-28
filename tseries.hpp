@@ -85,11 +85,11 @@ public:
   friend std::ostream& operator<< <> (std::ostream& os, const TSeries<TDATE,TDATA>& ts);
 
 
-  template<template <class> class F>
-  const TSeries<TDATE, TDATA> window(const int window) {
+  template<typename ReturnType, template <class> class F>
+  const TSeries<TDATE, ReturnType> window(const int window) {
 
     // allocate new answer
-    TSeries<TDATE,TDATA> ans(nrow(), ncol());
+    TSeries<TDATE,ReturnType> ans(nrow(), ncol());
 
     // copy over dates
     copyVector(ans.getDates(),getDates(),nrow());
@@ -101,7 +101,7 @@ public:
     TDATA* data = getData();
 
     for(TSDIM col = 0; col < ncol(); col++) {
-      windowApply<TDATA,F>::apply(ans_data,data, data + nrow(), window);
+      windowApply<ReturnType,F>::apply(ans_data,data, data + nrow(), window);
       ans_data += ans.nrow();
       data += nrow();
     }
