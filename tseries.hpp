@@ -12,6 +12,8 @@
 #include "ts.opps/ts.ts.opp.hpp"
 #include "ts.opps/ts.scalar.opp.hpp"
 #include "vector/window.apply.hpp"
+#include "vector/lag.hpp"
+#include "vector/lead.hpp"
 using namespace std;
 
 // pre-declare template friends
@@ -66,6 +68,8 @@ public:
   template<typename ReturnType, template <class> class F>
   const TSeries<TDATE, ReturnType> window(const int window);
 
+  const TSeries<TDATE, TDATA> operator() (const int n);
+
   // binary TS TS opps
   friend TSeries<TDATE,TDATA> operator+ <> (const TSeries<TDATE,TDATA>& lhs, const TSeries<TDATE,TDATA>& rhs);
   friend TSeries<TDATE,TDATA> operator- <> (const TSeries<TDATE,TDATA>& lhs, const TSeries<TDATE,TDATA>& rhs);
@@ -112,6 +116,41 @@ TSeries<TDATE,TDATA>& TSeries<TDATE,TDATA>::operator=(const TDATA rhs) {
   for(TSDIM i = 0; i < nrow()*ncol(); i++) {
     data[i] = rhs;
   }
+}
+
+template <typename TDATE, typename TDATA>
+const TSeries<TDATE, TDATA> TSeries<TDATE,TDATA>::operator() (const int n) {
+  if(n == 0) {
+    return *this;
+  }
+
+  // positive value is lag
+  // negative value is lead
+  TSeries<TDATE,TDATA> ans(nrow(), ncol());
+
+  // copy over dates
+  copyVector(ans.getDates(),getDates(),nrow());
+
+  // set new colnames
+  ans.setColnames(getColnames());
+
+  TDATA* ans_data = ans.getData();
+  TDATA* data = getData();
+
+  if(n > 0) {
+    for(TSDIM c = 0; c < ncol(); c++) {
+      lag(ans_data,data,data+nrow(),std::abs(n));
+      ans_data+=ans.nrow();
+      data+=nrow();
+    }
+  } else {
+    for(TSDIM c = 0; c < ncol(); c++) {
+      lead(ans_data,data,data+nrow(),std::abs(n));
+      ans_data+=ans.nrow();
+      data+=nrow();
+    }
+  }
+  return ans;
 }
 
 template <typename TDATE, typename TDATA>

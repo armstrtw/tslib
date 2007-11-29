@@ -209,7 +209,6 @@ void window_apply_test() {
 
   TSeries<double,double> x(xnr,xnc);
 
-
   // gernate data
   for(TSDIM vi = 0; vi < x.nrow()*x.ncol(); vi++)
     x.getData()[vi] = vi+1;
@@ -223,6 +222,26 @@ void window_apply_test() {
 }
 
 
+void lag_lead_test() {
+  
+  TSDIM xnr = 50;
+  TSDIM xnc = 5;
+
+  TSeries<double,double> x(xnr,xnc);
+
+  // gernate data
+  for(TSDIM vi = 0; vi < x.nrow()*x.ncol(); vi++)
+    x.getData()[vi] = vi+1;
+  
+  // generate dates
+  for(TSDIM xi = 0; xi < x.nrow(); xi++)
+    x.getDates()[xi] = xi+1;
+  
+  //TSeries<double,double> ans = x(1);
+  //TSeries<double,double> ans = x(-1);
+  cout << x(-2) << endl;
+}
+
 test_suite*
 init_unit_test_suite( int argc, char* argv[] ) {
   
@@ -235,6 +254,7 @@ init_unit_test_suite( int argc, char* argv[] ) {
   test->add( BOOST_TEST_CASE( &assignment_test ) );
   test->add( BOOST_TEST_CASE( &vector_window_apply_test ) );
   test->add( BOOST_TEST_CASE( &window_apply_test ) );
+  test->add( BOOST_TEST_CASE( &lag_lead_test ) );
   return test;
 }
 
