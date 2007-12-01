@@ -16,7 +16,7 @@ void null_constructor_test() {
   TSeries<double,double> x;
 
   // so we have the same type
-  TSDIM zero = 0;
+  long zero = 0;
   BOOST_CHECK_EQUAL( x.nrow(), zero );
   BOOST_CHECK_EQUAL( x.ncol(), zero );
   BOOST_CHECK_EQUAL( x.getData(), static_cast<double*>(NULL) );
@@ -25,9 +25,9 @@ void null_constructor_test() {
 }
 
 void std_constructor_test() {
-  TSDIM nr = 1000;
-  TSDIM nc = 10;
-  TSDIM zero = 0;
+  long nr = 1000;
+  long nc = 10;
+  long zero = 0;
 
   TSeries<double,double> x(nr,nc);
 
@@ -88,9 +88,9 @@ void range_specifier_test() {
 }
 
 void operators_test() {
-  TSDIM xnr = 100;
-  TSDIM ynr = 10;
-  TSDIM nc = 10;
+  long xnr = 100;
+  long ynr = 10;
+  long nc = 10;
 
   TSeries<double,double> x(xnr,nc);
   TSeries<double,double> y(ynr,nc);
@@ -100,11 +100,11 @@ void operators_test() {
   fill_n(y.getData(),y.nrow()*y.ncol(),5.0);
 
   // generate dates
-  for(TSDIM xi = 0; xi < x.nrow(); xi++)
+  for(long xi = 0; xi < x.nrow(); xi++)
     x.getDates()[xi] = xi;
 
   // generate dates
-  for(TSDIM yi = 0; yi < y.nrow(); yi++)
+  for(long yi = 0; yi < y.nrow(); yi++)
     y.getDates()[yi] = yi;
     
   TSeries<double,double> Zplus = x + y;
@@ -141,11 +141,11 @@ void operators_test() {
 }
 
 void assignment_test() {
-  TSDIM xnr = 10;
-  TSDIM xnc = 2;
+  long xnr = 10;
+  long xnc = 2;
 
-  TSDIM ynr = 100;
-  TSDIM ync = 50;
+  long ynr = 100;
+  long ync = 50;
 
   TSeries<double,double> x(xnr,xnc);
   TSeries<double,double> y(ynr,ync);
@@ -176,7 +176,7 @@ void assignment_test() {
   BOOST_CHECK_EQUAL(x.ncol(),xnc);
 
   // now all values of x shoud be == 100.0
-  for(TSDIM i = 0; i < x.nrow()*x.ncol(); i++) {
+  for(long i = 0; i < x.nrow()*x.ncol(); i++) {
     BOOST_CHECK_EQUAL(x.getData()[i],100);
   }
 }
@@ -192,7 +192,7 @@ void vector_window_apply_test() {
   double* x = new double[N];
   ansType* ans = new ansType[N];
   // gernate data
-  for(TSDIM vi = 0; vi < N; vi++)
+  for(long vi = 0; vi < N; vi++)
     x[vi] = vi+1;
 
   windowApply<ansType,Mean>::apply(ans,x,x+N,20);
@@ -204,17 +204,17 @@ void window_apply_test() {
   // define our answer type
   typedef meanTraits<double>::ReturnType ansType;
 
-  TSDIM xnr = 50;
-  TSDIM xnc = 5;
+  long xnr = 50;
+  long xnc = 5;
 
   TSeries<double,double> x(xnr,xnc);
 
   // gernate data
-  for(TSDIM vi = 0; vi < x.nrow()*x.ncol(); vi++)
+  for(long vi = 0; vi < x.nrow()*x.ncol(); vi++)
     x.getData()[vi] = vi+1;
   
   // generate dates
-  for(TSDIM xi = 0; xi < x.nrow(); xi++)
+  for(long xi = 0; xi < x.nrow(); xi++)
     x.getDates()[xi] = xi+1;
 
   TSeries<double,ansType> ans = x.window<ansType,Mean>(5);
@@ -224,17 +224,17 @@ void window_apply_test() {
 
 void lag_lead_test() {
   
-  TSDIM xnr = 50;
-  TSDIM xnc = 5;
+  long xnr = 50;
+  long xnc = 5;
 
   TSeries<double,double> x(xnr,xnc);
 
   // gernate data
-  for(TSDIM vi = 0; vi < x.nrow()*x.ncol(); vi++)
+  for(long vi = 0; vi < x.nrow()*x.ncol(); vi++)
     x.getData()[vi] = vi+1;
   
   // generate dates
-  for(TSDIM xi = 0; xi < x.nrow(); xi++)
+  for(long xi = 0; xi < x.nrow(); xi++)
     x.getDates()[xi] = xi+1;
   
   //TSeries<double,double> ans = x(1);

@@ -17,29 +17,29 @@
 using namespace std;
 
 // pre-declare template friends
-template<typename TDATE, typename TDATA> class TSeries;
-template<typename TDATE, typename TDATA> TSeries<TDATE,TDATA> operator+(const TSeries<TDATE,TDATA>& lhs, const TSeries<TDATE,TDATA>& rhs);
-template<typename TDATE, typename TDATA> TSeries<TDATE,TDATA> operator-(const TSeries<TDATE,TDATA>& lhs, const TSeries<TDATE,TDATA>& rhs);
-template<typename TDATE, typename TDATA> TSeries<TDATE,TDATA> operator*(const TSeries<TDATE,TDATA>& lhs, const TSeries<TDATE,TDATA>& rhs);
-template<typename TDATE, typename TDATA> TSeries<TDATE,TDATA> operator/(const TSeries<TDATE,TDATA>& lhs, const TSeries<TDATE,TDATA>& rhs);
+template<typename TDATE, typename TDATA, typename TSDIM> class TSeries;
+template<typename TDATE, typename TDATA, typename TSDIM> TSeries<TDATE,TDATA,TSDIM> operator+(const TSeries<TDATE,TDATA,TSDIM>& lhs, const TSeries<TDATE,TDATA,TSDIM>& rhs);
+template<typename TDATE, typename TDATA, typename TSDIM> TSeries<TDATE,TDATA,TSDIM> operator-(const TSeries<TDATE,TDATA,TSDIM>& lhs, const TSeries<TDATE,TDATA,TSDIM>& rhs);
+template<typename TDATE, typename TDATA, typename TSDIM> TSeries<TDATE,TDATA,TSDIM> operator*(const TSeries<TDATE,TDATA,TSDIM>& lhs, const TSeries<TDATE,TDATA,TSDIM>& rhs);
+template<typename TDATE, typename TDATA, typename TSDIM> TSeries<TDATE,TDATA,TSDIM> operator/(const TSeries<TDATE,TDATA,TSDIM>& lhs, const TSeries<TDATE,TDATA,TSDIM>& rhs);
 
-template<typename TDATE, typename TDATA> TSeries<TDATE,TDATA> operator+(const TDATA lhs, const TSeries<TDATE,TDATA>& rhs);
-template<typename TDATE, typename TDATA> TSeries<TDATE,TDATA> operator-(const TDATA lhs, const TSeries<TDATE,TDATA>& rhs);
-template<typename TDATE, typename TDATA> TSeries<TDATE,TDATA> operator*(const TDATA lhs, const TSeries<TDATE,TDATA>& rhs);
-template<typename TDATE, typename TDATA> TSeries<TDATE,TDATA> operator/(const TDATA lhs, const TSeries<TDATE,TDATA>& rhs);
+template<typename TDATE, typename TDATA, typename TSDIM> TSeries<TDATE,TDATA,TSDIM> operator+(const TDATA lhs, const TSeries<TDATE,TDATA,TSDIM>& rhs);
+template<typename TDATE, typename TDATA, typename TSDIM> TSeries<TDATE,TDATA,TSDIM> operator-(const TDATA lhs, const TSeries<TDATE,TDATA,TSDIM>& rhs);
+template<typename TDATE, typename TDATA, typename TSDIM> TSeries<TDATE,TDATA,TSDIM> operator*(const TDATA lhs, const TSeries<TDATE,TDATA,TSDIM>& rhs);
+template<typename TDATE, typename TDATA, typename TSDIM> TSeries<TDATE,TDATA,TSDIM> operator/(const TDATA lhs, const TSeries<TDATE,TDATA,TSDIM>& rhs);
 
-template<typename TDATE, typename TDATA> TSeries<TDATE,TDATA> operator+(const TSeries<TDATE,TDATA>& lhs, const TDATA rhs);
-template<typename TDATE, typename TDATA> TSeries<TDATE,TDATA> operator-(const TSeries<TDATE,TDATA>& lhs, const TDATA rhs);
-template<typename TDATE, typename TDATA> TSeries<TDATE,TDATA> operator*(const TSeries<TDATE,TDATA>& lhs, const TDATA rhs);
-template<typename TDATE, typename TDATA> TSeries<TDATE,TDATA> operator/(const TSeries<TDATE,TDATA>& lhs, const TDATA rhs);
+template<typename TDATE, typename TDATA, typename TSDIM> TSeries<TDATE,TDATA,TSDIM> operator+(const TSeries<TDATE,TDATA,TSDIM>& lhs, const TDATA rhs);
+template<typename TDATE, typename TDATA, typename TSDIM> TSeries<TDATE,TDATA,TSDIM> operator-(const TSeries<TDATE,TDATA,TSDIM>& lhs, const TDATA rhs);
+template<typename TDATE, typename TDATA, typename TSDIM> TSeries<TDATE,TDATA,TSDIM> operator*(const TSeries<TDATE,TDATA,TSDIM>& lhs, const TDATA rhs);
+template<typename TDATE, typename TDATA, typename TSDIM> TSeries<TDATE,TDATA,TSDIM> operator/(const TSeries<TDATE,TDATA,TSDIM>& lhs, const TDATA rhs);
 
 
-template<typename TDATE, typename TDATA> std::ostream& operator<<(std::ostream& os, const TSeries<TDATE,TDATA>& ts);
+template<typename TDATE, typename TDATA, typename TSDIM> std::ostream& operator<<(std::ostream& os, const TSeries<TDATE,TDATA,TSDIM>& ts);
 
-template <typename TDATE,typename TDATA>
+template <typename TDATE, typename TDATA, typename TSDIM = long>
 class TSeries {
 private:
-  TSdata<TDATE,TDATA>* tsdata_;
+  TSdata<TDATE,TDATA,TSDIM>* tsdata_;
 
 public:
   // ctors dtors
@@ -49,7 +49,7 @@ public:
   TSeries(const TSeries& T);
 
   // copy an object
-  TSeries<TDATE,TDATA> copy() const;
+  TSeries<TDATE,TDATA,TSDIM> copy() const;
 
   // accessors
   vector<string> getColnames() const;
@@ -62,8 +62,8 @@ public:
   int setColnames(const vector<string>& cnames);
   
   //operators
-  TSeries<TDATE,TDATA>& operator=(const TSeries<TDATE,TDATA>& x);
-  TSeries<TDATE,TDATA>& operator=(const TDATA x);
+  TSeries<TDATE,TDATA,TSDIM>& operator=(const TSeries<TDATE,TDATA,TSDIM>& x);
+  TSeries<TDATE,TDATA,TSDIM>& operator=(const TDATA x);
 
   template<typename ReturnType, template <class> class F>
   const TSeries<TDATE, ReturnType> window(const int window);
@@ -71,29 +71,29 @@ public:
   const TSeries<TDATE, TDATA> operator() (const int n);
 
   // binary TS TS opps
-  friend TSeries<TDATE,TDATA> operator+ <> (const TSeries<TDATE,TDATA>& lhs, const TSeries<TDATE,TDATA>& rhs);
-  friend TSeries<TDATE,TDATA> operator- <> (const TSeries<TDATE,TDATA>& lhs, const TSeries<TDATE,TDATA>& rhs);
-  friend TSeries<TDATE,TDATA> operator* <> (const TSeries<TDATE,TDATA>& lhs, const TSeries<TDATE,TDATA>& rhs);
-  friend TSeries<TDATE,TDATA> operator/ <> (const TSeries<TDATE,TDATA>& lhs, const TSeries<TDATE,TDATA>& rhs);
+  friend TSeries<TDATE,TDATA,TSDIM> operator+ <> (const TSeries<TDATE,TDATA,TSDIM>& lhs, const TSeries<TDATE,TDATA,TSDIM>& rhs);
+  friend TSeries<TDATE,TDATA,TSDIM> operator- <> (const TSeries<TDATE,TDATA,TSDIM>& lhs, const TSeries<TDATE,TDATA,TSDIM>& rhs);
+  friend TSeries<TDATE,TDATA,TSDIM> operator* <> (const TSeries<TDATE,TDATA,TSDIM>& lhs, const TSeries<TDATE,TDATA,TSDIM>& rhs);
+  friend TSeries<TDATE,TDATA,TSDIM> operator/ <> (const TSeries<TDATE,TDATA,TSDIM>& lhs, const TSeries<TDATE,TDATA,TSDIM>& rhs);
 
   // binary TDATA TS opps
-  friend TSeries<TDATE,TDATA> operator+ <> (const TDATA lhs, const TSeries<TDATE,TDATA>& rhs);
-  friend TSeries<TDATE,TDATA> operator- <> (const TDATA lhs, const TSeries<TDATE,TDATA>& rhs);
-  friend TSeries<TDATE,TDATA> operator* <> (const TDATA lhs, const TSeries<TDATE,TDATA>& rhs);
-  friend TSeries<TDATE,TDATA> operator/ <> (const TDATA lhs, const TSeries<TDATE,TDATA>& rhs);
+  friend TSeries<TDATE,TDATA,TSDIM> operator+ <> (const TDATA lhs, const TSeries<TDATE,TDATA,TSDIM>& rhs);
+  friend TSeries<TDATE,TDATA,TSDIM> operator- <> (const TDATA lhs, const TSeries<TDATE,TDATA,TSDIM>& rhs);
+  friend TSeries<TDATE,TDATA,TSDIM> operator* <> (const TDATA lhs, const TSeries<TDATE,TDATA,TSDIM>& rhs);
+  friend TSeries<TDATE,TDATA,TSDIM> operator/ <> (const TDATA lhs, const TSeries<TDATE,TDATA,TSDIM>& rhs);
 
   // binary TS TDATA opps
-  friend TSeries<TDATE,TDATA> operator+ <> (const TSeries<TDATE,TDATA>& lhs, const TDATA rhs);
-  friend TSeries<TDATE,TDATA> operator- <> (const TSeries<TDATE,TDATA>& lhs, const TDATA rhs);
-  friend TSeries<TDATE,TDATA> operator* <> (const TSeries<TDATE,TDATA>& lhs, const TDATA rhs);
-  friend TSeries<TDATE,TDATA> operator/ <> (const TSeries<TDATE,TDATA>& lhs, const TDATA rhs);
+  friend TSeries<TDATE,TDATA,TSDIM> operator+ <> (const TSeries<TDATE,TDATA,TSDIM>& lhs, const TDATA rhs);
+  friend TSeries<TDATE,TDATA,TSDIM> operator- <> (const TSeries<TDATE,TDATA,TSDIM>& lhs, const TDATA rhs);
+  friend TSeries<TDATE,TDATA,TSDIM> operator* <> (const TSeries<TDATE,TDATA,TSDIM>& lhs, const TDATA rhs);
+  friend TSeries<TDATE,TDATA,TSDIM> operator/ <> (const TSeries<TDATE,TDATA,TSDIM>& lhs, const TDATA rhs);
 
 
-  friend std::ostream& operator<< <> (std::ostream& os, const TSeries<TDATE,TDATA>& ts);
+  friend std::ostream& operator<< <> (std::ostream& os, const TSeries<TDATE,TDATA,TSDIM>& ts);
 };
 
-template <typename TDATE, typename TDATA>
-TSeries<TDATE,TDATA>& TSeries<TDATE,TDATA>::operator=(const TSeries<TDATE,TDATA>& rhs) {
+template <typename TDATE, typename TDATA, typename TSDIM>
+TSeries<TDATE,TDATA,TSDIM>& TSeries<TDATE,TDATA,TSDIM>::operator=(const TSeries<TDATE,TDATA,TSDIM>& rhs) {
 
   // self assignment
   if(tsdata_ == rhs.tsdata_) {
@@ -110,23 +110,23 @@ TSeries<TDATE,TDATA>& TSeries<TDATE,TDATA>::operator=(const TSeries<TDATE,TDATA>
   return *this;
 }
 
-template <typename TDATE, typename TDATA>
-TSeries<TDATE,TDATA>& TSeries<TDATE,TDATA>::operator=(const TDATA rhs) {
+template <typename TDATE, typename TDATA, typename TSDIM>
+TSeries<TDATE,TDATA,TSDIM>& TSeries<TDATE,TDATA,TSDIM>::operator=(const TDATA rhs) {
   TDATA* data = getData();
   for(TSDIM i = 0; i < nrow()*ncol(); i++) {
     data[i] = rhs;
   }
 }
 
-template <typename TDATE, typename TDATA>
-const TSeries<TDATE, TDATA> TSeries<TDATE,TDATA>::operator() (const int n) {
+template <typename TDATE, typename TDATA, typename TSDIM>
+const TSeries<TDATE, TDATA> TSeries<TDATE,TDATA,TSDIM>::operator() (const int n) {
   if(n == 0) {
     return *this;
   }
 
   // positive value is lag
   // negative value is lead
-  TSeries<TDATE,TDATA> ans(nrow(), ncol());
+  TSeries<TDATE,TDATA,TSDIM> ans(nrow(), ncol());
 
   // copy over dates
   copyVector(ans.getDates(),getDates(),nrow());
@@ -153,68 +153,68 @@ const TSeries<TDATE, TDATA> TSeries<TDATE,TDATA>::operator() (const int n) {
   return ans;
 }
 
-template <typename TDATE, typename TDATA>
-TSeries<TDATE,TDATA> operator+(const TSeries<TDATE,TDATA>& lhs, const TSeries<TDATE,TDATA>& rhs) {
+template <typename TDATE, typename TDATA, typename TSDIM>
+TSeries<TDATE,TDATA,TSDIM> operator+(const TSeries<TDATE,TDATA,TSDIM>& lhs, const TSeries<TDATE,TDATA,TSDIM>& rhs) {
   return apply_opp(lhs,rhs,plus<TDATA>());
 }
 
-template <typename TDATE, typename TDATA>
-TSeries<TDATE,TDATA> operator-(const TSeries<TDATE,TDATA>& lhs, const TSeries<TDATE,TDATA>& rhs) {
+template <typename TDATE, typename TDATA, typename TSDIM>
+TSeries<TDATE,TDATA,TSDIM> operator-(const TSeries<TDATE,TDATA,TSDIM>& lhs, const TSeries<TDATE,TDATA,TSDIM>& rhs) {
   return apply_opp(lhs,rhs,minus<TDATA>());
 }
 
-template <typename TDATE, typename TDATA>
-TSeries<TDATE,TDATA> operator*(const TSeries<TDATE,TDATA>& lhs, const TSeries<TDATE,TDATA>& rhs) {
+template <typename TDATE, typename TDATA, typename TSDIM>
+TSeries<TDATE,TDATA,TSDIM> operator*(const TSeries<TDATE,TDATA,TSDIM>& lhs, const TSeries<TDATE,TDATA,TSDIM>& rhs) {
   return apply_opp(lhs,rhs,multiplies<TDATA>());
 }
 
-template <typename TDATE, typename TDATA>
-TSeries<TDATE,TDATA> operator/(const TSeries<TDATE,TDATA>& lhs, const TSeries<TDATE,TDATA>& rhs) {
+template <typename TDATE, typename TDATA, typename TSDIM>
+TSeries<TDATE,TDATA,TSDIM> operator/(const TSeries<TDATE,TDATA,TSDIM>& lhs, const TSeries<TDATE,TDATA,TSDIM>& rhs) {
   return apply_opp(lhs,rhs,divides<TDATA>());
 }
 
-template <typename TDATE, typename TDATA>
-TSeries<TDATE,TDATA> operator+(const TDATA lhs, const TSeries<TDATE,TDATA>& rhs) {
+template <typename TDATE, typename TDATA, typename TSDIM>
+TSeries<TDATE,TDATA,TSDIM> operator+(const TDATA lhs, const TSeries<TDATE,TDATA,TSDIM>& rhs) {
   return apply_opp(lhs,rhs,plus<TDATA>());
 }
 
-template <typename TDATE, typename TDATA>
-TSeries<TDATE,TDATA> operator-(const TDATA lhs, const TSeries<TDATE,TDATA>& rhs) {
+template <typename TDATE, typename TDATA, typename TSDIM>
+TSeries<TDATE,TDATA,TSDIM> operator-(const TDATA lhs, const TSeries<TDATE,TDATA,TSDIM>& rhs) {
   return apply_opp(lhs,rhs,minus<TDATA>());
 }
 
-template <typename TDATE, typename TDATA>
-TSeries<TDATE,TDATA> operator*(const TDATA lhs, const TSeries<TDATE,TDATA>& rhs) {
+template <typename TDATE, typename TDATA, typename TSDIM>
+TSeries<TDATE,TDATA,TSDIM> operator*(const TDATA lhs, const TSeries<TDATE,TDATA,TSDIM>& rhs) {
   return apply_opp(lhs,rhs,multiplies<TDATA>());
 }
 
-template <typename TDATE, typename TDATA>
-TSeries<TDATE,TDATA> operator/(const TDATA lhs, const TSeries<TDATE,TDATA>& rhs) {
+template <typename TDATE, typename TDATA, typename TSDIM>
+TSeries<TDATE,TDATA,TSDIM> operator/(const TDATA lhs, const TSeries<TDATE,TDATA,TSDIM>& rhs) {
   return apply_opp(lhs,rhs,divides<TDATA>());
 }
 
-template <typename TDATE, typename TDATA>
-TSeries<TDATE,TDATA> operator+(const TSeries<TDATE,TDATA>& lhs, const TDATA rhs) {
+template <typename TDATE, typename TDATA, typename TSDIM>
+TSeries<TDATE,TDATA,TSDIM> operator+(const TSeries<TDATE,TDATA,TSDIM>& lhs, const TDATA rhs) {
   return apply_opp(lhs,rhs,plus<TDATA>());
 }
 
-template <typename TDATE, typename TDATA>
-TSeries<TDATE,TDATA> operator-(const TSeries<TDATE,TDATA>& lhs, const TDATA rhs) {
+template <typename TDATE, typename TDATA, typename TSDIM>
+TSeries<TDATE,TDATA,TSDIM> operator-(const TSeries<TDATE,TDATA,TSDIM>& lhs, const TDATA rhs) {
   return apply_opp(lhs,rhs,minus<TDATA>());
 }
 
-template <typename TDATE, typename TDATA>
-TSeries<TDATE,TDATA> operator*(const TSeries<TDATE,TDATA>& lhs, const TDATA rhs) {
+template <typename TDATE, typename TDATA, typename TSDIM>
+TSeries<TDATE,TDATA,TSDIM> operator*(const TSeries<TDATE,TDATA,TSDIM>& lhs, const TDATA rhs) {
   return apply_opp(lhs,rhs,multiplies<TDATA>());
 }
 
-template <typename TDATE, typename TDATA>
-TSeries<TDATE,TDATA> operator/(const TSeries<TDATE,TDATA>& lhs, const TDATA rhs) {
+template <typename TDATE, typename TDATA, typename TSDIM>
+TSeries<TDATE,TDATA,TSDIM> operator/(const TSeries<TDATE,TDATA,TSDIM>& lhs, const TDATA rhs) {
   return apply_opp(lhs,rhs,divides<TDATA>());
 }
 
-template <typename TDATE, typename TDATA>
-std::ostream& operator<< (std::ostream& os, const TSeries<TDATE,TDATA>& ts) {
+template <typename TDATE, typename TDATA, typename TSDIM>
+std::ostream& operator<< (std::ostream& os, const TSeries<TDATE,TDATA,TSDIM>& ts) {
   vector<string> cnames(ts.getColnames());
   
   if(cnames.size()) {
@@ -240,29 +240,29 @@ std::ostream& operator<< (std::ostream& os, const TSeries<TDATE,TDATA>& ts) {
   return os;
 }
 
-template <typename TDATE,typename TDATA>
-TSeries<TDATE,TDATA>::~TSeries() {
+template <typename TDATE, typename TDATA, typename TSDIM>
+TSeries<TDATE,TDATA,TSDIM>::~TSeries() {
   tsdata_->detach();
 }
 
-template <typename TDATE,typename TDATA>
-TSeries<TDATE,TDATA>::TSeries() {
+template <typename TDATE, typename TDATA, typename TSDIM>
+TSeries<TDATE,TDATA,TSDIM>::TSeries() {
   tsdata_ = TSdata<TDATE,TDATA>::init();
 }
 
-template <typename TDATE,typename TDATA>
-TSeries<TDATE,TDATA>::TSeries(const TSDIM rows, const TSDIM cols) {
+template <typename TDATE, typename TDATA, typename TSDIM>
+TSeries<TDATE,TDATA,TSDIM>::TSeries(const TSDIM rows, const TSDIM cols) {
   tsdata_ = TSdata<TDATA,TDATA>::init(rows,cols);
 }
 
-template <typename TDATE,typename TDATA>
-TSeries<TDATE,TDATA>::TSeries(const TSeries& T) {
+template <typename TDATE, typename TDATA, typename TSDIM>
+TSeries<TDATE,TDATA,TSDIM>::TSeries(const TSeries& T) {
   tsdata_ = T.tsdata_;
   tsdata_->attach();
 }
 
-template <typename TDATE,typename TDATA>
-TSeries<TDATE,TDATA> TSeries<TDATE,TDATA>::copy() const {
+template <typename TDATE, typename TDATA, typename TSDIM>
+TSeries<TDATE,TDATA,TSDIM> TSeries<TDATE,TDATA,TSDIM>::copy() const {
   TSeries ans(nrow(),ncol());
   ans.setColnames(getColnames());
 
@@ -272,39 +272,39 @@ TSeries<TDATE,TDATA> TSeries<TDATE,TDATA>::copy() const {
   return ans;
 }
 
-template <typename TDATE,typename TDATA>
+template <typename TDATE, typename TDATA, typename TSDIM>
 inline
-TDATE* TSeries<TDATE,TDATA>::getDates() const {
+TDATE* TSeries<TDATE,TDATA,TSDIM>::getDates() const {
   return tsdata_->getDates();
 }
 
-template <typename TDATE,typename TDATA>
+template <typename TDATE, typename TDATA, typename TSDIM>
 inline
-TDATA* TSeries<TDATE,TDATA>::getData() const {
+TDATA* TSeries<TDATE,TDATA,TSDIM>::getData() const {
   return tsdata_->getData();
 }
 
 
-template <typename TDATE,typename TDATA>
+template <typename TDATE, typename TDATA, typename TSDIM>
 inline
-const TSDIM TSeries<TDATE,TDATA>::nrow() const {
+const TSDIM TSeries<TDATE,TDATA,TSDIM>::nrow() const {
   return tsdata_->nrow();
 }
 
-template <typename TDATE,typename TDATA>
+template <typename TDATE, typename TDATA, typename TSDIM>
 inline
-const TSDIM TSeries<TDATE,TDATA>::ncol() const {
+const TSDIM TSeries<TDATE,TDATA,TSDIM>::ncol() const {
   return tsdata_->ncol();
 }
 
-template <typename TDATE,typename TDATA>
+template <typename TDATE, typename TDATA, typename TSDIM>
 inline
-vector<string> TSeries<TDATE,TDATA>::getColnames() const {
+vector<string> TSeries<TDATE,TDATA,TSDIM>::getColnames() const {
   return tsdata_->getColnames();
 }
 
-template <typename TDATE,typename TDATA>
-int TSeries<TDATE,TDATA>::setColnames(const vector<string>& cnames) {
+template <typename TDATE, typename TDATA, typename TSDIM>
+int TSeries<TDATE,TDATA,TSDIM>::setColnames(const vector<string>& cnames) {
   if(cnames.size() == ncol()) {
     tsdata_->setColnames(cnames);
     return EXIT_SUCCESS;
@@ -313,9 +313,9 @@ int TSeries<TDATE,TDATA>::setColnames(const vector<string>& cnames) {
   }
 }
 
-template <typename TDATE,typename TDATA>
+template <typename TDATE, typename TDATA, typename TSDIM>
 template<typename ReturnType, template <class> class F>
-const TSeries<TDATE, ReturnType> TSeries<TDATE,TDATA>::window(const int window) {
+const TSeries<TDATE, ReturnType> TSeries<TDATE,TDATA,TSDIM>::window(const int window) {
 
   // allocate new answer
   TSeries<TDATE,ReturnType> ans(nrow(), ncol());

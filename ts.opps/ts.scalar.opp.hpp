@@ -4,13 +4,13 @@
 #include "../tseries.data.hpp"
 #include "../utils/copyVector.hpp"
 
-template<class TDATE, class TDATA, template<class U, class V> class TSeries, class opptype>
-const TSeries<TDATE,TDATA> apply_opp(const TDATA lhs_scalar, 
-                                     const TSeries<TDATE,TDATA>& rhs_TSeries, 
-                                     opptype opp) {
+template<class TDATE, class TDATA, class TSDIM, template<class U, class V, class W> class TSeries, class opptype>
+const TSeries<TDATE,TDATA,TSDIM> apply_opp(const TDATA lhs_scalar, 
+                                           const TSeries<TDATE,TDATA,TSDIM>& rhs_TSeries, 
+                                           opptype opp) {
 
   // allocate new answer
-  TSeries<TDATE,TDATA> ans(rhs_TSeries.nrow(),rhs_TSeries.ncol());
+  TSeries<TDATE,TDATA,TSDIM> ans(rhs_TSeries.nrow(),rhs_TSeries.ncol());
 
   // copy over dates
   copyVector(ans.getDates(),rhs_TSeries.getDates(),rhs_TSeries.nrow());
@@ -24,13 +24,13 @@ const TSeries<TDATE,TDATA> apply_opp(const TDATA lhs_scalar,
 }
 
 
-template<class TDATE, class TDATA, template<class U, class V> class TSeries, class opptype>
-const TSeries<TDATE,TDATA> apply_opp(const TSeries<TDATE,TDATA>& lhs_TSeries,
+template<class TDATE, class TDATA, class TSDIM, template<class U, class V, class W> class TSeries, class opptype>
+const TSeries<TDATE,TDATA,TSDIM> apply_opp(const TSeries<TDATE,TDATA,TSDIM>& lhs_TSeries,
                                      const TDATA rhs_scalar,
                                      opptype opp) {
 
   // allocate new answer
-  TSeries<TDATE,TDATA> ans(lhs_TSeries.nrow(),lhs_TSeries.ncol());
+  TSeries<TDATE,TDATA,TSDIM> ans(lhs_TSeries.nrow(),lhs_TSeries.ncol());
 
   // copy over dates
   copyVector(ans.getDates(),lhs_TSeries.getDates(),lhs_TSeries.nrow());

@@ -10,22 +10,22 @@
 //template<template<class TDATE, class TDATA> class TSeries>
 //template<typename opptype>
 
-template<class TDATE, class TDATA, template<class U, class V> class TSeries, class opptype>
-const TSeries<TDATE,TDATA> apply_opp(const TSeries<TDATE,TDATA>& lhs, 
-                                     const TSeries<TDATE,TDATA>& rhs, 
+template<class TDATE, class TDATA, class TSDIM, template<class U, class V, class W> class TSeries, class opptype>
+const TSeries<TDATE,TDATA,TSDIM> apply_opp(const TSeries<TDATE,TDATA,TSDIM>& lhs, 
+                                     const TSeries<TDATE,TDATA,TSDIM>& rhs, 
                                      opptype opp) {
 
   if(lhs.ncol() != rhs.ncol())
-    return TSeries<TDATE,TDATA>();
+    return TSeries<TDATE,TDATA,TSDIM>();
   
   // find date intersection
   RangeSpecifier<TDATE,TSDIM> range(lhs.getDates(), rhs.getDates(), lhs.nrow(), rhs.nrow() );
 
   if(!range.getSize())
-    return TSeries<TDATE,TDATA>();
+    return TSeries<TDATE,TDATA,TSDIM>();
 
   // allocate new answer
-  TSeries<TDATE,TDATA> ans(range.getSize(),lhs.ncol());
+  TSeries<TDATE,TDATA,TSDIM> ans(range.getSize(),lhs.ncol());
 
   // copy over dates
   copyVector(ans.getDates(),range.getDates(),range.getSize());

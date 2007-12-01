@@ -7,9 +7,7 @@
 using std::vector;
 using std::string;
 
-typedef long TSDIM;
-
-template <typename TDATE,typename TDATA>
+template <typename TDATE,typename TDATA, typename TSDIM = long>
 class TSdata {
 private:
   int refcount_;
@@ -59,16 +57,16 @@ public:
 };
 
 
-template <typename TDATE,typename TDATA>
-TSdata<TDATE,TDATA>::~TSdata() {
+template <typename TDATE,typename TDATA, typename TSDIM>
+TSdata<TDATE,TDATA,TSDIM>::~TSdata() {
   if(release_data_) {
     delete []dates_;
     delete []data_;
   }
 }
 
-template <typename TDATE,typename TDATA>
-TSdata<TDATE,TDATA>::TSdata() {
+template <typename TDATE,typename TDATA, typename TSDIM>
+TSdata<TDATE,TDATA,TSDIM>::TSdata() {
   refcount_ = 1;
   release_data_ = true;
   rows_ = 0;
@@ -77,8 +75,8 @@ TSdata<TDATE,TDATA>::TSdata() {
   data_ = NULL;
 }
 
-template <typename TDATE,typename TDATA>
-TSdata<TDATE,TDATA>::TSdata(const TSDIM rows, const TSDIM cols) {
+template <typename TDATE,typename TDATA, typename TSDIM>
+TSdata<TDATE,TDATA,TSDIM>::TSdata(const TSDIM rows, const TSDIM cols) {
   refcount_ = 1;
   release_data_ = true;
   rows_ = rows;
@@ -98,8 +96,8 @@ TSdata<TDATE,TDATA>::TSdata(const TSDIM rows, const TSDIM cols) {
   }
 }
 
-template <typename TDATE,typename TDATA>
-TSdata<TDATE,TDATA>::TSdata(TDATA* external_data,
+template <typename TDATE,typename TDATA, typename TSDIM>
+TSdata<TDATE,TDATA,TSDIM>::TSdata(TDATA* external_data,
                             TDATE* external_dates,
                             const TSDIM nrows,
                             const TSDIM ncols,
@@ -124,18 +122,18 @@ TSdata<TDATE,TDATA>::TSdata(TDATA* external_data,
 }
 
 
-template <typename TDATE,typename TDATA>
-TSdata<TDATE,TDATA>* TSdata<TDATE,TDATA>::init() {
+template <typename TDATE,typename TDATA, typename TSDIM>
+TSdata<TDATE,TDATA,TSDIM>* TSdata<TDATE,TDATA,TSDIM>::init() {
   return new TSdata();
 }
 
-template <typename TDATE,typename TDATA>
-TSdata<TDATE,TDATA>* TSdata<TDATE,TDATA>::init(const TSDIM rows, const TSDIM cols) {
+template <typename TDATE,typename TDATA, typename TSDIM>
+TSdata<TDATE,TDATA,TSDIM>* TSdata<TDATE,TDATA,TSDIM>::init(const TSDIM rows, const TSDIM cols) {
   return new TSdata(rows, cols);
 }
 
-template <typename TDATE,typename TDATA>
-TSdata<TDATE,TDATA>* TSdata<TDATE,TDATA>::init(TDATA* external_data,
+template <typename TDATE,typename TDATA, typename TSDIM>
+TSdata<TDATE,TDATA,TSDIM>* TSdata<TDATE,TDATA,TSDIM>::init(TDATA* external_data,
                                                TDATE* external_dates,
                                                const TSDIM nrows,
                                                const TSDIM ncols,
@@ -148,14 +146,14 @@ TSdata<TDATE,TDATA>* TSdata<TDATE,TDATA>::init(TDATA* external_data,
                     release);
 }
 
-template <typename TDATE,typename TDATA>
-void TSdata<TDATE,TDATA>::attach() {
+template <typename TDATE,typename TDATA, typename TSDIM>
+void TSdata<TDATE,TDATA,TSDIM>::attach() {
   ++refcount_;
   //cout << "attach, new refcount_: " << refcount_ << endl;
 }
 
-template <typename TDATE,typename TDATA>
-void TSdata<TDATE,TDATA>::detach() {
+template <typename TDATE,typename TDATA, typename TSDIM>
+void TSdata<TDATE,TDATA,TSDIM>::detach() {
   refcount_--;
   //cout << "detach, refcount_: " << refcount_ << endl;
   if(refcount_ == 0) {
@@ -163,44 +161,44 @@ void TSdata<TDATE,TDATA>::detach() {
   }
 }
 
-template <typename TDATE,typename TDATA>
-void TSdata<TDATE,TDATA>::setColnames(const vector<string>& cnames) {
+template <typename TDATE,typename TDATA, typename TSDIM>
+void TSdata<TDATE,TDATA,TSDIM>::setColnames(const vector<string>& cnames) {
   colnames_ = cnames;
 }
 
-template <typename TDATE,typename TDATA>
+template <typename TDATE,typename TDATA, typename TSDIM>
 inline
-vector<string> TSdata<TDATE,TDATA>::getColnames() const {
+vector<string> TSdata<TDATE,TDATA,TSDIM>::getColnames() const {
   return colnames_;
 }
 
-template <typename TDATE,typename TDATA>
+template <typename TDATE,typename TDATA, typename TSDIM>
 inline
-const size_t TSdata<TDATE,TDATA>::getColnamesSize() const {
+const size_t TSdata<TDATE,TDATA,TSDIM>::getColnamesSize() const {
   return colnames_.size();
 }
 
-template <typename TDATE,typename TDATA>
+template <typename TDATE,typename TDATA, typename TSDIM>
 inline
-TDATA* TSdata<TDATE,TDATA>::getData() const {
+TDATA* TSdata<TDATE,TDATA,TSDIM>::getData() const {
   return data_;
 }
 
-template <typename TDATE,typename TDATA>
+template <typename TDATE,typename TDATA, typename TSDIM>
 inline
-TDATE* TSdata<TDATE,TDATA>::getDates() const {
+TDATE* TSdata<TDATE,TDATA,TSDIM>::getDates() const {
   return dates_;
 }
 
-template <typename TDATE,typename TDATA>
+template <typename TDATE,typename TDATA, typename TSDIM>
 inline
-TSDIM TSdata<TDATE,TDATA>::nrow() const {
+TSDIM TSdata<TDATE,TDATA,TSDIM>::nrow() const {
   return rows_;
 }
 
-template <typename TDATE,typename TDATA>
+template <typename TDATE,typename TDATA, typename TSDIM>
 inline
-TSDIM TSdata<TDATE,TDATA>::ncol() const {
+TSDIM TSdata<TDATE,TDATA,TSDIM>::ncol() const {
   return cols_;
 }
 
