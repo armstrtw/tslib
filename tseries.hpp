@@ -102,9 +102,9 @@ public:
   TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND>& operator=(const TDATA x);
 
   template<typename ReturnType, template <class> class F>
-  const TSeries<TDATE, ReturnType> window(const int window);
+  const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND> window(const int window);
 
-  const TSeries<TDATE, TDATA> operator() (const int n);
+  const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND> operator() (const int n);
 
   // binary TS TS opps
   friend TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND> operator+ <> (const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND>& lhs, const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND>& rhs);
@@ -155,7 +155,7 @@ TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND>& TSeries<TDATE,TDATA,TSDIM,TSDATABACKEN
 }
 
 template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND>
-const TSeries<TDATE, TDATA> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND>::operator() (const int n) {
+const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND>::operator() (const int n) {
   if(n == 0) {
     return *this;
   }
@@ -353,7 +353,7 @@ int TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND>::setColnames(const vector<string>& 
 // which may differ from the instantiated template which is calling this function
 template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND>
 template<typename ReturnType, template<class> class F>
-const TSeries<TDATE, ReturnType> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND>::window(const int window) {
+const TSeries<TDATE, ReturnType, TSDIM, TSDATABACKEND> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND>::window(const int window) {
 
   // allocate new answer
   TSeries<TDATE,ReturnType> ans(nrow(), ncol());
