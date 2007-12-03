@@ -18,23 +18,59 @@ using namespace std;
 
 // pre-declare template friends
 template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND> class TSeries;
-template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND> operator+(const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND>& lhs, const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND>& rhs);
-template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND> operator-(const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND>& lhs, const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND>& rhs);
-template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND> operator*(const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND>& lhs, const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND>& rhs);
-template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND> operator/(const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND>& lhs, const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND>& rhs);
 
-template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND> operator+(const TDATA lhs, const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND>& rhs);
-template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND> operator-(const TDATA lhs, const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND>& rhs);
-template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND> operator*(const TDATA lhs, const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND>& rhs);
-template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND> operator/(const TDATA lhs, const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND>& rhs);
+template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND>
+TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND> operator+(const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND>& lhs,
+                                                   const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND>& rhs);
 
-template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND> operator+(const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND>& lhs, const TDATA rhs);
-template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND> operator-(const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND>& lhs, const TDATA rhs);
-template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND> operator*(const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND>& lhs, const TDATA rhs);
-template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND> operator/(const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND>& lhs, const TDATA rhs);
+template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND>
+TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND> operator-(const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND>& lhs,
+                                                   const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND>& rhs);
+
+template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND>
+TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND> operator*(const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND>& lhs,
+                                                   const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND>& rhs);
+
+template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND>
+TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND> operator/(const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND>& lhs,
+                                                   const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND>& rhs);
+
+template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND>
+TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND> operator+(const TDATA lhs, 
+                                                   const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND>& rhs);
+
+template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND>
+TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND> operator-(const TDATA lhs, 
+                                                   const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND>& rhs);
+
+template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND>
+TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND> operator*(const TDATA lhs,
+                                                   const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND>& rhs);
+
+template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND>
+TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND> operator/(const TDATA lhs, const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND>& rhs);
+
+template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND>
+TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND> operator+(const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND>& lhs,
+                                                   const TDATA rhs);
+
+template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND>
+TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND> operator-(const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND>& lhs,
+                                                   const TDATA rhs);
+
+template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND>
+TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND> operator*(const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND>& lhs,
+                                                   const TDATA rhs);
+
+template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND>
+TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND> operator/(const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND>& lhs,
+                                                   const TDATA rhs);
 
 
-template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND> std::ostream& operator<<(std::ostream& os, const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND>& ts);
+template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND>
+std::ostream& operator<<(std::ostream& os,
+                         const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND>& ts);
+
 
 template <typename TDATE, typename TDATA, typename TSDIM = long, template<typename,typename,typename> class TSDATABACKEND = TSdataSingleThreaded >
 class TSeries {
