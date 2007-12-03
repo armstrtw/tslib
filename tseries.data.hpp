@@ -8,7 +8,7 @@ using std::vector;
 using std::string;
 
 template <typename TDATE,typename TDATA, typename TSDIM = long>
-class TSdata {
+class TSdataSingleThreaded {
 private:
   int refcount_;
   bool release_data_;
@@ -18,27 +18,27 @@ private:
   TDATE* dates_;
   TDATA* data_;
 
-  TSdata();
-  TSdata(const TSdata& t); // not allowed
+  TSdataSingleThreaded();
+  TSdataSingleThreaded(const TSdataSingleThreaded& t); // not allowed
 
-  TSdata(const TSDIM rows, const TSDIM cols);
+  TSdataSingleThreaded(const TSDIM rows, const TSDIM cols);
 
-  TSdata(TDATA* external_data,
+  TSdataSingleThreaded(TDATA* external_data,
          TDATE* external_dates,
          const TSDIM rows,
          const TSDIM cols,
          const bool release = false);
 
-  TSdata& operator=(const TSdata& right);  // not allowed
+  TSdataSingleThreaded& operator=(const TSdataSingleThreaded& right);  // not allowed
 
 public:
-  ~TSdata();
+  ~TSdataSingleThreaded();
 
-  static TSdata* init();
+  static TSdataSingleThreaded* init();
 
-  static TSdata* init(const TSDIM rows, const TSDIM cols);
+  static TSdataSingleThreaded* init(const TSDIM rows, const TSDIM cols);
 
-  static TSdata* init(TDATA* external_data,
+  static TSdataSingleThreaded* init(TDATA* external_data,
                       TDATE* external_dates,
                       const TSDIM rows,
                       const TSDIM cols,
@@ -58,7 +58,7 @@ public:
 
 
 template <typename TDATE,typename TDATA, typename TSDIM>
-TSdata<TDATE,TDATA,TSDIM>::~TSdata() {
+TSdataSingleThreaded<TDATE,TDATA,TSDIM>::~TSdataSingleThreaded() {
   if(release_data_) {
     delete []dates_;
     delete []data_;
@@ -66,7 +66,7 @@ TSdata<TDATE,TDATA,TSDIM>::~TSdata() {
 }
 
 template <typename TDATE,typename TDATA, typename TSDIM>
-TSdata<TDATE,TDATA,TSDIM>::TSdata() {
+TSdataSingleThreaded<TDATE,TDATA,TSDIM>::TSdataSingleThreaded() {
   refcount_ = 1;
   release_data_ = true;
   rows_ = 0;
@@ -76,7 +76,7 @@ TSdata<TDATE,TDATA,TSDIM>::TSdata() {
 }
 
 template <typename TDATE,typename TDATA, typename TSDIM>
-TSdata<TDATE,TDATA,TSDIM>::TSdata(const TSDIM rows, const TSDIM cols) {
+TSdataSingleThreaded<TDATE,TDATA,TSDIM>::TSdataSingleThreaded(const TSDIM rows, const TSDIM cols) {
   refcount_ = 1;
   release_data_ = true;
   rows_ = rows;
@@ -97,7 +97,7 @@ TSdata<TDATE,TDATA,TSDIM>::TSdata(const TSDIM rows, const TSDIM cols) {
 }
 
 template <typename TDATE,typename TDATA, typename TSDIM>
-TSdata<TDATE,TDATA,TSDIM>::TSdata(TDATA* external_data,
+TSdataSingleThreaded<TDATE,TDATA,TSDIM>::TSdataSingleThreaded(TDATA* external_data,
                             TDATE* external_dates,
                             const TSDIM nrows,
                             const TSDIM ncols,
@@ -123,23 +123,23 @@ TSdata<TDATE,TDATA,TSDIM>::TSdata(TDATA* external_data,
 
 
 template <typename TDATE,typename TDATA, typename TSDIM>
-TSdata<TDATE,TDATA,TSDIM>* TSdata<TDATE,TDATA,TSDIM>::init() {
-  return new TSdata();
+TSdataSingleThreaded<TDATE,TDATA,TSDIM>* TSdataSingleThreaded<TDATE,TDATA,TSDIM>::init() {
+  return new TSdataSingleThreaded();
 }
 
 template <typename TDATE,typename TDATA, typename TSDIM>
-TSdata<TDATE,TDATA,TSDIM>* TSdata<TDATE,TDATA,TSDIM>::init(const TSDIM rows, const TSDIM cols) {
-  return new TSdata(rows, cols);
+TSdataSingleThreaded<TDATE,TDATA,TSDIM>* TSdataSingleThreaded<TDATE,TDATA,TSDIM>::init(const TSDIM rows, const TSDIM cols) {
+  return new TSdataSingleThreaded(rows, cols);
 }
 
 template <typename TDATE,typename TDATA, typename TSDIM>
-TSdata<TDATE,TDATA,TSDIM>* TSdata<TDATE,TDATA,TSDIM>::init(TDATA* external_data,
+TSdataSingleThreaded<TDATE,TDATA,TSDIM>* TSdataSingleThreaded<TDATE,TDATA,TSDIM>::init(TDATA* external_data,
                                                TDATE* external_dates,
                                                const TSDIM nrows,
                                                const TSDIM ncols,
                                                const bool release) {
 
-  return new TSdata(external_data,
+  return new TSdataSingleThreaded(external_data,
                     external_dates,
                     nrows,
                     ncols,
@@ -147,13 +147,13 @@ TSdata<TDATE,TDATA,TSDIM>* TSdata<TDATE,TDATA,TSDIM>::init(TDATA* external_data,
 }
 
 template <typename TDATE,typename TDATA, typename TSDIM>
-void TSdata<TDATE,TDATA,TSDIM>::attach() {
+void TSdataSingleThreaded<TDATE,TDATA,TSDIM>::attach() {
   ++refcount_;
   //cout << "attach, new refcount_: " << refcount_ << endl;
 }
 
 template <typename TDATE,typename TDATA, typename TSDIM>
-void TSdata<TDATE,TDATA,TSDIM>::detach() {
+void TSdataSingleThreaded<TDATE,TDATA,TSDIM>::detach() {
   refcount_--;
   //cout << "detach, refcount_: " << refcount_ << endl;
   if(refcount_ == 0) {
@@ -162,43 +162,43 @@ void TSdata<TDATE,TDATA,TSDIM>::detach() {
 }
 
 template <typename TDATE,typename TDATA, typename TSDIM>
-void TSdata<TDATE,TDATA,TSDIM>::setColnames(const vector<string>& cnames) {
+void TSdataSingleThreaded<TDATE,TDATA,TSDIM>::setColnames(const vector<string>& cnames) {
   colnames_ = cnames;
 }
 
 template <typename TDATE,typename TDATA, typename TSDIM>
 inline
-vector<string> TSdata<TDATE,TDATA,TSDIM>::getColnames() const {
+vector<string> TSdataSingleThreaded<TDATE,TDATA,TSDIM>::getColnames() const {
   return colnames_;
 }
 
 template <typename TDATE,typename TDATA, typename TSDIM>
 inline
-const size_t TSdata<TDATE,TDATA,TSDIM>::getColnamesSize() const {
+const size_t TSdataSingleThreaded<TDATE,TDATA,TSDIM>::getColnamesSize() const {
   return colnames_.size();
 }
 
 template <typename TDATE,typename TDATA, typename TSDIM>
 inline
-TDATA* TSdata<TDATE,TDATA,TSDIM>::getData() const {
+TDATA* TSdataSingleThreaded<TDATE,TDATA,TSDIM>::getData() const {
   return data_;
 }
 
 template <typename TDATE,typename TDATA, typename TSDIM>
 inline
-TDATE* TSdata<TDATE,TDATA,TSDIM>::getDates() const {
+TDATE* TSdataSingleThreaded<TDATE,TDATA,TSDIM>::getDates() const {
   return dates_;
 }
 
 template <typename TDATE,typename TDATA, typename TSDIM>
 inline
-TSDIM TSdata<TDATE,TDATA,TSDIM>::nrow() const {
+TSDIM TSdataSingleThreaded<TDATE,TDATA,TSDIM>::nrow() const {
   return rows_;
 }
 
 template <typename TDATE,typename TDATA, typename TSDIM>
 inline
-TSDIM TSdata<TDATE,TDATA,TSDIM>::ncol() const {
+TSDIM TSdataSingleThreaded<TDATE,TDATA,TSDIM>::ncol() const {
   return cols_;
 }
 
