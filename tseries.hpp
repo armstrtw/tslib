@@ -99,13 +99,17 @@ public:
 
   // mutators
   int setColnames(const vector<string>& cnames);
+
+  // transforms
+  template<typename ReturnType, template <class> class F>
+  const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> window(const int window);
+
+  template<typename ReturnType, template <class> class F>
+  const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> transform();
   
   //operators
   TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& operator=(const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& x);
   TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& operator=(const TDATA x);
-
-  template<typename ReturnType, template <class> class F>
-  const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> window(const int window);
 
   const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> operator() (const int n);
 
@@ -373,14 +377,12 @@ int TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::setColnames(const vecto
   }
 }
 
-// FIXME: defining answer type like this will give the answer the defaults
-// which may differ from the instantiated template which is calling this function
 template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
 template<typename ReturnType, template<class> class F>
 const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::window(const int window) {
 
   // allocate new answer
-  TSeries<TDATE,ReturnType> ans(nrow(), ncol());
+  TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> ans(nrow(), ncol());
 
   // copy over dates
   copyVector(ans.getDates(),getDates(),nrow());
@@ -392,7 +394,31 @@ const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDA
   TDATA* data = getData();
 
   for(TSDIM col = 0; col < ncol(); col++) {
-    windowApply<ReturnType,F>::apply(ans_data,data, data + nrow(), window);
+    windowApply<ReturnType,F>::apply(ans_data, data, data + nrow(), window);
+    ans_data += ans.nrow();
+    data += nrow();
+  }
+  return ans;
+}
+
+template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
+template<typename ReturnType, template<class> class F>
+const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::transform() {
+
+  // allocate new answer
+  TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> ans(nrow(), ncol());
+
+  // copy over dates
+  copyVector(ans.getDates(),getDates(),nrow());
+
+  // set new colnames
+  ans.setColnames(getColnames());
+
+  TDATA* ans_data = ans.getData();
+  TDATA* data = getData();
+
+  for(TSDIM col = 0; col < ncol(); col++) {
+    F<TDATA>::apply(ans_data, data, data + nrow());
     ans_data += ans.nrow();
     data += nrow();
   }
