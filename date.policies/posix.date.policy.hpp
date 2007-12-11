@@ -6,25 +6,104 @@
 template<typename T>
 class PosixDate {
 private:
-  static void to_time_tm(struct tm* posix_time_tm, const T x);
+  static void to_time_tm(struct tm& posix_time_tm, const T x);
+  static void check_day_of_month(struct tm& posix_time_tm); // needs to check for leapyears too
+  static const int dst_shift_check(const T ans,const T x); // returns seconds from original hour and minute that has occurred
+  static const bool is_leap_year(const int year);
 public:
-  static const T toDate(const char* date, const char* format1);
+  static const T toDate(const char* date, const char* format);
   static const T toDate(const int year, const int month, const int day, const int hour, const int minute, const int second);
-  static const std::string toString(const T x, const char* format1);
+  static const std::string toString(const T x, const char* format);
   static const int dayofweek(const T x);
   static const int dayofmonth(const T x);
   static const int month(const T x);
   static const int year(const T x);
+  static const int last_day_of_month(const T x);
+  static const T AddYears(const T x, const int n);
+  static const T AddMonths(const T x, const int n);
+  static const T AddDays(const T x, const int n);
 };
 
 template<typename T>
-void to_time_tm(struct tm* posix_time_tm, const T x) {
-  const time_t posix_time_t = static_cast<time_t>(x);  
+void PosixDate<T>::to_time_tm(struct tm& posix_time_tm, const T x) {
+  const time_t posix_time_t = static_cast<time_t>(x);
 #ifdef WIN32
   memcpy(posix_time_tm,localtime(&posix_time_t), sizeof(struct tm));
 #else
-  localtime_r(&posix_time_t,posix_time_tm);
+  localtime_r(&posix_time_t,&posix_time_tm);
 #endif
+}
+
+// does not check for negative months, only running off the back of a month
+template<typename T>
+void PosixDate<T>::check_day_of_month(struct tm& posix_time_tm) {
+
+  if(posix_time_tm.tm_mday < 28) {
+    return;
+  }
+
+  // tm_mon is 0 to 11
+  switch(posix_time_tm.tm_mon + 1) {
+
+    // case for Apr, June, Sep, Nov (30 day months)
+  case 4:
+  case 6:
+  case 9:
+  case 11:
+    posix_time_tm.tm_mday =  (posix_time_tm.tm_mday > 30) ? 30 : posix_time_tm.tm_mday;
+    break;
+
+    /* Do we need these cases?  there is no way of creating a day of month 32 from the 
+       methods that would call this check, so don't do it.
+
+    // case for Jan, March, May, July, Aug, Oct, Dec
+  case 1:
+  case 3:
+  case 5:
+  case 7:
+  case 8:
+  case 10:
+  case 12:
+    posix_time_tm.tm_mday =  (posix_time_tm.tm_mday > 31) ? 31 : posix_time_tm.tm_mday;
+    break;
+    */
+    // special case for feb
+  case 2:
+    if(is_leap_year(posix_time_tm.tm_year + 1900)) {
+      posix_time_tm.tm_mday =  (posix_time_tm.tm_mday > 29) ? 29 : posix_time_tm.tm_mday;
+    } else {
+      posix_time_tm.tm_mday =  (posix_time_tm.tm_mday > 28) ? 28 : posix_time_tm.tm_mday;
+    }
+    break;
+  }
+}
+
+template<typename T>
+const int PosixDate<T>::dst_shift_check(const T shifted, const T original) {
+  struct tm original_time_tm, shifted_time_tm;
+
+  to_time_tm(original_time_tm, original);
+  to_time_tm(shifted_time_tm, shifted);
+
+  // hour = 60s/min * 60min = 3600 seconds
+  int ans = (original_time_tm.tm_hour - shifted_time_tm.tm_hour) * 3600;
+
+  // some zones have half hour shifts
+  ans += (original_time_tm.tm_min - shifted_time_tm.tm_min) * 60;
+
+  return ans;
+}
+
+// takes a year in the form YYYY
+// so you must add 1900 to tm_year before calling this func
+template<typename T>
+const bool PosixDate<T>::is_leap_year(const int year) {
+  int mod_4 = year % 4;
+  int mod_100 = year % 100;
+  int mod_400 = year % 400;
+
+  // mod_400 or mod_4 but not mod_100
+  return (mod_400 == 0 || (mod_4 && !(mod_100) ) ) ? 1 : 0;
 }
 
 template<typename T>
@@ -70,7 +149,7 @@ const std::string PosixDate<T>::toString(const T x, const char* format) {
   struct tm posix_time_tm;
   const int BUFFSIZE = 32;
   char ans_char[BUFFSIZE];
-  to_time_tm(&posix_time_tm, x);  
+  to_time_tm(posix_time_tm, x);
   strftime(ans_char,BUFFSIZE,format,&posix_time_tm);
   return std::string(ans_char);
 }
@@ -78,29 +157,119 @@ const std::string PosixDate<T>::toString(const T x, const char* format) {
 template<typename T>
 const int PosixDate<T>::dayofweek(const T x) {
   struct tm posix_time_tm;
-  to_time_tm(&posix_time_tm, x);
+  to_time_tm(posix_time_tm, x);
   return posix_time_tm.tm_wday;  // days since sunday 0 to 6
 }
 
 template<typename T>
 const int PosixDate<T>::dayofmonth(const T x) {
   struct tm posix_time_tm;
-  to_time_tm(&posix_time_tm, x);
+  to_time_tm(posix_time_tm, x);
   return posix_time_tm.tm_mday;  // no adjustment, it's already 1 to 31
 }
 
 template<typename T>
 const int PosixDate<T>::month(const T x) {
   struct tm posix_time_tm;
-  to_time_tm(&posix_time_tm, x);
+  to_time_tm(posix_time_tm, x);
   return posix_time_tm.tm_mon + 1;  // posix is 0 to 11, we want 1 to 12
 }
 
 template<typename T>
 const int PosixDate<T>::year(const T x) {
   struct tm posix_time_tm;
-  to_time_tm(&posix_time_tm, x);
+  to_time_tm(posix_time_tm, x);
   return posix_time_tm.tm_year + 1900;  // we want actual year instead of years since 1900
+}
+
+template<typename T>
+const int PosixDate<T>::last_day_of_month(const T x) {
+  struct tm posix_time_tm;
+  to_time_tm(posix_time_tm, x);
+  
+  switch(posix_time_tm.tm_mon + 1) {
+
+    // case for Apr, June, Sep, Nov (30 day months)
+  case 4:
+  case 6:
+  case 9:
+  case 11:
+    return 30;
+    break;
+
+    // case for Jan, March, May, July, Aug, Oct, Dec
+  case 1:
+  case 3:
+  case 5:
+  case 7:
+  case 8:
+  case 10:
+  case 12:
+    return 31;
+    break;
+
+    // special case for feb
+  case 2:
+    if(is_leap_year(posix_time_tm.tm_year + 1900)) {
+      return 29;
+    } else {
+      return 28;
+    }
+    break;
+  }
+}
+
+template<typename T>
+const T PosixDate<T>::AddYears(const T x, const int n) {
+  struct tm posix_time_tm;
+  to_time_tm(posix_time_tm, x);
+
+  // adjust years
+  posix_time_tm.tm_year+=n;
+
+  // make sure we don't drop out Feb 28 if shift causes us to land on leapyear
+  check_day_of_month(posix_time_tm);
+
+  // convert to POSIXct
+  return static_cast<T>(mktime(&posix_time_tm));
+}
+
+template<typename T>
+const T PosixDate<T>::AddMonths(const T x, const int n) {
+  struct tm posix_time_tm;
+  to_time_tm(posix_time_tm, x);
+
+  int yrs_to_add = n / 12; 
+
+  // adjust years
+  posix_time_tm.tm_year += yrs_to_add;
+
+  // adjust months to add
+  //n = ( std::abs(n) % 12 ) * std::sign(n);
+  // adjust months
+  posix_time_tm.tm_mon += (n % 12);
+
+  // check day of month
+  check_day_of_month(posix_time_tm);
+
+  // because we can cross a DST boundry
+  posix_time_tm.tm_isdst = -1;
+
+  // convert to POSIXct
+  return static_cast<T>(mktime(&posix_time_tm));
+}
+
+template<typename T>
+const T PosixDate<T>::AddDays(const T x, const int n) {
+  // one day is 60*60*24 seconds = 86400
+  const int seconds_in_day = 86400;
+
+  T ans = x + (seconds_in_day * n);
+
+  // do DST shift check
+  dst_shift_check(ans,x);
+
+  return ans;
 }
 
 #endif // POSIX_DATE_POLICY_HPP

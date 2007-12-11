@@ -4,6 +4,7 @@
 #include <tseries.hpp>
 #include <vector/window.apply.hpp>
 #include <vector/mean.hpp>
+#include <date.policies/posix.date.policy.hpp>
 
 using namespace boost::unit_test_framework;
 using std::cout;
@@ -242,11 +243,41 @@ void lag_lead_test() {
   cout << x(-2) << endl;
 }
 
+
+void posix_date_test() {
+  const char* jan_01_2007 = "01/01/2007";
+  const char* fmt_america = "%m/%d/%Y";
+
+  long dt = PosixDate<long>::toDate(jan_01_2007,fmt_america);
+  BOOST_CHECK_EQUAL(strcmp(PosixDate<long>::toString(dt,fmt_america).c_str(),"01/01/2007"),0);
+
+  // shifting
+  long d1_shft_1d = PosixDate<long>::AddDays(dt,1);
+  BOOST_CHECK_EQUAL(strcmp(PosixDate<long>::toString(d1_shft_1d,fmt_america).c_str(),"01/02/2007"),0);
+
+  long d1_shft_1m = PosixDate<long>::AddMonths(dt,1);
+  BOOST_CHECK_EQUAL(strcmp(PosixDate<long>::toString(d1_shft_1m,fmt_america).c_str(),"02/01/2007"),0);
+
+  long d1_shft_1yr = PosixDate<long>::AddYears(dt,1);
+  BOOST_CHECK_EQUAL(strcmp(PosixDate<long>::toString(d1_shft_1yr,fmt_america).c_str(),"01/01/2008"),0);
+
+  long d1_shft_24m = PosixDate<long>::AddMonths(dt,24);
+  BOOST_CHECK_EQUAL(strcmp(PosixDate<long>::toString(d1_shft_24m,fmt_america).c_str(),"01/01/2009"),0);
+
+  long d1_shft_neg24m = PosixDate<long>::AddMonths(dt,-24);
+  BOOST_CHECK_EQUAL(strcmp(PosixDate<long>::toString(d1_shft_neg24m,fmt_america).c_str(),"01/01/2005"),0);
+
+  long d1_shft_neg18m = PosixDate<long>::AddMonths(dt,-18);
+  BOOST_CHECK_EQUAL(strcmp(PosixDate<long>::toString(d1_shft_neg18m,fmt_america).c_str(),"07/01/2005"),0);
+
+}
+
 test_suite*
 init_unit_test_suite( int argc, char* argv[] ) {
   
   test_suite* test= BOOST_TEST_SUITE("tslib test");
-  test->add( BOOST_TEST_CASE( &null_constructor_test ) );
+
+  /*  test->add( BOOST_TEST_CASE( &null_constructor_test ) );
   test->add( BOOST_TEST_CASE( &std_constructor_test ) );
   test->add( BOOST_TEST_CASE( &set_colnames_test ) );  
   test->add( BOOST_TEST_CASE( &range_specifier_test ) );
@@ -255,6 +286,8 @@ init_unit_test_suite( int argc, char* argv[] ) {
   test->add( BOOST_TEST_CASE( &vector_window_apply_test ) );
   test->add( BOOST_TEST_CASE( &window_apply_test ) );
   test->add( BOOST_TEST_CASE( &lag_lead_test ) );
+  */
+  test->add( BOOST_TEST_CASE( &posix_date_test ) );
   return test;
 }
 
