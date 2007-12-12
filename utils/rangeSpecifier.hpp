@@ -1,6 +1,8 @@
 #ifndef RANGESPECIFIER_HPP
 #define RANGESPECIFIER_HPP
 
+#include <iostream>
+
 using std::cout;
 using std::cerr;
 using std::endl;
