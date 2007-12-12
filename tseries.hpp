@@ -75,7 +75,8 @@ template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typen
 std::ostream& operator<<(std::ostream& os,
                          const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& ts);
 
-template <typename TDATE, typename TDATA, typename TSDIM = long,
+template <typename TDATE, typename TDATA,
+          typename TSDIM = long,
           template<typename,typename,typename> class TSDATABACKEND = TSdataSingleThreaded,
           template<typename> class DatePolicy = PosixDate>
 class TSeries {
