@@ -9,6 +9,7 @@
 using namespace boost::unit_test_framework;
 using std::cout;
 using std::endl;
+using std::fill_n;
 
 // seed random number generator
 // srand((unsigned)time(0));
@@ -31,6 +32,21 @@ void std_constructor_test() {
   long zero = 0;
 
   TSeries<double,double> x(nr,nc);
+
+  BOOST_CHECK_EQUAL( x.nrow(), nr );
+  BOOST_CHECK_EQUAL( x.ncol(), nc );
+  BOOST_CHECK( x.getData() != static_cast<double*>(NULL) );
+  BOOST_CHECK( x.getDates() != static_cast<double*>(NULL) );
+  BOOST_CHECK_EQUAL( x.getColnames().size(), zero );
+}
+
+void tsdata_constructor_test() {
+  long nr = 1000;
+  long nc = 10;
+  long zero = 0;
+
+  TSdataSingleThreaded<double,double>* ts_data = TSdataSingleThreaded<double,double>::init(nr,nc);
+  TSeries<double,double> x(ts_data);
 
   BOOST_CHECK_EQUAL( x.nrow(), nr );
   BOOST_CHECK_EQUAL( x.ncol(), nc );
@@ -277,8 +293,9 @@ init_unit_test_suite( int argc, char* argv[] ) {
   
   test_suite* test= BOOST_TEST_SUITE("tslib test");
 
-  /*  test->add( BOOST_TEST_CASE( &null_constructor_test ) );
+  test->add( BOOST_TEST_CASE( &null_constructor_test ) );
   test->add( BOOST_TEST_CASE( &std_constructor_test ) );
+  test->add( BOOST_TEST_CASE( &tsdata_constructor_test) );
   test->add( BOOST_TEST_CASE( &set_colnames_test ) );  
   test->add( BOOST_TEST_CASE( &range_specifier_test ) );
   test->add( BOOST_TEST_CASE( &operators_test ) );
@@ -286,7 +303,6 @@ init_unit_test_suite( int argc, char* argv[] ) {
   test->add( BOOST_TEST_CASE( &vector_window_apply_test ) );
   test->add( BOOST_TEST_CASE( &window_apply_test ) );
   test->add( BOOST_TEST_CASE( &lag_lead_test ) );
-  */
   test->add( BOOST_TEST_CASE( &posix_date_test ) );
   return test;
 }

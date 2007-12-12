@@ -2,7 +2,6 @@
 #define TSERIES_HPP
 
 #include <cstdlib>
-#include <iostream>
 #include <algorithm>
 #include <numeric>
 #include <functional>
@@ -15,7 +14,11 @@
 #include "vector/lag.hpp"
 #include "vector/lead.hpp"
 #include "date.policies/posix.date.policy.hpp"
-using namespace std;
+
+using std::plus;
+using std::minus;
+using std::multiplies;
+using std::divides;
 
 // pre-declare template friends
 template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy> class TSeries;
@@ -72,9 +75,8 @@ template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typen
 std::ostream& operator<<(std::ostream& os,
                          const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& ts);
 
-
-template <typename TDATE, typename TDATA, typename TSDIM = long, 
-          template<typename,typename,typename> class TSDATABACKEND = TSdataSingleThreaded, 
+template <typename TDATE, typename TDATA, typename TSDIM = long,
+          template<typename,typename,typename> class TSDATABACKEND = TSdataSingleThreaded,
           template<typename> class DatePolicy = PosixDate>
 class TSeries {
 private:
@@ -84,6 +86,7 @@ public:
   // ctors dtors
   ~TSeries();
   TSeries();
+  TSeries(TSDATABACKEND<TDATE,TDATA,TSDIM>* tsdata);
   TSeries(const TSDIM rows, const TSDIM cols);
   TSeries(const TSeries& T);
 
@@ -91,6 +94,7 @@ public:
   TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> copy() const;
 
   // accessors
+  TSDATABACKEND<TDATE,TDATA,TSDIM>* getIMPL() const;
   vector<string> getColnames() const;
   const TSDIM nrow() const;
   const TSDIM ncol() const;
@@ -315,6 +319,11 @@ TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::TSeries() {
 }
 
 template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
+TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::TSeries(TSDATABACKEND<TDATE,TDATA,TSDIM>* tsdata) {
+  tsdata_ = tsdata;
+}
+
+template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
 TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::TSeries(const TSDIM rows, const TSDIM cols) {
   tsdata_ = TSDATABACKEND<TDATE,TDATA,TSDIM>::init(rows,cols);
 }
@@ -334,6 +343,12 @@ TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TS
   copyVector(ans.getData(), getData(), nrow() * ncol() );
 
   return ans;
+}
+
+template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
+inline
+TSDATABACKEND<TDATE,TDATA,TSDIM>* TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::getIMPL() const {
+  return tsdata_;
 }
 
 template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
