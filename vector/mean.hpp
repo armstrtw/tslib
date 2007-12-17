@@ -1,6 +1,8 @@
 #ifndef MEAN_HPP
 #define MEAN_HPP
 
+#include <iterator>
+#include "utils/numeric.traits.hpp"
 
 template<typename T>
 class meanTraits;
@@ -27,6 +29,9 @@ public:
     ReturnType len =  static_cast<ReturnType>(distance(beg,end));
 
     while(beg != end) {
+      if(numeric_traits<typename std::iterator_traits<T>::value_type>::ISNA(*beg)) {
+        return numeric_traits<ReturnType>::NA();
+      }
       ans += *beg;
       ++beg;
     }
