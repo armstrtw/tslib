@@ -17,7 +17,7 @@ class Rank{
 public:
   template<typename T>
   static ReturnType apply(T beg, T end) {
-    ReturnType ans = 0;
+    ReturnType ans = 1;
 
     while(beg != end) {
       if(numeric_traits<typename std::iterator_traits<T>::value_type>::ISNA(*beg)) {
@@ -25,7 +25,7 @@ public:
       }
 
       // if end > data[index] then increment it's rank
-      ans += (*end > *beg ? 1 : 0);
+      ans += (*(end - 1) > *beg ? 1 : 0);
       ++beg;
     }
     return ans;
