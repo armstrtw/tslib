@@ -4,6 +4,8 @@
 #include <tseries.hpp>
 #include <vector/window.apply.hpp>
 #include <vector/mean.hpp>
+#include <vector/sum.hpp>
+#include <vector/rank.hpp>
 #include <date.policies/posix.date.policy.hpp>
 
 using namespace tslib;
@@ -220,7 +222,9 @@ void vector_window_apply_test() {
 
 void window_apply_test() {
   // define our answer type
-  typedef meanTraits<double>::ReturnType ansType;
+  typedef meanTraits<double>::ReturnType mean_ansType;
+  typedef sumTraits<double>::ReturnType sum_ansType;
+  typedef rankTraits<double>::ReturnType rank_ansType;
 
   long xnr = 50;
   long xnc = 5;
@@ -235,8 +239,16 @@ void window_apply_test() {
   for(long xi = 0; xi < x.nrow(); xi++)
     x.getDates()[xi] = xi+1;
 
-  TSeries<double,ansType> ans = x.window<ansType,Mean>(5);
-  BOOST_CHECK_EQUAL(ans.getData()[4],3);
+  TSeries<double,mean_ansType> mean_ans = x.window<mean_ansType,Mean>(5);
+  BOOST_CHECK_EQUAL(mean_ans.getData()[4],3);
+
+  TSeries<double,sum_ansType> sum_ans = x.window<sum_ansType,Sum>(5);
+  BOOST_CHECK_EQUAL(sum_ans.getData()[4],(5.0*6.0)/2.0);
+
+  TSeries<double,rank_ansType> rank_ans = x.window<rank_ansType,Rank>(5);
+  BOOST_CHECK_EQUAL(rank_ans.getData()[4],5);
+
+  cout << rank_ans << endl;
 }
 
 
