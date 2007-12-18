@@ -1,6 +1,9 @@
 #ifndef SUM_HPP
 #define SUM_HPP
 
+#include <iterator>
+#include "utils/numeric.traits.hpp"
+
 namespace tslib {
 
 template<typename T>
@@ -27,6 +30,9 @@ public:
     ReturnType ans = 0;
 
     while(beg != end) {
+      if(numeric_traits<typename std::iterator_traits<T>::value_type>::ISNA(*beg)) {
+        return numeric_traits<ReturnType>::NA();
+      }
       ans += *beg;
       ++beg;
     }
