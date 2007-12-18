@@ -32,7 +32,7 @@ public:
   }
 
   static bool ISNA(int x) {
-    return x = std::numeric_limits<int>::min() ? true : false;
+    return x == std::numeric_limits<int>::min() ? true : false;
   }
 };
 
