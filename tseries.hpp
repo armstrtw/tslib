@@ -409,7 +409,7 @@ const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDA
   // set new colnames
   ans.setColnames(getColnames());
 
-  TDATA* ans_data = ans.getData();
+  ReturnType* ans_data = ans.getData();
   TDATA* data = getData();
 
   for(TSDIM col = 0; col < ncol(); col++) {
