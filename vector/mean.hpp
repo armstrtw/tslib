@@ -4,6 +4,8 @@
 #include <iterator>
 #include "utils/numeric.traits.hpp"
 
+namespace tslib {
+
 template<typename T>
 class meanTraits;
 
@@ -38,5 +40,7 @@ public:
     return ans/len;
   }
 };
+
+} // namespace tslib
 
 #endif // MEAN_HPP

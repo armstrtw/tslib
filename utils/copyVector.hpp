@@ -1,6 +1,8 @@
 #ifndef COPY_VECTOR_HPP
 #define COPY_VECTOR_HPP
 
+namespace tslib {
+
 template <typename T, typename U>
 inline
 void copyVector(T* dest, const T* source, const U len) {
@@ -22,5 +24,6 @@ void copyVector(int* dest, const int* source, const U len) {
   memcpy(dest, source, len * sizeof(int) );
 }
 
+} // namespace tslib
 
 #endif // COPY_VECTOR_HPP

@@ -3,6 +3,8 @@
 
 #include "../utils/numeric.traits.hpp"
 
+namespace tslib {
+
 template<typename ReturnType,
          template<class> class F>
 class windowApply {
@@ -34,5 +36,6 @@ public:
   }
 };
 
+} // namespace tslib
 
 #endif // WINDOW_APPLY_HPP

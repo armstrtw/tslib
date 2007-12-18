@@ -7,6 +7,8 @@
 using std::vector;
 using std::string;
 
+namespace tslib {
+
 template <typename TDATE,typename TDATA, typename TSDIM = long>
 class TSdataSingleThreaded {
 private:
@@ -202,5 +204,6 @@ TSDIM TSdataSingleThreaded<TDATE,TDATA,TSDIM>::ncol() const {
   return cols_;
 }
 
+} // namespace tslib
 
 #endif // TSERIES_DATA_HPP

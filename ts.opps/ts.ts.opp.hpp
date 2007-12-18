@@ -5,19 +5,18 @@
 #include "../utils/rangeSpecifier.hpp"
 #include "../utils/copyVector.hpp"
 
-//template<template<TDATE,TDATA> class TSeries>
-//template<typename TDATE, typename TDATA, template<TDATE,TDATA> class TSeries>
-//template<template<class TDATE, class TDATA> class TSeries>
-//template<typename opptype>
+namespace tslib
+{
+
 
 template<class TDATE, class TDATA, class TSDIM, template<class U, class V, class W> class TSeries, class opptype>
-const TSeries<TDATE,TDATA,TSDIM> apply_opp(const TSeries<TDATE,TDATA,TSDIM>& lhs, 
-                                     const TSeries<TDATE,TDATA,TSDIM>& rhs, 
+const TSeries<TDATE,TDATA,TSDIM> apply_opp(const TSeries<TDATE,TDATA,TSDIM>& lhs,
+                                     const TSeries<TDATE,TDATA,TSDIM>& rhs,
                                      opptype opp) {
 
   if(lhs.ncol() != rhs.ncol())
     return TSeries<TDATE,TDATA,TSDIM>();
-  
+
   // find date intersection
   RangeSpecifier<TDATE,TSDIM> range(lhs.getDates(), rhs.getDates(), lhs.nrow(), rhs.nrow() );
 
@@ -65,5 +64,7 @@ const TSeries<TDATE,TDATA,TSDIM> apply_opp(const TSeries<TDATE,TDATA,TSDIM>& lhs
 
   return ans;
 }
+
+} // namespace tslib
 
 #endif // TS_TS_OPP_HPP

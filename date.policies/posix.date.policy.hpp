@@ -3,6 +3,10 @@
 
 #include <ctime>
 
+namespace tslib
+{
+
+
 template<typename T>
 class PosixDate {
 private:
@@ -53,7 +57,7 @@ void PosixDate<T>::check_day_of_month(struct tm& posix_time_tm) {
     posix_time_tm.tm_mday =  (posix_time_tm.tm_mday > 30) ? 30 : posix_time_tm.tm_mday;
     break;
 
-    /* Do we need these cases?  there is no way of creating a day of month 32 from the 
+    /* Do we need these cases?  there is no way of creating a day of month 32 from the
        methods that would call this check, so don't do it.
 
     // case for Jan, March, May, July, Aug, Oct, Dec
@@ -186,7 +190,7 @@ template<typename T>
 const int PosixDate<T>::last_day_of_month(const T x) {
   struct tm posix_time_tm;
   to_time_tm(posix_time_tm, x);
-  
+
   switch(posix_time_tm.tm_mon + 1) {
 
     // case for Apr, June, Sep, Nov (30 day months)
@@ -239,7 +243,7 @@ const T PosixDate<T>::AddMonths(const T x, const int n) {
   struct tm posix_time_tm;
   to_time_tm(posix_time_tm, x);
 
-  int yrs_to_add = n / 12; 
+  int yrs_to_add = n / 12;
 
   // adjust years
   posix_time_tm.tm_year += yrs_to_add;
@@ -271,5 +275,8 @@ const T PosixDate<T>::AddDays(const T x, const int n) {
 
   return ans;
 }
+
+
+} // namespace tslib
 
 #endif // POSIX_DATE_POLICY_HPP

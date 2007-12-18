@@ -9,6 +9,9 @@ using std::endl;
 using std::distance;
 using std::set_intersection;
 
+
+namespace tslib {
+
 template<typename T, typename U>
 class RangeSpecifier {
 private:
@@ -30,7 +33,7 @@ public:
   const U* getArg2() const;
   const U getSize() const;
   void print() const;
-  
+
   template<typename D, typename BinaryOpp>
   void applyOpp(D* ans, D* index1_Data, D* index2_Data, BinaryOpp opp) const;
 };
@@ -83,7 +86,7 @@ RangeSpecifier<T,U>::RangeSpecifier(T *dates_1,
   // we can alloc space for the intersection points
   index1_ = new U[size_];
   index2_ = new U[size_];
-	
+
   // if we cannot get memory, then print error, release any memory that was allocated and return
   if(index1_==NULL || index2_==NULL) {
     cerr << "ERROR: RangeSpecifier::RangeSpecifier" << endl;
@@ -160,5 +163,7 @@ void RangeSpecifier<T,U>::print() const {
     cout << dates_[i] << ":" << index1_[i] << ":" << index2_[i] << endl;
   }
 }
+
+} // namespace tslib
 
 #endif

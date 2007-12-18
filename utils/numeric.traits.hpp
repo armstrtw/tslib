@@ -4,6 +4,8 @@
 #include <limits>
 #include <cmath>
 
+namespace tslib {
+
 template<typename T>
 class numeric_traits;
 
@@ -33,5 +35,7 @@ public:
     return x = std::numeric_limits<int>::min() ? true : false;
   }
 };
+
+}  // namespace tslib
 
 #endif //NUMERIC_TRAITS_HPP

@@ -1,6 +1,9 @@
 #ifndef JULIAN_DATE_POLICY_HPP
 #define JULIAN_DATE_POLICY_HPP
 
+namespace tslib
+{
+
 template<typename T>
 class JulianDate {
 public:
@@ -16,5 +19,7 @@ public:
   static const T AddMonths(const T x, const int n);
   static const T AddDays(const T x, const int n);
 };
+
+} // namespace tslib
 
 #endif // JULIAN_DATE_POLICY_HPP

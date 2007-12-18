@@ -6,6 +6,7 @@
 #include <vector/mean.hpp>
 #include <date.policies/posix.date.policy.hpp>
 
+using namespace tslib;
 using namespace boost::unit_test_framework;
 using std::cout;
 using std::endl;
@@ -96,11 +97,11 @@ void range_specifier_test() {
   BOOST_CHECK(r.getArg1()[0] == 0);
   BOOST_CHECK(r.getArg1()[1] == 2);
   BOOST_CHECK(r.getArg1()[2] == 4);
-  
+
   BOOST_CHECK(r.getArg2()[0] == 0);
   BOOST_CHECK(r.getArg2()[1] == 1);
   BOOST_CHECK(r.getArg2()[2] == 2);
-  
+
   r.print();
 }
 
@@ -123,7 +124,7 @@ void operators_test() {
   // generate dates
   for(long yi = 0; yi < y.nrow(); yi++)
     y.getDates()[yi] = yi;
-    
+
   TSeries<double,double> Zplus = x + y;
   TSeries<double,double> Zminus = x - y;
   TSeries<double,double> Zmultiplies = x * y;
@@ -181,7 +182,7 @@ void assignment_test() {
   // TS TS assignment
   BOOST_CHECK_EQUAL(y.getData()[0],2.0);
   y = x;
-  
+
   BOOST_CHECK_EQUAL(y.nrow(),xnr);
   BOOST_CHECK_EQUAL(y.ncol(),xnc);
   BOOST_CHECK_EQUAL(y.getData()[0],1.0);
@@ -200,7 +201,7 @@ void assignment_test() {
 
 
 void vector_window_apply_test() {
-  
+
   // define our answer type
   typedef meanTraits<double>::ReturnType ansType;
 
@@ -229,7 +230,7 @@ void window_apply_test() {
   // gernate data
   for(long vi = 0; vi < x.nrow()*x.ncol(); vi++)
     x.getData()[vi] = vi+1;
-  
+
   // generate dates
   for(long xi = 0; xi < x.nrow(); xi++)
     x.getDates()[xi] = xi+1;
@@ -240,7 +241,7 @@ void window_apply_test() {
 
 
 void lag_lead_test() {
-  
+
   long xnr = 50;
   long xnc = 5;
 
@@ -249,11 +250,11 @@ void lag_lead_test() {
   // gernate data
   for(long vi = 0; vi < x.nrow()*x.ncol(); vi++)
     x.getData()[vi] = vi+1;
-  
+
   // generate dates
   for(long xi = 0; xi < x.nrow(); xi++)
     x.getDates()[xi] = xi+1;
-  
+
   //TSeries<double,double> ans = x(1);
   //TSeries<double,double> ans = x(-1);
   cout << x(-2) << endl;
@@ -290,13 +291,13 @@ void posix_date_test() {
 
 test_suite*
 init_unit_test_suite( int argc, char* argv[] ) {
-  
+
   test_suite* test= BOOST_TEST_SUITE("tslib test");
 
   test->add( BOOST_TEST_CASE( &null_constructor_test ) );
   test->add( BOOST_TEST_CASE( &std_constructor_test ) );
   test->add( BOOST_TEST_CASE( &tsdata_constructor_test) );
-  test->add( BOOST_TEST_CASE( &set_colnames_test ) );  
+  test->add( BOOST_TEST_CASE( &set_colnames_test ) );
   test->add( BOOST_TEST_CASE( &range_specifier_test ) );
   test->add( BOOST_TEST_CASE( &operators_test ) );
   test->add( BOOST_TEST_CASE( &assignment_test ) );
@@ -306,5 +307,3 @@ init_unit_test_suite( int argc, char* argv[] ) {
   test->add( BOOST_TEST_CASE( &posix_date_test ) );
   return test;
 }
-
-  

@@ -20,6 +20,9 @@ using std::minus;
 using std::multiplies;
 using std::divides;
 
+
+namespace tslib {
+
 // pre-declare template friends
 template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy> class TSeries;
 
@@ -40,11 +43,11 @@ TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> operator/(const TSeries<TDAT
                                                               const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& rhs);
 
 template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
-TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> operator+(const TDATA lhs, 
+TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> operator+(const TDATA lhs,
                                                               const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& rhs);
 
 template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
-TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> operator-(const TDATA lhs, 
+TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> operator-(const TDATA lhs,
                                                               const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& rhs);
 
 template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
@@ -111,7 +114,7 @@ public:
 
   template<typename ReturnType, template <class> class F>
   const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> transform();
-  
+
   //operators
   TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& operator=(const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& x);
   TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& operator=(const TDATA x);
@@ -157,7 +160,7 @@ public:
   friend TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> operator/ <> (const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& lhs,
                                                                            const TDATA rhs);
 
-  friend std::ostream& operator<< <> (std::ostream& os, 
+  friend std::ostream& operator<< <> (std::ostream& os,
                                       const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& ts);
 };
 
@@ -285,7 +288,7 @@ TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> operator/(const TSeries<TDAT
 template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
 std::ostream& operator<< (std::ostream& os, const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& ts) {
   vector<string> cnames(ts.getColnames());
-  
+
   if(cnames.size()) {
     // shift out to be in line w/ first column of values (space is for dates column)
     os << "\t";
@@ -298,7 +301,7 @@ std::ostream& operator<< (std::ostream& os, const TSeries<TDATE,TDATA,TSDIM,TSDA
   TDATA* data = ts.getData();
   TSDIM nr  = ts.nrow();
   TSDIM nc  = ts.ncol();
-  
+
   for(TSDIM row = 0; row < nr; row++) {
     os << dates[row] << "\t";
     for(TSDIM col = 0; col < nc; col++) {
@@ -441,5 +444,6 @@ const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDA
   return ans;
 }
 
+}  // namespace tslib
 
 #endif // TSERIES_HPP

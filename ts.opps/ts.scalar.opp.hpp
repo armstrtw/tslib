@@ -4,9 +4,12 @@
 #include "../tseries.data.hpp"
 #include "../utils/copyVector.hpp"
 
+namespace tslib
+{
+
 template<class TDATE, class TDATA, class TSDIM, template<class U, class V, class W> class TSeries, class opptype>
-const TSeries<TDATE,TDATA,TSDIM> apply_opp(const TDATA lhs_scalar, 
-                                           const TSeries<TDATE,TDATA,TSDIM>& rhs_TSeries, 
+const TSeries<TDATE,TDATA,TSDIM> apply_opp(const TDATA lhs_scalar,
+                                           const TSeries<TDATE,TDATA,TSDIM>& rhs_TSeries,
                                            opptype opp) {
 
   // allocate new answer
@@ -42,5 +45,7 @@ const TSeries<TDATE,TDATA,TSDIM> apply_opp(const TSeries<TDATE,TDATA,TSDIM>& lhs
 
   return ans;
 }
+
+} // namespace tslib
 
 #endif // TS_SCALAR_OPP_HPP
