@@ -4,6 +4,7 @@ LDFLAGS =
 CXX      = g++
 FXX      = g77
 
+.PHONY: test
 
 test: ../tseries.hpp ../tseries.data.hpp
 	$(CXX) test.cpp -o $@ -I..
