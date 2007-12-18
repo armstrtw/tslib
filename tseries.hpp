@@ -305,7 +305,11 @@ std::ostream& operator<< (std::ostream& os, const TSeries<TDATE,TDATA,TSDIM,TSDA
   for(TSDIM row = 0; row < nr; row++) {
     os << dates[row] << "\t";
     for(TSDIM col = 0; col < nc; col++) {
-      os << data[row + col*nr] << " ";
+      if(numeric_traits<TDATA>::ISNA(data[row + col*nr])) {
+          os << "NA" << " ";
+      } else {
+        os << data[row + col*nr] << " ";
+      }
     }
     os << std::endl;
   }
