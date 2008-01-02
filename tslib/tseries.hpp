@@ -6,15 +6,15 @@
 #include <numeric>
 #include <functional>
 
-#include <tseries.data.hpp>
-#include <utils/rangeSpecifier.hpp>
-#include <utils/copyVector.hpp>
-#include <ts.opps/ts.ts.opp.hpp>
-#include <ts.opps/ts.scalar.opp.hpp>
-#include <utils/window.apply.hpp>
-#include <vector.transform/lag.hpp>
-#include <vector.transform/lead.hpp>
-#include <date.policies/posix.date.policy.hpp>
+#include <tslib/tseries.data.hpp>
+#include <tslib/utils/rangeSpecifier.hpp>
+#include <tslib/utils/copyVector.hpp>
+#include <tslib/ts.opps/ts.ts.opp.hpp>
+#include <tslib/ts.opps/ts.scalar.opp.hpp>
+#include <tslib/utils/window.apply.hpp>
+#include <tslib/vector.transform/lag.hpp>
+#include <tslib/vector.transform/lead.hpp>
+#include <tslib/date.policies/posix.date.policy.hpp>
 
 using std::plus;
 using std::minus;
