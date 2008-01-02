@@ -10,7 +10,7 @@ template<typename T>
 class minTraits {
 public:
   typedef T ReturnType;
-}
+};
 
 template<typename ReturnType>
 class Min{

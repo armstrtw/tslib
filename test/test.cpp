@@ -1,12 +1,9 @@
 #include <boost/test/included/unit_test_framework.hpp>
 #include <boost/test/unit_test.hpp>
 #include <ctime>
+
 #include <tseries.hpp>
-#include <vector/window.apply.hpp>
-#include <vector/mean.hpp>
-#include <vector/sum.hpp>
-#include <vector/rank.hpp>
-#include <date.policies/posix.date.policy.hpp>
+#include <vector.summary.hpp>
 
 using namespace tslib;
 using namespace boost::unit_test_framework;

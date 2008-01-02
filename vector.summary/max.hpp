@@ -10,7 +10,7 @@ template<typename T>
 class maxTraits {
 public:
   typedef T ReturnType;
-}
+};
 
 template<typename ReturnType>
 class Max{
