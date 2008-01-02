@@ -6,7 +6,7 @@ FXX      = g77
 
 .PHONY: test
 
-test: ../tseries.hpp ../tseries.data.hpp
-	$(CXX) test.cpp -o $@ -I..
+test:
+	$(CXX) -I.. test.cpp -o $@
 	./test
 	rm -f ./test

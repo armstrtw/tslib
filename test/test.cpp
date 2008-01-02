@@ -2,8 +2,8 @@
 #include <boost/test/unit_test.hpp>
 #include <ctime>
 
-#include <tseries.hpp>
-#include <vector.summary.hpp>
+#include <tslib/tseries.hpp>
+#include <tslib/vector.summary.hpp>
 
 using namespace tslib;
 using namespace boost::unit_test_framework;
