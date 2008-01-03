@@ -2,7 +2,7 @@
 #define STDEV_HPP
 
 #include <iterator>
-#include "../utils/numeric.traits.hpp"
+#include <tslib/utils/numeric.traits.hpp>
 
 namespace tslib {
 
@@ -29,18 +29,24 @@ public:
   static ReturnType apply(T beg, T end) {
     ReturnType ans = 0;
     ReturnType len =  static_cast<ReturnType>(distance(beg,end));
+
+    // can't take stdev of only 1 element
+    if(len <= 1) {
+      return numeric_traits<ReturnType>::NA();
+    }
+
     ReturnType vec_mean = Mean<ReturnType>::apply(beg,end);
 
     // check NA of mean
-    if(numeric_traits<typename std::iterator_traits<T>::value_type>::ISNA(vec_mean)) {
-      return ans;
+    if(numeric_traits<ReturnType>::ISNA(vec_mean)) {
+      return numeric_traits<ReturnType>::NA();
     }
 
     while(beg != end) {
-      ans += (*beg - vec_mean)^2;
+      ans += std::pow(*beg - vec_mean, 2);
       ++beg;
     }
-    return (ans/(len - 1))^(0.5);
+    return std::pow( ans/(len - 1), 0.5);
   }
 };
 

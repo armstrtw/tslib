@@ -1,7 +1,7 @@
 #ifndef LEAD_HPP
 #define LEAD_HPP
 
-#include "../utils/copyVector.hpp"
+#include <tslib/utils/copyVector.hpp>
 
 namespace tslib {
 

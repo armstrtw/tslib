@@ -2,7 +2,7 @@
 #define MEAN_HPP
 
 #include <iterator>
-#include "../utils/numeric.traits.hpp"
+#include <tslib/utils/numeric.traits.hpp>
 
 namespace tslib {
 
