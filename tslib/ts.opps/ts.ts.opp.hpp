@@ -1,9 +1,10 @@
 #ifndef TS_TS_OPP_HPP
 #define TS_TS_OPP_HPP
 
-#include "../tseries.data.hpp"
-#include "../utils/rangeSpecifier.hpp"
-#include "../utils/copyVector.hpp"
+#include <tslib/tseries.data.hpp>
+#include <tslib/range.specifier/rangeSpecifier.hpp>
+#include <tslib/range.specifier/range.opp.hpp>
+#include <tslib/utils/copyVector.hpp>
 
 namespace tslib
 {
@@ -54,7 +55,11 @@ const TSeries<TDATE,TDATA,TSDIM> apply_opp(const TSeries<TDATE,TDATA,TSDIM>& lhs
   TDATA* rhs_data = rhs.getData();
 
   for(TSDIM col = 0; col < lhs.ncol(); col++) {
-    range.applyOpp(ans_data, lhs_data, rhs_data, opp);
+
+    RangeIterator<const TDATA*, const TSDIM*> lhs_iter(lhs_data, range.getArg1());
+    RangeIterator<const TDATA*, const TSDIM*> rhs_iter(rhs_data, range.getArg2());
+
+    applyRangeOpp(ans_data, lhs_iter, rhs_iter, range.getSize(), opp);
 
     // increment column
     ans_data+= ans.nrow();

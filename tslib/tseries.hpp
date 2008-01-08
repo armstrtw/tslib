@@ -7,7 +7,7 @@
 #include <functional>
 
 #include <tslib/tseries.data.hpp>
-#include <tslib/utils/rangeSpecifier.hpp>
+#include <tslib/range.specifier/rangeSpecifier.hpp>
 #include <tslib/utils/copyVector.hpp>
 #include <tslib/ts.opps/ts.ts.opp.hpp>
 #include <tslib/ts.opps/ts.scalar.opp.hpp>

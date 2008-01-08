@@ -33,9 +33,6 @@ public:
   const U* getArg2() const;
   const U getSize() const;
   void print() const;
-
-  template<typename D, typename BinaryOpp>
-  void applyOpp(D* ans, D* index1_Data, D* index2_Data, BinaryOpp opp) const;
 };
 
 template<typename T, typename U>
@@ -148,13 +145,6 @@ const U* RangeSpecifier<T,U>::getArg1() const {
 template<typename T, typename U>
 const U* RangeSpecifier<T,U>::getArg2() const {
   return index2_;
-}
-
-template<typename T, typename U>
-template<typename D, typename BinaryOpp>
-void RangeSpecifier<T,U>::applyOpp(D* ans, D* index1_Data, D* index2_Data, BinaryOpp opp) const {
-  for(U i = 0; i < size_; i++)
-    ans[i] = opp( index1_Data[ index1_[i] ] , index2_Data[ index2_[i] ] );
 }
 
 template<typename T, typename U>
