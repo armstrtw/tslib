@@ -412,9 +412,9 @@ template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typen
 int TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::setColnames(const vector<string>& cnames) {
   if(cnames.size() == ncol()) {
     tsdata_->setColnames(cnames);
-    return EXIT_SUCCESS;
+    return 0; // SUCCESS
   } else {
-    return EXIT_FAILURE;
+    return 1; // FAILURE
   }
 }
 
