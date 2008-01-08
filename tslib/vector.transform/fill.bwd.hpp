@@ -20,7 +20,7 @@ void fill_bwd(T dest, const T beg, const T end) {
 
   while(beg != end) {
     if(numeric_traits<typename std::iterator_traits<T>::value_type>::ISNA(*end)) {
-      *dest = *(end + 1);
+      *dest = *(dest + 1);
       --dest;
       --end;
     }

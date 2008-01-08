@@ -13,7 +13,7 @@ void fill_fwd(T dest, const T beg, const T end) {
 
   while(beg != end) {
     if(numeric_traits<typename std::iterator_traits<T>::value_type>::ISNA(*beg)) {
-      *dest = *(beg - 1);
+      *dest = *(dest - 1);
       beg++;
       dest++;
     }
