@@ -1,8 +1,8 @@
 #ifndef TS_SCALAR_OPP_HPP
 #define TS_SCALAR_OPP_HPP
 
-#include "../tseries.data.hpp"
-#include "../utils/copyVector.hpp"
+#include <tslib/tseries.data.hpp>
+#include <tslib/utils/copyVector.hpp>
 
 namespace tslib
 {
