@@ -1,7 +1,7 @@
 #ifndef WINDOW_APPLY_HPP
 #define WINDOW_APPLY_HPP
 
-#include "../utils/numeric.traits.hpp"
+#include <tslib/utils/numeric.traits.hpp>
 
 namespace tslib {
 
