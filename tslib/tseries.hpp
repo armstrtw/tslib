@@ -103,7 +103,7 @@ template <typename TDATE, typename TDATA,
 class TSeries {
 private:
   TSDATABACKEND<TDATE,TDATA,TSDIM>* tsdata_;
-
+  const TSDIM offset(const TSDIM row, const TSDIM col) const;
 public:
   // ctors dtors
   ~TSeries();
@@ -181,6 +181,11 @@ public:
   friend std::ostream& operator<< <> (std::ostream& os,
                                       const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& ts);
 };
+
+template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
+const TSDIM TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::offset(const TSDIM row, const TSDIM col) const {
+  return row + col*nrow();
+}
 
 template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
 TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::operator=(const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& rhs) {
