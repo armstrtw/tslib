@@ -1,9 +1,13 @@
+#include <ctime>
+#include <iostream>
+#include <iterator>
 #include <boost/test/included/unit_test_framework.hpp>
 #include <boost/test/unit_test.hpp>
-#include <ctime>
+
 
 #include <tslib/tseries.hpp>
 #include <tslib/vector.summary.hpp>
+#include <tslib/vector.transform.hpp>
 
 using namespace tslib;
 using namespace boost::unit_test_framework;
@@ -11,8 +15,12 @@ using std::cout;
 using std::endl;
 using std::fill_n;
 
+using namespace std;
+
 // seed random number generator
 // srand((unsigned)time(0));
+
+
 
 void null_constructor_test() {
   TSeries<double,double> x;
@@ -248,6 +256,63 @@ void window_apply_test() {
   cout << rank_ans << endl;
 }
 
+void vector_transform_test() {
+
+  // define our answer type
+  typedef fillTraits<double>::ReturnType ansType;
+
+  // gernate data
+  int N = 10;
+  double* x = new double[N];
+  ansType* ans = new ansType[N];
+
+  // gernate data
+  for(long vi = 0; vi < N; vi++)
+    x[vi] = vi+1;
+
+  x[4] = NAN;
+
+  FillBwd<ansType>::apply(ans,x,x+N);
+
+  // 6 because 5 is NA and 6 is next ele
+  BOOST_CHECK_EQUAL(ans[4],6);
+
+  /*
+  cout << "data" << endl;
+  copy(x, x+N,
+       ostream_iterator<double>(cout, " "));
+  cout << endl;
+  cout << "ans" << endl;
+  copy(ans, ans+N,
+       ostream_iterator<double>(cout, " "));
+  cout << endl;
+  */
+
+}
+
+void transform_test() {
+  // define our answer type
+  typedef fillTraits<double>::ReturnType fill_ansType;
+
+  long xnr = 50;
+  long xnc = 5;
+
+  TSeries<double,double> x(xnr,xnc);
+
+  // gernate data
+  for(long vi = 0; vi < x.nrow()*x.ncol(); vi++)
+    x.getData()[vi] = vi+1;
+
+  // generate dates
+  for(long xi = 0; xi < x.nrow(); xi++)
+    x.getDates()[xi] = xi+1;
+
+  x.getData()[21] = NAN;
+
+  TSeries<double,fill_ansType> fillbwd_ans = x.transform<fill_ansType,FillBwd>();
+  BOOST_CHECK_EQUAL(fillbwd_ans.getData()[21], static_cast<double>(23));
+}
+
 
 void lag_lead_test() {
 
@@ -314,5 +379,7 @@ init_unit_test_suite( int argc, char* argv[] ) {
   test->add( BOOST_TEST_CASE( &window_apply_test ) );
   test->add( BOOST_TEST_CASE( &lag_lead_test ) );
   test->add( BOOST_TEST_CASE( &posix_date_test ) );
+  test->add( BOOST_TEST_CASE( &vector_transform_test ) );
+  test->add( BOOST_TEST_CASE( &transform_test ) );
   return test;
 }

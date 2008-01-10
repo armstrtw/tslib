@@ -1,20 +1,24 @@
 #ifndef LAG_HPP
 #define LAG_HPP
 
-#include <tslib/utils/copyVector.hpp>
+#include <algorithm>
 
 namespace tslib {
 
-template <typename T, typename U>
-void lag(T* dest, const T* source_beg, const T* source_end, const U periods) {
+template<typename ReturnType>
+class Lag {
+public:
+  template<typename T, typename U, typename V>
+  static void apply(T dest, U beg, U end, V periods) {
 
-  // set head to NA
-  for(U i = 0; i < periods; i++, dest++, --source_end)
-    *dest = numeric_traits<T>::NA();
+    // set head to NA
+    for(V i = 0; i < periods; i++, dest++, end--)
+      *dest = numeric_traits<ReturnType>::NA();
 
-  if( source_end > source_beg )
-    copyVector(dest, source_beg, std::distance(source_beg,source_end) );
-}
+    if( end > beg )
+      copy(beg, end, dest);
+  }
+};
 
 } // namespace tslib
 

@@ -12,8 +12,7 @@
 #include <tslib/ts.opps/ts.ts.opp.hpp>
 #include <tslib/ts.opps/ts.scalar.opp.hpp>
 #include <tslib/utils/window.apply.hpp>
-#include <tslib/vector.transform/lag.hpp>
-#include <tslib/vector.transform/lead.hpp>
+#include <tslib/vector.transform.hpp>
 #include <tslib/date.policies/posix.date.policy.hpp>
 
 using std::plus;
@@ -127,10 +126,10 @@ public:
   int setColnames(const vector<string>& cnames);
 
   // transforms
-  template<typename ReturnType, template <class> class F>
+  template<typename ReturnType, template<class> class F>
   const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> window(const int window);
 
-  template<typename ReturnType, template <class> class F>
+  template<typename ReturnType, template<class> class F>
   const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> transform();
 
   //operators
@@ -234,13 +233,13 @@ const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TS
 
   if(n > 0) {
     for(TSDIM c = 0; c < ncol(); c++) {
-      lag(ans_data,data,data+nrow(),std::abs(n));
+      Lag<TDATA>::apply(ans_data,data,data+nrow(),std::abs(n));
       ans_data+=ans.nrow();
       data+=nrow();
     }
   } else {
     for(TSDIM c = 0; c < ncol(); c++) {
-      lead(ans_data,data,data+nrow(),std::abs(n));
+      Lead<TDATA>::apply(ans_data,data,data+nrow(),std::abs(n));
       ans_data+=ans.nrow();
       data+=nrow();
     }
@@ -464,7 +463,7 @@ const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDA
   TDATA* data = getData();
 
   for(TSDIM col = 0; col < ncol(); col++) {
-    F<TDATA>::apply(ans_data, data, data + nrow());
+    F<ReturnType>::apply(ans_data, data, data + nrow());
     ans_data += ans.nrow();
     data += nrow();
   }

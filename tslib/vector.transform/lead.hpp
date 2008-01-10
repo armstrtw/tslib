@@ -1,25 +1,29 @@
 #ifndef LEAD_HPP
 #define LEAD_HPP
 
-#include <tslib/utils/copyVector.hpp>
+#include <algorithm>
 
 namespace tslib {
 
-template <typename T, typename U>
-void lead(T* dest, const T* source_beg, const T* source_end, const U periods) {
+template<typename ReturnType>
+class Lead {
+public:
+  template<typename T, typename U, typename V>
+  static void apply(T dest, U beg, U end, V periods) {
 
-  source_beg+=periods;
+    beg+=periods;
 
-  if(source_beg < source_end)
-    copyVector(dest, source_beg, std::distance(source_beg,source_end) );
+    if(beg < end)
+      copy(beg, end, dest);
 
-  // advance dest to beginning of NA's
-  dest += std::distance(source_beg,source_end);
+    // advance dest to beginning of NA's
+    dest += std::distance(beg,end);
 
-  // set tail values to NA
-  for(U i = 0; i < periods; i++,dest++)
-    *dest = numeric_traits<T>::NA();
-}
+    // set tail values to NA
+    for(V i = 0; i < periods; i++, dest++)
+      *dest = numeric_traits<ReturnType>::NA();
+  }
+};
 
 } // namespace tslib
 
