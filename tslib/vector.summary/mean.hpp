@@ -23,7 +23,7 @@ public:
 
 
 template<typename ReturnType>
-class Mean{
+class Mean {
 public:
   template<typename T>
   static ReturnType apply(T beg, T end) {
