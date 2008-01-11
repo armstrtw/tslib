@@ -8,7 +8,6 @@
 
 #include <tslib/tseries.data.hpp>
 #include <tslib/range.specifier/rangeSpecifier.hpp>
-#include <tslib/utils/copyVector.hpp>
 #include <tslib/ts.opps/ts.ts.opp.hpp>
 #include <tslib/ts.opps/ts.scalar.opp.hpp>
 #include <tslib/utils/window.apply.hpp>
@@ -223,7 +222,7 @@ const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TS
   TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> ans(nrow(), ncol());
 
   // copy over dates
-  copyVector(ans.getDates(),getDates(),nrow());
+  std::copy(getDates(),getDates()+nrow(),ans.getDates());
 
   // set new colnames
   ans.setColnames(getColnames());
@@ -369,8 +368,8 @@ TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TS
   TSeries ans(nrow(),ncol());
   ans.setColnames(getColnames());
 
-  copyVector(ans.getDates(), getDates(),nrow());
-  copyVector(ans.getData(), getData(), nrow() * ncol() );
+  std::copy(getDates(),getDates()+nrow(),ans.getDates());
+  std::copy(getData(),getData()+nrow()*ncol(),ans.getData());
 
   return ans;
 }
@@ -430,7 +429,7 @@ const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDA
   TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> ans(nrow(), ncol());
 
   // copy over dates
-  copyVector(ans.getDates(),getDates(),nrow());
+  std::copy(getDates(),getDates()+nrow(),ans.getDates());
 
   // set new colnames
   ans.setColnames(getColnames());
@@ -454,7 +453,7 @@ const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDA
   TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> ans(nrow(), ncol());
 
   // copy over dates
-  copyVector(ans.getDates(),getDates(),nrow());
+  std::copy(getDates(),getDates()+nrow(),ans.getDates());
 
   // set new colnames
   ans.setColnames(getColnames());

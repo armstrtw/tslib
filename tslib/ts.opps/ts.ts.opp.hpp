@@ -1,10 +1,11 @@
 #ifndef TS_TS_OPP_HPP
 #define TS_TS_OPP_HPP
 
+#include <algorithm>
+
 #include <tslib/tseries.data.hpp>
 #include <tslib/range.specifier/rangeSpecifier.hpp>
 #include <tslib/range.specifier/range.opp.hpp>
-#include <tslib/utils/copyVector.hpp>
 
 namespace tslib
 {
@@ -28,7 +29,7 @@ const TSeries<TDATE,TDATA,TSDIM> apply_opp(const TSeries<TDATE,TDATA,TSDIM>& lhs
   TSeries<TDATE,TDATA,TSDIM> ans(range.getSize(),lhs.ncol());
 
   // copy over dates
-  copyVector(ans.getDates(),range.getDates(),range.getSize());
+  std::copy(range.getDates(),range.getDates()+range.getSize(),ans.getDates());
 
   // set new colnames
   vector<string> lhs_cnames = lhs.getColnames();

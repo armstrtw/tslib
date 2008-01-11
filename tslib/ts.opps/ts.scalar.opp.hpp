@@ -1,8 +1,9 @@
 #ifndef TS_SCALAR_OPP_HPP
 #define TS_SCALAR_OPP_HPP
 
+#include <algorithm>
+
 #include <tslib/tseries.data.hpp>
-#include <tslib/utils/copyVector.hpp>
 
 namespace tslib
 {
@@ -16,7 +17,7 @@ const TSeries<TDATE,TDATA,TSDIM> apply_opp(const TDATA lhs_scalar,
   TSeries<TDATE,TDATA,TSDIM> ans(rhs_TSeries.nrow(),rhs_TSeries.ncol());
 
   // copy over dates
-  copyVector(ans.getDates(),rhs_TSeries.getDates(),rhs_TSeries.nrow());
+  std::copy(rhs_TSeries.getDates(),rhs_TSeries.getDates()+rhs_TSeries.nrow(),ans.getDates());
   TDATA* ans_data = ans.getData();
   TDATA* rhs_TSeries_data = rhs_TSeries.getData();
 
@@ -36,7 +37,7 @@ const TSeries<TDATE,TDATA,TSDIM> apply_opp(const TSeries<TDATE,TDATA,TSDIM>& lhs
   TSeries<TDATE,TDATA,TSDIM> ans(lhs_TSeries.nrow(),lhs_TSeries.ncol());
 
   // copy over dates
-  copyVector(ans.getDates(),lhs_TSeries.getDates(),lhs_TSeries.nrow());
+  std::copy(lhs_TSeries.getDates(),lhs_TSeries.getDates()+lhs_TSeries.nrow(),ans.getDates());
   TDATA* ans_data = ans.getData();
   TDATA* lhs_TSeries_data = lhs_TSeries.getData();
 
