@@ -13,7 +13,7 @@ public:
 };
 
 template<typename ReturnType>
-class Rank{
+class Rank {
 public:
   template<typename T>
   static ReturnType apply(T beg, T end) {

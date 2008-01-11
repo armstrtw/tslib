@@ -13,7 +13,7 @@ public:
 };
 
 template<typename ReturnType>
-class Max{
+class Max {
 public:
   template<typename T>
   static ReturnType apply(T beg, T end) {
