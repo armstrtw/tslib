@@ -15,13 +15,13 @@ public:
     *dest++ = *beg++;
 
     while(beg != end) {
-      if(numeric_traits<typename std::iterator_traits<T>::value_type>::ISNA(*beg)) {
+      if(numeric_traits<typename std::iterator_traits<U>::value_type>::ISNA(*beg)) {
         *dest = *(dest - 1);
       } else {
         *dest = *beg;
       }
-      --beg;
-      --dest;
+      ++beg;
+      ++dest;
     }
   }
 };

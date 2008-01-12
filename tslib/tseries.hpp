@@ -131,6 +131,9 @@ public:
   template<typename ReturnType, template<class> class F>
   const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> transform();
 
+  template<typename ReturnType, template<class> class F, typename T>
+  const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> transform_1arg(T arg1);
+
   //operators
   TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& operator=(const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& x);
   TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& operator=(const TDATA x);
@@ -463,6 +466,30 @@ const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDA
 
   for(TSDIM col = 0; col < ncol(); col++) {
     F<ReturnType>::apply(ans_data, data, data + nrow());
+    ans_data += ans.nrow();
+    data += nrow();
+  }
+  return ans;
+}
+
+template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
+template<typename ReturnType, template<class> class F, typename T>
+const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::transform_1arg(T arg1) {
+
+  // allocate new answer
+  TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> ans(nrow(), ncol());
+
+  // copy over dates
+  std::copy(getDates(),getDates()+nrow(),ans.getDates());
+
+  // set new colnames
+  ans.setColnames(getColnames());
+
+  TDATA* ans_data = ans.getData();
+  TDATA* data = getData();
+
+  for(TSDIM col = 0; col < ncol(); col++) {
+    F<ReturnType>::apply(ans_data, data, data + nrow(), arg1);
     ans_data += ans.nrow();
     data += nrow();
   }
