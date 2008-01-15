@@ -24,11 +24,6 @@ using std::divides;
 
 namespace tslib {
 
-
-template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
-std::ostream& operator<<(std::ostream& os,
-                         const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& ts);
-
 template <typename TDATE, typename TDATA,
           typename TSDIM = long,
           template<typename,typename,typename> class TSDATABACKEND = TSdataSingleThreaded,
@@ -274,10 +269,10 @@ std::ostream& operator<< (std::ostream& os, const TSeries<TDATE,TDATA,TSDIM,TSDA
   for(TSDIM row = 0; row < nr; row++) {
     os << DatePolicy<TDATE>::toString(dates[row],"%Y-%m-%d %T") << "\t";
     for(TSDIM col = 0; col < nc; col++) {
-      if(numeric_traits<TDATA>::ISNA(data[row + col*nr])) {
+      if(numeric_traits<TDATA>::ISNA(data[ts.offset(row,col)])) {
           os << "NA" << " ";
       } else {
-        os << data[row + col*nr] << " ";
+        os << data[ts.offset(row,col)] << " ";
       }
     }
     os << std::endl;
