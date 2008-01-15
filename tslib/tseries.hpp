@@ -449,6 +449,20 @@ const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TS
   return row_subset(breaks.begin(), breaks.end());
 }
 
+template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
+const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::toMonthly() const {
+  vector<TSDIM> breaks;
+  MonthlyBreaks<DatePolicy>(getDates(), getDates()+nrow(), breaks);
+  return row_subset(breaks.begin(), breaks.end());
+}
+
+template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
+const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::toWeekly() const {
+  vector<TSDIM> breaks;
+  WeeklyBreaks<DatePolicy>(getDates(), getDates()+nrow(), breaks);
+  return row_subset(breaks.begin(), breaks.end());
+}
+
 // this is for a positive row subset (positive and negative rowsets cannot mix)
 template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
 template<typename T>
@@ -479,24 +493,6 @@ const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TS
   }
   return ans;
 }
-
-
-/*
-template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
-const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::toMonthly() const {
-  vetor<TSDIM> breaks;
-  MonthlyBreaks(breaks,getDates(),getDates()+nrow());
-  return row_subset(breaks);
-}
-
-template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
-const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::toWeekly() const {
-  vetor<TSDIM> breaks;
-  WeeklyBreaks(breaks,getDates(),getDates()+nrow());
-  return row_subset(breaks);
-}
-*/
-
 
 }  // namespace tslib
 
