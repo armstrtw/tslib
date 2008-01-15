@@ -16,7 +16,7 @@ public:
       *dest = numeric_traits<ReturnType>::NA();
 
     if( end > beg )
-      copy(beg, end, dest);
+      std::copy(beg, end, dest);
   }
 };
 

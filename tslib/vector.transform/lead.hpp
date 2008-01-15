@@ -14,7 +14,7 @@ public:
     beg+=periods;
 
     if(beg < end)
-      copy(beg, end, dest);
+      std::copy(beg, end, dest);
 
     // advance dest to beginning of NA's
     dest += std::distance(beg,end);
