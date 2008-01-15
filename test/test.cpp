@@ -4,7 +4,6 @@
 #include <boost/test/included/unit_test_framework.hpp>
 #include <boost/test/unit_test.hpp>
 
-
 #include <tslib/tseries.hpp>
 #include <tslib/vector.summary.hpp>
 #include <tslib/vector.transform.hpp>
@@ -363,11 +362,61 @@ void posix_date_test() {
 
 }
 
+
+void quarterly_breaks_test() {
+  const char* jan_01_2007 = "01/01/2007";
+  const char* fmt_america = "%m/%d/%Y";
+  vector<long> dts;
+
+  long dt = PosixDate<long>::toDate(jan_01_2007,fmt_america);
+
+  for(int i = 0; i < 24; i++) {
+    back_inserter(dts) = PosixDate<long>::AddMonths(dt,i);
+  }
+
+
+  for(vector<long>::iterator beg = dts.begin(); beg != dts.end(); beg++) {
+    cout << PosixDate<long>::toString(*beg,fmt_america);
+    cout << endl;
+  }
+
+  vector<int> ans;
+  QuarterlyBreaks<PosixDate,int>(dts.begin(),dts.end(),ans);
+
+  copy(ans.begin(), ans.end(), ostream_iterator<int>(cout, " "));
+}
+
+void quarterly_tseries_test() {
+  const char* jan_01_2007 = "01/01/2007";
+  const char* fmt_america = "%m/%d/%Y";
+  vector<long> dts;
+
+  long xnr = 365*2;
+  long xnc = 5;
+
+  TSeries<long,double> x(xnr,xnc);
+
+  // gernate data
+  for(long vi = 0; vi < x.nrow()*x.ncol(); vi++)
+    x.getData()[vi] = vi+1;
+
+  long dt = PosixDate<long>::toDate(jan_01_2007,fmt_america);
+
+  for(int i = 0; i < xnr; i++) {
+    x.getDates()[i] = PosixDate<long>::AddDays(dt,i);
+  }
+
+  cout << x << endl;
+  cout << x.toQuarterly() << endl;
+
+}
+
 test_suite*
 init_unit_test_suite( int argc, char* argv[] ) {
 
   test_suite* test= BOOST_TEST_SUITE("tslib test");
 
+  /*
   test->add( BOOST_TEST_CASE( &null_constructor_test ) );
   test->add( BOOST_TEST_CASE( &std_constructor_test ) );
   test->add( BOOST_TEST_CASE( &tsdata_constructor_test) );
@@ -381,5 +430,9 @@ init_unit_test_suite( int argc, char* argv[] ) {
   test->add( BOOST_TEST_CASE( &posix_date_test ) );
   test->add( BOOST_TEST_CASE( &vector_transform_test ) );
   test->add( BOOST_TEST_CASE( &transform_test ) );
+  test->add( BOOST_TEST_CASE( &quarterly_breaks_test ) );
+  */
+
+  test->add( BOOST_TEST_CASE( &quarterly_tseries_test ) );
   return test;
 }
