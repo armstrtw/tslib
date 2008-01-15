@@ -3,8 +3,7 @@
 
 #include <ctime>
 
-namespace tslib
-{
+namespace tslib {
 
 
 template<typename T>
@@ -26,6 +25,7 @@ public:
   static const T AddYears(const T x, const int n);
   static const T AddMonths(const T x, const int n);
   static const T AddDays(const T x, const int n);
+  static const int daily_distance(const T x, const T y);
 };
 
 template<typename T>
@@ -276,6 +276,13 @@ const T PosixDate<T>::AddDays(const T x, const int n) {
   return ans;
 }
 
+template<typename T>
+const int PosixDate<T>::daily_distance(const T x, const T y) {
+
+  const long seconds_in_day = 60*60*24;
+
+  return (x - y)/seconds_in_day;
+}
 
 } // namespace tslib
 
