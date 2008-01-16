@@ -416,7 +416,6 @@ init_unit_test_suite( int argc, char* argv[] ) {
 
   test_suite* test= BOOST_TEST_SUITE("tslib test");
 
-  /*
   test->add( BOOST_TEST_CASE( &null_constructor_test ) );
   test->add( BOOST_TEST_CASE( &std_constructor_test ) );
   test->add( BOOST_TEST_CASE( &tsdata_constructor_test) );
@@ -431,8 +430,6 @@ init_unit_test_suite( int argc, char* argv[] ) {
   test->add( BOOST_TEST_CASE( &vector_transform_test ) );
   test->add( BOOST_TEST_CASE( &transform_test ) );
   test->add( BOOST_TEST_CASE( &quarterly_breaks_test ) );
-  */
-
   test->add( BOOST_TEST_CASE( &quarterly_tseries_test ) );
   return test;
 }
