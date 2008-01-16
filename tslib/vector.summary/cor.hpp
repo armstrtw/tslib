@@ -3,6 +3,7 @@
 
 #include <iterator>
 #include <tslib/utils/numeric.traits.hpp>
+#include <tslib/vector.summary/stdev.hpp>
 
 namespace tslib {
 
