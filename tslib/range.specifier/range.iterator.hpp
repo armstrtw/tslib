@@ -1,73 +1,108 @@
 #ifndef RANGE_ITERATOR_HPP
 #define RANGE_ITERATOR_HPP
 
+namespace tslib {
+
+
 #include <iterator>
-template<typename DATAITER, typename INDEXITER>
+template<typename DATAPOINTER, typename INDEXPOINTER>
 class RangeIterator {
 private:
-  DATAITER data_iterator_;
-  const INDEXITER index_iterator_;
-  size_t current_index_;
+  const DATAPOINTER data_pointer_;
+  INDEXPOINTER index_pointer_;
 public:
-  RangeIterator(const DATAITER data_iterator, const INDEXITER index_iterator);
+  RangeIterator(const DATAPOINTER data_pointer, const INDEXPOINTER index_pointer);
+  RangeIterator(const RangeIterator& r);
 
-  RangeIterator<DATAITER,INDEXITER>& operator++();
-  RangeIterator<DATAITER,INDEXITER> operator++(int i);
-  RangeIterator<DATAITER,INDEXITER>& operator--();
-  RangeIterator<DATAITER,INDEXITER> operator--(int i);
+  RangeIterator<DATAPOINTER,INDEXPOINTER>& operator++();
+  RangeIterator<DATAPOINTER,INDEXPOINTER> operator++(const int i);
+  RangeIterator<DATAPOINTER,INDEXPOINTER>& operator--();
+  RangeIterator<DATAPOINTER,INDEXPOINTER> operator--(const int i);
 
-  RangeIterator<DATAITER,INDEXITER>& operator+=(int i);
-  RangeIterator<DATAITER,INDEXITER>& operator-=(int i);
-  typename std::iterator_traits<DATAITER>::value_type operator*();
+  RangeIterator<DATAPOINTER,INDEXPOINTER>& operator+=(const int i);
+  RangeIterator<DATAPOINTER,INDEXPOINTER>& operator-=(const int i);
+
+  RangeIterator<DATAPOINTER,INDEXPOINTER>& operator+(const int i) const;
+  RangeIterator<DATAPOINTER,INDEXPOINTER>& operator-(const int i) const;
+
+  typename std::iterator_traits<DATAPOINTER>::value_type operator*();
 };
 
-template<typename DATAITER, typename INDEXITER>
-RangeIterator<DATAITER,INDEXITER>::RangeIterator(const DATAITER data_iterator, const INDEXITER index_iterator) :
-  data_iterator_(data_iterator),
-  index_iterator_(index_iterator),
-  current_index_(0) {}
+template<typename DATAPOINTER, typename INDEXPOINTER>
+RangeIterator<DATAPOINTER,INDEXPOINTER>::RangeIterator(const DATAPOINTER data_pointer, const INDEXPOINTER index_pointer) :
+  data_pointer_(data_pointer),
+  index_pointer_(index_pointer) {
+}
 
-template<typename DATAITER, typename INDEXITER>
-RangeIterator<DATAITER,INDEXITER>& RangeIterator<DATAITER,INDEXITER>::operator++() {
-    ++current_index_;
+template<typename DATAPOINTER, typename INDEXPOINTER>
+inline
+RangeIterator<DATAPOINTER,INDEXPOINTER>::RangeIterator(const RangeIterator& r) :
+  data_pointer_(r.data_pointer_),
+  index_pointer_(r.index_pointer_) {
+}
+
+template<typename DATAPOINTER, typename INDEXPOINTER>
+inline
+RangeIterator<DATAPOINTER,INDEXPOINTER>& RangeIterator<DATAPOINTER,INDEXPOINTER>::operator++() {
+    ++index_pointer_;
     return *this;
 }
 
-template<typename DATAITER, typename INDEXITER>
-RangeIterator<DATAITER,INDEXITER> RangeIterator<DATAITER,INDEXITER>::operator++(int i) {
-  RangeIterator<DATAITER,INDEXITER> tmp = *this;
+template<typename DATAPOINTER, typename INDEXPOINTER>
+inline
+RangeIterator<DATAPOINTER,INDEXPOINTER> RangeIterator<DATAPOINTER,INDEXPOINTER>::operator++(const int i) {
+  RangeIterator<DATAPOINTER,INDEXPOINTER> tmp(*this);
   ++*this;
   return tmp;
 }
 
-template<typename DATAITER, typename INDEXITER>
-RangeIterator<DATAITER,INDEXITER>& RangeIterator<DATAITER,INDEXITER>::operator--() {
-  --current_index_;
+template<typename DATAPOINTER, typename INDEXPOINTER>
+inline
+RangeIterator<DATAPOINTER,INDEXPOINTER>& RangeIterator<DATAPOINTER,INDEXPOINTER>::operator--() {
+  --index_pointer_;
   return *this;
 }
 
-template<typename DATAITER, typename INDEXITER>
-RangeIterator<DATAITER,INDEXITER> RangeIterator<DATAITER,INDEXITER>::operator--(int i) {
-  RangeIterator<DATAITER,INDEXITER> tmp = *this;
+template<typename DATAPOINTER, typename INDEXPOINTER>
+inline
+RangeIterator<DATAPOINTER,INDEXPOINTER> RangeIterator<DATAPOINTER,INDEXPOINTER>::operator--(const int i) {
+  RangeIterator<DATAPOINTER,INDEXPOINTER> tmp(*this);
   --*this;
   return tmp;
 }
 
-template<typename DATAITER, typename INDEXITER>
-RangeIterator<DATAITER,INDEXITER>& RangeIterator<DATAITER,INDEXITER>::operator+=(int i) {
-  current_index_ += i;
+template<typename DATAPOINTER, typename INDEXPOINTER>
+inline
+RangeIterator<DATAPOINTER,INDEXPOINTER>& RangeIterator<DATAPOINTER,INDEXPOINTER>::operator+=(const int i) {
+  index_pointer_ += i;
   return *this;
 }
 
-template<typename DATAITER, typename INDEXITER>
-RangeIterator<DATAITER,INDEXITER>& RangeIterator<DATAITER,INDEXITER>::operator-=(int i) {
-  current_index_ -= i;
+template<typename DATAPOINTER, typename INDEXPOINTER>
+inline
+RangeIterator<DATAPOINTER,INDEXPOINTER>& RangeIterator<DATAPOINTER,INDEXPOINTER>::operator-=(const int i) {
+  index_pointer_ -= i;
   return *this;
 }
 
-template<typename DATAITER, typename INDEXITER>
-typename std::iterator_traits<DATAITER>::value_type RangeIterator<DATAITER,INDEXITER>::operator*() {
-  return data_iterator_[ index_iterator_[current_index_] ];
+template<typename DATAPOINTER, typename INDEXPOINTER>
+inline
+RangeIterator<DATAPOINTER,INDEXPOINTER>& RangeIterator<DATAPOINTER,INDEXPOINTER>::operator+(const int i) const {
+  return RangeIterator(data_pointer_, index_pointer_ + i);
 }
+
+template<typename DATAPOINTER, typename INDEXPOINTER>
+inline
+RangeIterator<DATAPOINTER,INDEXPOINTER>& RangeIterator<DATAPOINTER,INDEXPOINTER>::operator-(const int i) const {
+  return RangeIterator(data_pointer_, index_pointer_ - i);
+}
+
+template<typename DATAPOINTER, typename INDEXPOINTER>
+inline
+typename std::iterator_traits<DATAPOINTER>::value_type RangeIterator<DATAPOINTER,INDEXPOINTER>::operator*() {
+  return data_pointer_[ *index_pointer_ ];
+}
+
+} // namespace tslib
 
 #endif // RANGE_ITERATOR_HPP
