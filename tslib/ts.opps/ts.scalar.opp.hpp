@@ -5,47 +5,61 @@
 
 #include <tslib/tseries.data.hpp>
 
-namespace tslib
-{
+namespace tslib {
 
-template<class TDATE, class TDATA, class TSDIM, template<class U, class V, class W> class TSeries, class opptype>
-const TSeries<TDATE,TDATA,TSDIM> apply_opp(const TDATA lhs_scalar,
-                                           const TSeries<TDATE,TDATA,TSDIM>& rhs_TSeries,
-                                           opptype opp) {
+  template<class TDATE,
+           class TDATA,
+           class TSDIM,
+           template<typename,typename,typename> class TSDATABACKEND,
+           template<typename> class DatePolicy,
+           template<class U, class V, class W, template<typename,typename,typename> class DATABACKEND, template<typename> class DP> class TSeries,
+           class opptype>
 
-  // allocate new answer
-  TSeries<TDATE,TDATA,TSDIM> ans(rhs_TSeries.nrow(),rhs_TSeries.ncol());
+  const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> apply_opp(const TDATA lhs_scalar,
+                                             const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& rhs_TSeries,
+                                             opptype opp) {
 
-  // copy over dates
-  std::copy(rhs_TSeries.getDates(),rhs_TSeries.getDates()+rhs_TSeries.nrow(),ans.getDates());
-  TDATA* ans_data = ans.getData();
-  TDATA* rhs_TSeries_data = rhs_TSeries.getData();
+    // allocate new answer
+    TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> ans(rhs_TSeries.nrow(),rhs_TSeries.ncol());
 
-  for(TSDIM i = 0; i < rhs_TSeries.nrow()*rhs_TSeries.ncol(); i++)
-    ans_data[i] = opp(lhs_scalar,rhs_TSeries_data[i]);
+    // copy over dates
+    std::copy(rhs_TSeries.getDates(),rhs_TSeries.getDates()+rhs_TSeries.nrow(),ans.getDates());
+    TDATA* ans_data = ans.getData();
+    TDATA* rhs_TSeries_data = rhs_TSeries.getData();
 
-  return ans;
-}
+    for(TSDIM i = 0; i < rhs_TSeries.nrow()*rhs_TSeries.ncol(); i++)
+      ans_data[i] = opp(lhs_scalar,rhs_TSeries_data[i]);
+
+    return ans;
+  }
 
 
-template<class TDATE, class TDATA, class TSDIM, template<class U, class V, class W> class TSeries, class opptype>
-const TSeries<TDATE,TDATA,TSDIM> apply_opp(const TSeries<TDATE,TDATA,TSDIM>& lhs_TSeries,
-                                     const TDATA rhs_scalar,
-                                     opptype opp) {
+  template<class TDATE,
+           class TDATA,
+           class TSDIM,
+           template<typename,typename,typename> class TSDATABACKEND,
+           template<typename> class DatePolicy,
+           template<class U, class V, class W, template<typename,typename,typename> class DATABACKEND, template<typename> class DP> class TSeries,
+           class opptype>
 
-  // allocate new answer
-  TSeries<TDATE,TDATA,TSDIM> ans(lhs_TSeries.nrow(),lhs_TSeries.ncol());
 
-  // copy over dates
-  std::copy(lhs_TSeries.getDates(),lhs_TSeries.getDates()+lhs_TSeries.nrow(),ans.getDates());
-  TDATA* ans_data = ans.getData();
-  TDATA* lhs_TSeries_data = lhs_TSeries.getData();
+  const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> apply_opp(const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& lhs_TSeries,
+                                             const TDATA rhs_scalar,
+                                             opptype opp) {
 
-  for(TSDIM i = 0; i < lhs_TSeries.nrow()*lhs_TSeries.ncol(); i++)
-    ans_data[i] = opp(lhs_TSeries_data[i],rhs_scalar);
+    // allocate new answer
+    TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> ans(lhs_TSeries.nrow(),lhs_TSeries.ncol());
 
-  return ans;
-}
+    // copy over dates
+    std::copy(lhs_TSeries.getDates(),lhs_TSeries.getDates()+lhs_TSeries.nrow(),ans.getDates());
+    TDATA* ans_data = ans.getData();
+    TDATA* lhs_TSeries_data = lhs_TSeries.getData();
+
+    for(TSDIM i = 0; i < lhs_TSeries.nrow()*lhs_TSeries.ncol(); i++)
+      ans_data[i] = opp(lhs_TSeries_data[i],rhs_scalar);
+
+    return ans;
+  }
 
 } // namespace tslib
 

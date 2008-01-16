@@ -11,65 +11,72 @@ namespace tslib
 {
 
 
-template<class TDATE, class TDATA, class TSDIM, template<class U, class V, class W> class TSeries, class opptype>
-const TSeries<TDATE,TDATA,TSDIM> apply_opp(const TSeries<TDATE,TDATA,TSDIM>& lhs,
-                                     const TSeries<TDATE,TDATA,TSDIM>& rhs,
-                                     opptype opp) {
+  template<class TDATE,
+           class TDATA,
+           class TSDIM,
+           template<typename,typename,typename> class TSDATABACKEND,
+           template<typename> class DatePolicy,
+           template<class U, class V, class W, template<typename,typename,typename> class DATABACKEND, template<typename> class DP> class TSeries,
+           class opptype>
 
-  if(lhs.ncol() != rhs.ncol())
-    return TSeries<TDATE,TDATA,TSDIM>();
+  const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> apply_opp(const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& lhs,
+                                                                      const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& rhs,
+                                                                      opptype opp) {
 
-  // find date intersection
-  RangeSpecifier<TDATE,TSDIM> range(lhs.getDates(), rhs.getDates(), lhs.nrow(), rhs.nrow() );
+    if(lhs.ncol() != rhs.ncol())
+      return TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>();
 
-  if(!range.getSize())
-    return TSeries<TDATE,TDATA,TSDIM>();
+    // find date intersection
+    RangeSpecifier<TDATE,TSDIM> range(lhs.getDates(), rhs.getDates(), lhs.nrow(), rhs.nrow() );
 
-  // allocate new answer
-  TSeries<TDATE,TDATA,TSDIM> ans(range.getSize(),lhs.ncol());
+    if(!range.getSize())
+      return TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>();
 
-  // copy over dates
-  std::copy(range.getDates(),range.getDates()+range.getSize(),ans.getDates());
+    // allocate new answer
+    TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> ans(range.getSize(),lhs.ncol());
 
-  // set new colnames
-  vector<string> lhs_cnames = lhs.getColnames();
-  vector<string> rhs_cnames = rhs.getColnames();
-  vector<string> ans_cnames;
+    // copy over dates
+    std::copy(range.getDates(),range.getDates()+range.getSize(),ans.getDates());
 
-  if(lhs_cnames==rhs_cnames) {
-    ans_cnames = lhs_cnames;
-  } else {
-    // loop through and combine colnames from lhs and rhs
-    if(lhs_cnames.size() && rhs_cnames.size()) {
-      for(size_t i = 0; i < lhs_cnames.size(); i++) {
-        ans_cnames.push_back( lhs_cnames[i] + rhs_cnames[i] );
-      }
+    // set new colnames
+    vector<string> lhs_cnames = lhs.getColnames();
+    vector<string> rhs_cnames = rhs.getColnames();
+    vector<string> ans_cnames;
+
+    if(lhs_cnames==rhs_cnames) {
+      ans_cnames = lhs_cnames;
     } else {
-      ans_cnames = lhs_cnames.size() ? lhs_cnames : rhs_cnames;
+      // loop through and combine colnames from lhs and rhs
+      if(lhs_cnames.size() && rhs_cnames.size()) {
+        for(size_t i = 0; i < lhs_cnames.size(); i++) {
+          ans_cnames.push_back( lhs_cnames[i] + rhs_cnames[i] );
+        }
+      } else {
+        ans_cnames = lhs_cnames.size() ? lhs_cnames : rhs_cnames;
+      }
     }
+
+    ans.setColnames(ans_cnames);
+
+    TDATA* ans_data = ans.getData();
+    TDATA* lhs_data = lhs.getData();
+    TDATA* rhs_data = rhs.getData();
+
+    for(TSDIM col = 0; col < lhs.ncol(); col++) {
+
+      RangeIterator<const TDATA*, const TSDIM*> lhs_iter(lhs_data, range.getArg1());
+      RangeIterator<const TDATA*, const TSDIM*> rhs_iter(rhs_data, range.getArg2());
+
+      applyRangeOpp(ans_data, lhs_iter, rhs_iter, range.getSize(), opp);
+
+      // increment column
+      ans_data+= ans.nrow();
+      lhs_data+= lhs.nrow();
+      rhs_data+= rhs.nrow();
+    }
+
+    return ans;
   }
-
-  ans.setColnames(ans_cnames);
-
-  TDATA* ans_data = ans.getData();
-  TDATA* lhs_data = lhs.getData();
-  TDATA* rhs_data = rhs.getData();
-
-  for(TSDIM col = 0; col < lhs.ncol(); col++) {
-
-    RangeIterator<const TDATA*, const TSDIM*> lhs_iter(lhs_data, range.getArg1());
-    RangeIterator<const TDATA*, const TSDIM*> rhs_iter(rhs_data, range.getArg2());
-
-    applyRangeOpp(ans_data, lhs_iter, rhs_iter, range.getSize(), opp);
-
-    // increment column
-    ans_data+= ans.nrow();
-    lhs_data+= lhs.nrow();
-    rhs_data+= rhs.nrow();
-  }
-
-  return ans;
-}
 
 } // namespace tslib
 
