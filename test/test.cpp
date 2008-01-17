@@ -5,6 +5,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include <tslib/tseries.hpp>
+#include <tslib/utils/window.function.hpp>
 #include <tslib/vector.summary.hpp>
 #include <tslib/vector.transform.hpp>
 
@@ -411,6 +412,42 @@ void quarterly_tseries_test() {
 
 }
 
+void window_function_test() {
+const char* jan_01_2007 = "01/01/2007";
+  const char* fmt_america = "%m/%d/%Y";
+  vector<long> dts;
+
+  long xnr = 365;
+  long xnc = 1;
+
+  long ynr = 100;
+  long ync = 1;
+
+  TSeries<long,double> x(xnr,xnc);
+  TSeries<long,double> y(ynr,ync);
+
+  // gernate data for x
+  for(long vi = 0; vi < x.nrow()*x.ncol(); vi++)
+    x.getData()[vi] = rand();
+
+  long dt = PosixDate<long>::toDate(jan_01_2007,fmt_america);
+
+  for(int i = 0; i < xnr; i++)
+    x.getDates()[i] = PosixDate<long>::AddDays(dt,i);
+
+  // gernate data for y
+  for(long vi = 0; vi < y.nrow()*y.ncol(); vi++)
+    y.getData()[vi] = rand();
+
+  for(int i = 0; i < ynr; i++)
+    y.getDates()[i] = PosixDate<long>::AddDays(dt,i);
+
+  TSeries<long,corTraits<double>::ReturnType> ans =  window_function<corTraits<double>::ReturnType,Cor>(x,x,20);
+  TSeries<long,corTraits<double>::ReturnType> ans2 =  window_function<corTraits<double>::ReturnType,Cor>(x,y,5);
+  cout << ans << endl;
+  cout << ans2 << endl;
+}
+
 test_suite*
 init_unit_test_suite( int argc, char* argv[] ) {
 
@@ -431,5 +468,6 @@ init_unit_test_suite( int argc, char* argv[] ) {
   test->add( BOOST_TEST_CASE( &transform_test ) );
   test->add( BOOST_TEST_CASE( &quarterly_breaks_test ) );
   test->add( BOOST_TEST_CASE( &quarterly_tseries_test ) );
+  test->add( BOOST_TEST_CASE( &window_function_test ) );
   return test;
 }
