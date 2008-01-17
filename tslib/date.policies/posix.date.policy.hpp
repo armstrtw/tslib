@@ -25,7 +25,7 @@ public:
   static const T AddYears(const T x, const int n);
   static const T AddMonths(const T x, const int n);
   static const T AddDays(const T x, const int n);
-  static const int daily_distance(const T x, const T y);
+  static const double daily_distance(const T x, const T y);
 };
 
 template<typename T>
@@ -277,7 +277,7 @@ const T PosixDate<T>::AddDays(const T x, const int n) {
 }
 
 template<typename T>
-const int PosixDate<T>::daily_distance(const T x, const T y) {
+const double PosixDate<T>::daily_distance(const T x, const T y) {
 
   const long seconds_in_day = 60*60*24;
 
