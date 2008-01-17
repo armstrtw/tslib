@@ -12,6 +12,7 @@
 #include <tslib/ts.opps/ts.ts.opp.hpp>
 #include <tslib/ts.opps/ts.scalar.opp.hpp>
 #include <tslib/utils/window.apply.hpp>
+#include <tslib/utils/window.function.hpp>
 #include <tslib/vector.transform.hpp>
 #include <tslib/date.policies/posix.date.policy.hpp>
 #include <tslib/date.policies/date.breaks.hpp>
