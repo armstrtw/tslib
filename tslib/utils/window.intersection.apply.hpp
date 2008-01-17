@@ -1,5 +1,5 @@
-#ifndef WINDOW_APPLY_HPP
-#define WINDOW_APPLY_HPP
+#ifndef WINDOW_INTERSECTION_APPLY_HPP
+#define WINDOW_INTERSECTION_APPLY_HPP
 
 #include <tslib/utils/numeric.traits.hpp>
 
@@ -9,7 +9,7 @@ template<typename ReturnType,
          template<class> class F>
 class windowIntersectionApply {
 public:
-  template<typename T, template<class,class> DataIter, typename TSDIM>
+  template<typename T, class DataIter, typename TSDIM>
   static void apply(T ans, DataIter x_iter, DataIter y_iter, TSDIM size, const int window) {
 
     // if window is bigger than len, return all NA
@@ -27,7 +27,8 @@ public:
     }
 
     // apply fun to rest
-    while(beg != end) {
+    // FIXME: check this range to make sure it's right
+    for(TSDIM i = (window-1); i < size; i++) {
       *ans = F<ReturnType>::apply(x_iter-(window-1),x_iter+1,y_iter-(window-1),y_iter+1);
       ++x_iter;
       ++y_iter;
@@ -38,4 +39,4 @@ public:
 
 } // namespace tslib
 
-#endif // WINDOW_APPLY_HPP
+#endif // WINDOW_INTERSECTION_APPLY_HPP
