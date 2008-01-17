@@ -271,9 +271,9 @@ const T PosixDate<T>::AddDays(const T x, const int n) {
   T ans = x + (seconds_in_day * n);
 
   // do DST shift check
-  dst_shift_check(ans,x);
+  int shift_error = dst_shift_check(ans,x);
 
-  return ans;
+  return ans + shift_error;
 }
 
 template<typename T>
