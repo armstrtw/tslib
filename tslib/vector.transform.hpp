@@ -9,6 +9,7 @@
 #include <tslib/vector.transform/lag.lead.traits.hpp>
 #include <tslib/vector.transform/lag.hpp>
 #include <tslib/vector.transform/lead.hpp>
+#include <tslib/vector.transform/since.na.traits.hpp>
 #include <tslib/vector.transform/since.na.hpp>
 
 #endif // VECTOR_TRANSFORM_HPP
