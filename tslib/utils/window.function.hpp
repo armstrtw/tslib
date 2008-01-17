@@ -26,13 +26,13 @@ namespace tslib {
     TSDIM rhs_ncol = rhs.ncol();
 
     if(lhs_ncol != rhs_ncol && lhs_ncol != 1 && rhs_ncol != 1)
-      return TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>();
+      return TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy>();
 
     // find date intersection
     RangeSpecifier<TDATE,TSDIM> range(lhs.getDates(), rhs.getDates(), lhs.nrow(), rhs.nrow() );
 
     if(!range.getSize())
-      return TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>();
+      return TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy>();
 
     TSDIM ans_ncol = (lhs_ncol > rhs_ncol) ? lhs_ncol : rhs_ncol;
 
@@ -57,7 +57,7 @@ namespace tslib {
 
     ans.setColnames(ans_cnames);
 
-    TDATA* ans_data = ans.getData();
+    ReturnType* ans_data = ans.getData();
     TDATA* lhs_data = lhs.getData();
     TDATA* rhs_data = rhs.getData();
 
