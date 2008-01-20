@@ -22,25 +22,25 @@
 
 namespace tslib {
 
-template<typename ReturnType>
-class Lead {
-public:
-  template<typename T, typename U, typename V>
-  static void apply(T dest, U beg, U end, V periods) {
+  template<typename ReturnType>
+  class Lead {
+  public:
+    template<typename T, typename U, typename V>
+    static void apply(T dest, U beg, U end, V periods) {
 
-    beg+=periods;
+      beg+=periods;
 
-    if(beg < end)
-      std::copy(beg, end, dest);
+      if(beg < end)
+	std::copy(beg, end, dest);
 
-    // advance dest to beginning of NA's
-    dest += std::distance(beg,end);
+      // advance dest to beginning of NA's
+      dest += std::distance(beg,end);
 
-    // set tail values to NA
-    for(V i = 0; i < periods; i++, dest++)
-      *dest = numeric_traits<ReturnType>::NA();
-  }
-};
+      // set tail values to NA
+      for(V i = 0; i < periods; i++, dest++)
+	*dest = numeric_traits<ReturnType>::NA();
+    }
+  };
 
 } // namespace tslib
 

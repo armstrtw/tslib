@@ -24,8 +24,7 @@
 #include <tslib/range.specifier/rangeSpecifier.hpp>
 #include <tslib/range.specifier/range.opp.hpp>
 
-namespace tslib
-{
+namespace tslib {
 
 
   template<class TDATE,
