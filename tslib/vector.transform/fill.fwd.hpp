@@ -22,26 +22,26 @@
 
 namespace tslib {
 
-template<typename ReturnType>
-class FillFwd {
-public:
-  template<typename T, typename U>
-  static void apply(T dest, U beg, U end) {
+  template<typename ReturnType>
+  class FillFwd {
+  public:
+    template<typename T, typename U>
+    static void apply(T dest, U beg, U end) {
 
-    // nothing we can do about elelment [0]
-    *dest++ = *beg++;
+      // nothing we can do about elelment [0]
+      *dest++ = *beg++;
 
-    while(beg != end) {
-      if(numeric_traits<typename std::iterator_traits<U>::value_type>::ISNA(*beg)) {
-        *dest = *(dest - 1);
-      } else {
-        *dest = *beg;
+      while(beg != end) {
+	if(numeric_traits<typename std::iterator_traits<U>::value_type>::ISNA(*beg)) {
+	  *dest = *(dest - 1);
+	} else {
+	  *dest = *beg;
+	}
+	++beg;
+	++dest;
       }
-      ++beg;
-      ++dest;
     }
-  }
-};
+  };
 
 } // namespace tslib
 
