@@ -248,7 +248,7 @@ namespace tslib {
     // adjust years
     posix_time_tm.tm_year+=n;
 
-    // make sure we don't drop out Feb 28 if shift causes us to land on leapyear
+    // make sure we drop out Feb 29 if we go from leapyear to non-leapyear
     check_day_of_month(posix_time_tm);
 
     // convert to POSIXct
