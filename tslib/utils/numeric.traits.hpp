@@ -21,6 +21,13 @@
 #include <limits>
 #include <cmath>
 
+// to be conformant to R's NA value
+typedef union {
+  double value;
+  unsigned int word[2];
+} ieee_type;
+
+
 namespace tslib {
 
   template<typename T>
@@ -32,8 +39,23 @@ namespace tslib {
     static const bool has_NA = true;
 
     static double NA() {
-      return std::numeric_limits<double>::quiet_NaN();
+      volatile ieee_type ans_ieee;
+
+      // do this b/c don't have a good way to determine
+      // endianness at compile time
+      double ans = std::numeric_limits<double>::quiet_NaN();
+
+      ans_ieee.value = ans;
+
+      if( ans_ieee.word[0] == 0 ) {
+        ans_ieee.word[0] = 1954;
+      } else {
+        ans_ieee.word[1] = 1954;
+      }
+
+      return ans_ieee.value;
     }
+
     static bool ISNA(double x) {
       return isnan(x);
     }
