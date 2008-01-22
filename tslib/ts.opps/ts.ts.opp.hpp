@@ -94,6 +94,53 @@ namespace tslib {
     return ans;
   }
 
+
+  template<class TDATE,
+           class TDATA,
+           class TSDIM,
+           template<typename,typename,typename> class TSDATABACKEND,
+           template<typename> class DatePolicy,
+           template<class U, class V, class W, template<typename,typename,typename> class DATABACKEND, template<typename> class DP> class TSeries,
+           class opptype>
+
+  const vector<bool> apply_boolean_opp(const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& lhs,
+                                       const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& rhs,
+                                       opptype opp) {
+
+    vector<bool> ans;
+
+    if(lhs.ncol() != rhs.ncol())
+      return ans;
+
+    // find date intersection
+    RangeSpecifier<TDATE,TSDIM> range(lhs.getDates(), rhs.getDates(), lhs.nrow(), rhs.nrow() );
+
+    if(!range.getSize())
+      return ans;
+
+    // allocate new answer
+    ans.reserve(range.getSize()*lhs.ncol);
+
+    vector<bool>::iterator ans_data = ans.begin();
+    TDATA* lhs_data = lhs.getData();
+    TDATA* rhs_data = rhs.getData();
+
+    for(TSDIM col = 0; col < lhs.ncol(); col++) {
+
+      RangeIterator<const TDATA*, const TSDIM*> lhs_iter(lhs_data, range.getArg1());
+      RangeIterator<const TDATA*, const TSDIM*> rhs_iter(rhs_data, range.getArg2());
+
+      applyRangeOpp(ans_data, lhs_iter, rhs_iter, range.getSize(), opp);
+
+      // increment column
+      ans_data += range.getSize();
+      lhs_data += lhs.nrow();
+      rhs_data += rhs.nrow();
+    }
+
+    return ans;
+  }
+
 } // namespace tslib
 
 #endif // TS_TS_OPP_HPP
