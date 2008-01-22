@@ -33,7 +33,7 @@ namespace tslib {
       dest_type count;
 
       // while no NA is found at all in the tseries then -1
-      while(beg != end && !numeric_traits<typename std::iterator_traits<T>::value_type>::ISNA(*beg) ) {
+      while(beg != end && !numeric_traits<typename std::iterator_traits<U>::value_type>::ISNA(*beg) ) {
         *dest = static_cast<dest_type>(-1);
         ++beg;
         ++dest;
@@ -41,13 +41,13 @@ namespace tslib {
 
       // if we get here, then an NA has been found
       while(beg != end) {
-        if(numeric_traits<typename std::iterator_traits<T>::value_type>::ISNA(*beg)) {
+        if(numeric_traits<typename std::iterator_traits<U>::value_type>::ISNA(*beg)) {
           *dest = static_cast<dest_type>(0);
           count = 0;
         } else {
           *dest = count;
-          ++count;
         }
+        ++count;
         ++beg;
         ++dest;
       }
