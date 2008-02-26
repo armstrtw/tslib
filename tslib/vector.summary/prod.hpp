@@ -15,20 +15,48 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>. //
 ///////////////////////////////////////////////////////////////////////////
 
-#ifndef VECTOR_SUMMARY_HPP
-#define VECTOR_SUMMARY_HPP
+#ifndef PROD_HPP
+#define PROD_HPP
 
-// taking 1 vector an argument
-#include <tslib/vector.summary/max.hpp>
-#include <tslib/vector.summary/min.hpp>
-#include <tslib/vector.summary/mean.hpp>
-#include <tslib/vector.summary/sum.hpp>
-#include <tslib/vector.summary/prod.hpp>
-#include <tslib/vector.summary/stdev.hpp>
-#include <tslib/vector.summary/rank.hpp>
+#include <iterator>
+#include <tslib/utils/numeric.traits.hpp>
 
-// taking 2 vectors as arguments
-#include <tslib/vector.summary/cov.hpp>
-#include <tslib/vector.summary/cor.hpp>
+namespace tslib {
 
-#endif // VECTOR_SUMMARY_HPP
+  template<typename T>
+  class prodTraits;
+
+  template<>
+  class prodTraits<double> {
+  public:
+    typedef double ReturnType;
+  };
+
+  template<>
+  class prodTraits<int> {
+  public:
+    typedef int ReturnType;
+  };
+
+
+  template<typename ReturnType>
+  class Prod {
+  public:
+    template<typename T>
+    static ReturnType apply(T beg, T end) {
+      ReturnType ans = static_cast<ReturnType>( 1 );
+
+      while(beg != end) {
+	if(numeric_traits<typename std::iterator_traits<T>::value_type>::ISNA(*beg)) {
+	  return numeric_traits<ReturnType>::NA();
+	}
+	ans *= *beg;
+	++beg;
+      }
+      return ans;
+    }
+  };
+
+} // namespace tslib
+
+#endif // PROD_HPP
