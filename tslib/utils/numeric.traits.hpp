@@ -35,10 +35,8 @@ namespace tslib {
 
   template<>
   class numeric_traits<double> {
-  public:
-    static const bool has_NA = true;
-
-    static double NA() {
+  private:
+    static double calculate_NA() {
       volatile ieee_type ans_ieee;
 
       // do this b/c don't have a good way to determine
@@ -54,6 +52,14 @@ namespace tslib {
       }
 
       return ans_ieee.value;
+    }
+
+  public:
+    static const bool has_NA = true;
+
+    static double NA() {
+      static double na_value = calculate_NA();
+      return na_value;
     }
 
     static bool ISNA(double x) {
