@@ -63,7 +63,7 @@ namespace tslib {
     }
 
     static bool ISNA(double x) {
-      return isnan(x);
+      return std::isnan(x);
     }
   };
 
