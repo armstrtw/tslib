@@ -9,4 +9,6 @@ FXX      = g77
 test:
 	$(CXX) -I.. test.cpp -o $@
 	./test
+
+clean:
 	rm -f ./test
