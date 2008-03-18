@@ -1,4 +1,4 @@
-CFLAGS = -Wall -O0 -g -fpic
+CFLAGS = -Wall -O0 -g -fpic -I..
 CXXFLAGS = $(CFLAGS)
 LDFLAGS =
 CXX      = g++
@@ -7,7 +7,7 @@ FXX      = g77
 .PHONY: test
 
 test:
-	$(CXX) -I.. test.cpp -o $@
+	$(CXX) $(CXXFLAGS) test.cpp -o $@
 	./test
 
 clean:
