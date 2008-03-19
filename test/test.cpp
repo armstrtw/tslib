@@ -48,7 +48,7 @@ void null_constructor_test() {
   BOOST_CHECK_EQUAL( x.ncol(), zero );
   BOOST_CHECK_EQUAL( x.getData(), static_cast<double*>(NULL) );
   BOOST_CHECK_EQUAL( x.getDates(), static_cast<double*>(NULL) );
-  BOOST_CHECK_EQUAL( x.getColnames().size(), zero );
+  BOOST_CHECK_EQUAL( static_cast<long>(x.getColnames().size()), zero );
 }
 
 void std_constructor_test() {
@@ -62,7 +62,7 @@ void std_constructor_test() {
   BOOST_CHECK_EQUAL( x.ncol(), nc );
   BOOST_CHECK( x.getData() != static_cast<double*>(NULL) );
   BOOST_CHECK( x.getDates() != static_cast<double*>(NULL) );
-  BOOST_CHECK_EQUAL( x.getColnames().size(), zero );
+  BOOST_CHECK_EQUAL( static_cast<long>(x.getColnames().size()), zero );
 }
 
 void tsdata_constructor_test() {
@@ -77,7 +77,7 @@ void tsdata_constructor_test() {
   BOOST_CHECK_EQUAL( x.ncol(), nc );
   BOOST_CHECK( x.getData() != static_cast<double*>(NULL) );
   BOOST_CHECK( x.getDates() != static_cast<double*>(NULL) );
-  BOOST_CHECK_EQUAL( x.getColnames().size(), zero );
+  BOOST_CHECK_EQUAL( static_cast<long>(x.getColnames().size()), zero );
 }
 
 void set_colnames_test() {
