@@ -187,6 +187,7 @@ namespace tslib {
     for(TSDIM i = 0; i < nrow()*ncol(); i++) {
       data[i] = rhs;
     }
+    return *this;
   }
 
   template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
@@ -421,7 +422,7 @@ namespace tslib {
 
   template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
   int TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::setColnames(const vector<string>& cnames) {
-    if(cnames.size() == ncol()) {
+    if(static_cast<TSDIM>(cnames.size()) == ncol()) {
       tsdata_->setColnames(cnames);
       return 0; // SUCCESS
     } else {
