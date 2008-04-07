@@ -21,14 +21,14 @@
 #include <limits>
 #include <cmath>
 
-// to be conformant to R's NA value
-typedef union {
-  double value;
-  unsigned int word[2];
-} ieee_type;
-
-
 namespace tslib {
+
+  // to be conformant to R's NA value
+  typedef union {
+    double value;
+    unsigned int word[2];
+  } ieee_type;
+
 
   template<typename T>
   class numeric_traits;
