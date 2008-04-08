@@ -30,7 +30,7 @@ namespace tslib {
 
       typedef typename std::iterator_traits<T>::value_type dest_type;
 
-      dest_type count;
+      dest_type count(0);
 
       // while no NA is found at all in the tseries then -1
       while(beg != end && !numeric_traits<typename std::iterator_traits<U>::value_type>::ISNA(*beg) ) {
