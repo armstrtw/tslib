@@ -49,7 +49,7 @@ namespace tslib {
   void PosixDate<T>::to_time_tm(struct tm& posix_time_tm, const T x) {
     const time_t posix_time_t = static_cast<time_t>(x);
 #ifdef WIN32
-    memcpy(posix_time_tm,localtime(&posix_time_t), sizeof(struct tm));
+    memcpy(static_cast<void*>(&posix_time_tm),localtime(&posix_time_t), sizeof(struct tm));
 #else
     localtime_r(&posix_time_t,&posix_time_tm);
 #endif
@@ -127,6 +127,8 @@ namespace tslib {
     return (mod_400 == 0 || (mod_4 && !(mod_100) ) ) ? 1 : 0;
   }
 
+#ifndef WIN32
+  /* strptime not available on windows */
   template<typename T>
   const T PosixDate<T>::toDate(const char* date, const char* format) {
     struct tm posix_time_tm;
@@ -135,6 +137,7 @@ namespace tslib {
     posix_time_tm.tm_isdst = -1;
     return static_cast<T>(mktime(&posix_time_tm));
   }
+#endif
 
   template<typename T>
   const T PosixDate<T>::toDate(const int year, const int month, const int day, const int hour, const int minute, const int second) {
