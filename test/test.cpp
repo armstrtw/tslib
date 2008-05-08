@@ -351,6 +351,27 @@ void lag_lead_test() {
   cout << x(-2) << endl;
 }
 
+void expanding_max_test() {
+
+  vector<double> x;
+  vector<double> ans;
+
+  x.push_back(numeric_traits<double>::NA());
+  x.push_back(1.0);
+  x.push_back(2.0);
+  x.push_back(3.0);
+  x.push_back(1.0);
+  x.push_back(1.0);
+  x.push_back(1.0);
+
+  //ans.reserve(x.size());
+  //ExpandingMaximum<double>::apply(back_insert_iterator<vector<double> >(ans),x.begin(),x.end());;
+  ExpandingMaximum<double>::apply(back_inserter(ans),x.begin(),x.end());;
+  
+  cout << ans.size() << endl;
+  copy(ans.begin(), ans.end(), ostream_iterator<double>(cout, " "));
+}
+
 
 void posix_date_test() {
   const char* jan_01_2007 = "01/01/2007";
@@ -486,5 +507,6 @@ init_unit_test_suite( int argc, char* argv[] ) {
   test->add( BOOST_TEST_CASE( &quarterly_breaks_test ) );
   test->add( BOOST_TEST_CASE( &quarterly_tseries_test ) );
   test->add( BOOST_TEST_CASE( &window_function_test ) );
+  test->add( BOOST_TEST_CASE( &expanding_max_test ) );
   return test;
 }
