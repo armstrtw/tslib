@@ -15,20 +15,38 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>. //
 ///////////////////////////////////////////////////////////////////////////
 
-#ifndef VECTOR_TRANSFORM_HPP
-#define VECTOR_TRANSFORM_HPP
+#ifndef EXPANDING_MINIMUM_HPP
+#define EXPANDING_MINIMUM_HPP
 
-#include <tslib/vector.transform/diff.hpp>
-#include <tslib/vector.transform/fill.traits.hpp>
-#include <tslib/vector.transform/fill.bwd.hpp>
-#include <tslib/vector.transform/fill.fwd.hpp>
-#include <tslib/vector.transform/fill.value.hpp>
-#include <tslib/vector.transform/lag.lead.traits.hpp>
-#include <tslib/vector.transform/lag.hpp>
-#include <tslib/vector.transform/lead.hpp>
-#include <tslib/vector.transform/since.na.traits.hpp>
-#include <tslib/vector.transform/since.na.hpp>
-#include <tslib/vector.transform/expanding.maximum.hpp>
-#include <tslib/vector.transform/expanding.minimum.hpp>
+#include <iterator>
 
-#endif // VECTOR_TRANSFORM_HPP
+namespace tslib {
+
+  template<typename ReturnType>
+  class ExpandingMinimum {
+  public:
+    template<typename T, typename U>
+    static void apply(T dest, U beg, U end) {
+
+      // fill with NA until we have values
+      while(numeric_traits<typename std::iterator_traits<U>::value_type>::ISNA(*beg) && beg != end) {
+        *dest++ = numeric_traits<ReturnType>::NA();
+        *beg++;
+      }
+      
+      // init first value
+      ReturnType running_max = *beg++;
+
+      while(beg != end) {
+        running_max = std::min(*beg,running_max);
+        *dest = running_max;
+
+	++beg;
+	++dest;
+      }
+    }
+  };
+
+} // namespace tslib
+
+#endif // EXPANDING_MINIMUM_HPP
