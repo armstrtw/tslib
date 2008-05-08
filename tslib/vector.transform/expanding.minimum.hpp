@@ -36,6 +36,7 @@ namespace tslib {
       
       // init first value
       ReturnType running_max = *beg++;
+      *dest++ = running_max;
 
       while(beg != end) {
         running_max = std::min(*beg,running_max);
