@@ -26,7 +26,7 @@ namespace tslib {
   class FillFwd {
   public:
     template<typename T, typename U>
-    static void apply(T dest, U beg, U end) {
+    static inline void apply(T dest, U beg, U end) {
 
       // nothing we can do about elelment [0]
       *dest++ = *beg++;

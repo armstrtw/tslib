@@ -35,7 +35,7 @@ namespace tslib {
            template<typename,typename,typename> class TSDATABACKEND,
            template<typename> class DatePolicy,
            template<class U, class V, class W, template<typename,typename,typename> class DATABACKEND, template<typename> class DP> class TSeries>
-
+  inline
   const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> window_function(const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& lhs,
                                                                                  const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& rhs,
                                                                                  const int window) {

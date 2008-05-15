@@ -43,7 +43,7 @@ namespace tslib {
   class Stdev {
   public:
     template<typename T>
-    static ReturnType apply(T beg, T end) {
+    static inline ReturnType apply(T beg, T end) {
       ReturnType ans = 0;
       ReturnType len =  static_cast<ReturnType>(distance(beg,end));
 

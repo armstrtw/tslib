@@ -26,7 +26,7 @@ namespace tslib {
   class SinceNA {
   public:
     template<typename T, typename U>
-    static void apply(T dest, U beg, U end) {
+    static inline void apply(T dest, U beg, U end) {
 
       typedef typename std::iterator_traits<T>::value_type dest_type;
 

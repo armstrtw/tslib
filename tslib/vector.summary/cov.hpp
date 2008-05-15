@@ -43,7 +43,7 @@ namespace tslib {
   class Cov {
   public:
     template<typename T>
-    static ReturnType apply(T x_beg, T x_end, T y_beg, T y_end) {
+    static inline ReturnType apply(T x_beg, T x_end, T y_beg, T y_end) {
       typedef typename std::iterator_traits<T>::difference_type DT;
       typedef typename std::iterator_traits<T>::value_type VT;
 

@@ -27,7 +27,7 @@ namespace tslib {
   class windowIntersectionApply {
   public:
     template<typename T, class DataIter, typename TSDIM>
-    static void apply(T ans, DataIter x_iter, DataIter y_iter, TSDIM size, const int window) {
+    static inline void apply(T ans, DataIter x_iter, DataIter y_iter, TSDIM size, const int window) {
 
       // if window is bigger than len, return all NA
       if(size < static_cast<TSDIM>(window)) {

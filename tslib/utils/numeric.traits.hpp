@@ -57,12 +57,12 @@ namespace tslib {
   public:
     static const bool has_NA = true;
 
-    static double NA() {
+    static inline double NA() {
       static double na_value = calculate_NA();
       return na_value;
     }
 
-    static bool ISNA(double x) {
+    static inline bool ISNA(double x) {
       return std::isnan(x);
     }
   };
@@ -72,11 +72,11 @@ namespace tslib {
   public:
     static const bool has_NA = true;
 
-    static int NA() {
+    static inline int NA() {
       return std::numeric_limits<int>::min();
     }
 
-    static bool ISNA(int x) {
+    static inline bool ISNA(int x) {
       return x == std::numeric_limits<int>::min() ? true : false;
     }
   };

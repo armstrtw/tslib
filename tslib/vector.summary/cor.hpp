@@ -44,7 +44,7 @@ namespace tslib {
   class Cor {
   public:
     template<typename T>
-    static ReturnType apply(T x_beg, T x_end, T y_beg, T y_end) {
+    static inline ReturnType apply(T x_beg, T x_end, T y_beg, T y_end) {
 
       ReturnType xy_cov = Cov<ReturnType>::apply(x_beg, x_end, y_beg, y_end);
 

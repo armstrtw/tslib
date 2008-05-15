@@ -26,7 +26,7 @@ namespace tslib {
   class ExpandingMinimum {
   public:
     template<typename T, typename U>
-    static void apply(T dest, U beg, U end) {
+    static inline void apply(T dest, U beg, U end) {
 
       // fill with NA until we have values
       while(numeric_traits<typename std::iterator_traits<U>::value_type>::ISNA(*beg) && beg != end) {

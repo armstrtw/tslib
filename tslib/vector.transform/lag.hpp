@@ -26,7 +26,7 @@ namespace tslib {
   class Lag {
   public:
     template<typename T, typename U, typename V>
-    static void apply(T dest, U beg, U end, V periods) {
+    static inline void apply(T dest, U beg, U end, V periods) {
 
       // set head to NA
       for(V i = 0; i < periods; i++, dest++, end--)

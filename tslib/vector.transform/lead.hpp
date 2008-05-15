@@ -26,7 +26,7 @@ namespace tslib {
   class Lead {
   public:
     template<typename T, typename U, typename V>
-    static void apply(T dest, U beg, U end, V periods) {
+    static inline void apply(T dest, U beg, U end, V periods) {
 
       beg+=periods;
 

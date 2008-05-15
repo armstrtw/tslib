@@ -33,7 +33,7 @@ namespace tslib {
   class Rank {
   public:
     template<typename T>
-    static ReturnType apply(T beg, T end) {
+    static inline ReturnType apply(T beg, T end) {
       ReturnType ans = 1;
       typename std::iterator_traits<T>::value_type rank_value = *(end - 1);
       while(beg != (end - 1)) {

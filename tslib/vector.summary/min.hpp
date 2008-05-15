@@ -33,7 +33,7 @@ namespace tslib {
   class Min {
   public:
     template<typename T>
-    static ReturnType apply(T beg, T end) {
+    static inline ReturnType apply(T beg, T end) {
       ReturnType ans = *beg++;
 
       while(beg != end) {

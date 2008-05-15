@@ -27,7 +27,7 @@ namespace tslib {
   class windowApply {
   public:
     template<typename T, typename U>
-    static void apply(T ans, U beg, U end, const int window) {
+    static inline void apply(T ans, U beg, U end, const int window) {
 
       // if window is bigger than len, return all NA
       if(static_cast<int>(distance(beg,end)) < window) {

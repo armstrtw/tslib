@@ -26,7 +26,7 @@ namespace tslib {
   class FillBwd {
   public:
     template<typename T, typename U>
-    static void apply(T dest, U beg, U end) {
+    static inline void apply(T dest, U beg, U end) {
 
       // have to find offset to start from back
       typename std::iterator_traits<U>::difference_type len =  distance(beg,end);
