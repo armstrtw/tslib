@@ -1,3 +1,5 @@
+INSTALL_DIR=/usr/include
+
 CFLAGS = -Wall -O0 -g -fpic
 CXXFLAGS = $(CFLAGS)
 LDFLAGS =
@@ -12,5 +14,5 @@ subdirs: $(SUBDIRS)
 $(SUBDIRS):
 	$(MAKE) -C $@
 
-
-
+install:
+	cp -r ./tslib $(INSTALL_DIR)
