@@ -17,11 +17,12 @@
 
 #ifndef RANGE_ITERATOR_HPP
 #define RANGE_ITERATOR_HPP
-#include <iterator>
 
 namespace tslib {
 
-  using std::iterator_traits;
+
+#include <iterator>
+
 
   template<typename DATAPOINTER, typename INDEXPOINTER>
   class RangeIterator {

@@ -31,8 +31,9 @@ using namespace boost::unit_test_framework;
 using std::cout;
 using std::endl;
 using std::fill_n;
-
-using namespace std;
+using std::string;
+using std::vector;
+using std::ostream_iterator;
 
 // seed random number generator
 // srand((unsigned)time(0));

@@ -18,7 +18,6 @@
 #ifndef POSIX_DATE_POLICY_HPP
 #define POSIX_DATE_POLICY_HPP
 
-#include <string.h>
 #include <ctime>
 
 namespace tslib {
