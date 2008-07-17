@@ -31,8 +31,6 @@ using namespace boost::unit_test_framework;
 using std::cout;
 using std::endl;
 using std::fill_n;
-using std::string;
-using std::vector;
 using std::ostream_iterator;
 
 // seed random number generator
@@ -84,7 +82,7 @@ void tsdata_constructor_test() {
 void set_colnames_test() {
   TSeries<double,double> x;
 
-  vector<string> newColnames;
+  std::vector<std::string> newColnames;
 
   newColnames.push_back("hat");
   newColnames.push_back("cat");
@@ -103,8 +101,8 @@ void set_colnames_test() {
 
 void range_specifier_test() {
 
-  vector<int> x;
-  vector<int> y;
+  std::vector<int> x;
+  std::vector<int> y;
 
   x.push_back(1);
   x.push_back(2);
@@ -354,8 +352,8 @@ void lag_lead_test() {
 
 void expanding_max_test() {
 
-  vector<double> x;
-  vector<double> ans;
+  std::vector<double> x;
+  std::vector<double> ans;
 
   x.push_back(numeric_traits<double>::NA());
   x.push_back(1.0);
@@ -366,7 +364,7 @@ void expanding_max_test() {
   x.push_back(1.0);
 
   //ans.reserve(x.size());
-  //ExpandingMaximum<double>::apply(back_insert_iterator<vector<double> >(ans),x.begin(),x.end());;
+  //ExpandingMaximum<double>::apply(back_insert_iterator<std::vector<double> >(ans),x.begin(),x.end());;
   ExpandingMaximum<double>::apply(back_inserter(ans),x.begin(),x.end());;
   
   cout << ans.size() << endl;
@@ -406,7 +404,7 @@ void posix_date_test() {
 void quarterly_breaks_test() {
   const char* jan_01_2007 = "01/01/2007";
   const char* fmt_america = "%m/%d/%Y";
-  vector<long> dts;
+  std::vector<long> dts;
 
   long dt = PosixDate<long>::toDate(jan_01_2007,fmt_america);
 
@@ -415,12 +413,12 @@ void quarterly_breaks_test() {
   }
 
 
-  for(vector<long>::iterator beg = dts.begin(); beg != dts.end(); beg++) {
+  for(std::vector<long>::iterator beg = dts.begin(); beg != dts.end(); beg++) {
     cout << PosixDate<long>::toString(*beg,fmt_america);
     cout << endl;
   }
 
-  vector<int> ans;
+  std::vector<int> ans;
   QuarterlyBreaks<PosixDate,int>(dts.begin(),dts.end(),ans);
 
   copy(ans.begin(), ans.end(), ostream_iterator<int>(cout, " "));
@@ -429,7 +427,7 @@ void quarterly_breaks_test() {
 void quarterly_tseries_test() {
   const char* jan_01_2007 = "01/01/2007";
   const char* fmt_america = "%m/%d/%Y";
-  vector<long> dts;
+  std::vector<long> dts;
 
   long xnr = 365*2;
   long xnc = 5;
@@ -454,7 +452,7 @@ void quarterly_tseries_test() {
 void window_function_test() {
 const char* jan_01_2007 = "01/01/2007";
   const char* fmt_america = "%m/%d/%Y";
-  vector<long> dts;
+  std::vector<long> dts;
 
   long xnr = 365;
   long xnc = 1;

@@ -45,7 +45,7 @@ namespace tslib {
     template<typename T>
     static inline ReturnType apply(T beg, T end) {
       ReturnType ans = 0;
-      ReturnType len =  static_cast<ReturnType>(distance(beg,end));
+      ReturnType len =  static_cast<ReturnType>(std::distance(beg,end));
 
       // can't take stdev of only 1 element
       if(len <= 1) {

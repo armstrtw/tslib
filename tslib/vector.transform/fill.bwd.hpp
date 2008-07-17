@@ -29,7 +29,7 @@ namespace tslib {
     static inline void apply(T dest, U beg, U end) {
 
       // have to find offset to start from back
-      typename std::iterator_traits<U>::difference_type len =  distance(beg,end);
+      typename std::iterator_traits<U>::difference_type len =  std::distance(beg,end);
 
       // push beg off end of array since we are comming towards it
       --beg;

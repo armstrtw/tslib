@@ -30,7 +30,7 @@ namespace tslib {
     static inline void apply(T ans, U beg, U end, const int window) {
 
       // if window is bigger than len, return all NA
-      if(static_cast<int>(distance(beg,end)) < window) {
+      if(static_cast<int>(std::distance(beg,end)) < window) {
 	while(beg != end) {
 	  *ans = numeric_traits<ReturnType>::NA();
 	  ++ans;

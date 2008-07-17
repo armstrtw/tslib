@@ -60,9 +60,9 @@ namespace tslib {
     std::copy(range.getDates(),range.getDates()+range.getSize(),ans.getDates());
 
     // set new colnames
-    vector<string> lhs_cnames = lhs.getColnames();
-    vector<string> rhs_cnames = rhs.getColnames();
-    vector<string> ans_cnames;
+    std::vector<std::string> lhs_cnames = lhs.getColnames();
+    std::vector<std::string> rhs_cnames = rhs.getColnames();
+    std::vector<std::string> ans_cnames;
 
 
     // FIXME: this will take some work to get correct

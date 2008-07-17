@@ -20,13 +20,6 @@
 
 #include <iostream>
 
-using std::cout;
-using std::cerr;
-using std::endl;
-using std::distance;
-using std::set_intersection;
-
-
 namespace tslib {
 
   template<typename T, typename U>
@@ -73,8 +66,8 @@ namespace tslib {
 
     // if we can't get memory then print error and return NULL range specifier
     if(dates_==NULL) {
-      cerr << "ERROR: RangeSpecifier" << endl;
-      cerr << "out of memory" << endl;
+      std::cerr << "ERROR: RangeSpecifier" << std::endl;
+      std::cerr << "out of memory" << std::endl;
       size_ = 0;
       index1_ = NULL;
       index2_ = NULL;
@@ -83,9 +76,9 @@ namespace tslib {
     }
 
     // find size of date intersection
-    T* dates_end =  set_intersection(dates_1, dates_1+length_index1_, dates_2, dates_2+length_index2_, dates_);
+    T* dates_end =  std::set_intersection(dates_1, dates_1+length_index1_, dates_2, dates_2+length_index2_, dates_);
 
-    size_ = distance(dates_,dates_end);
+    size_ = std::distance(dates_,dates_end);
 
     // if there is no intersection then specifier has no size, and elements should be set to null
     // must delete buffer of dates_ that we allocated
@@ -103,8 +96,8 @@ namespace tslib {
 
     // if we cannot get memory, then print error, release any memory that was allocated and return
     if(index1_==NULL || index2_==NULL) {
-      cerr << "ERROR: RangeSpecifier::RangeSpecifier" << endl;
-      cerr << "out of memory" << endl;
+      std::cerr << "ERROR: RangeSpecifier::RangeSpecifier" << std::endl;
+      std::cerr << "out of memory" << std::endl;
       delete []index1_;
       delete []index2_;
       delete []dates_;
@@ -167,7 +160,7 @@ namespace tslib {
   template<typename T, typename U>
   void RangeSpecifier<T,U>::print() const {
     for(U i = 0; i < size_; i++) {
-      cout << dates_[i] << ":" << index1_[i] << ":" << index2_[i] << endl;
+      std::cout << dates_[i] << ":" << index1_[i] << ":" << index2_[i] << std::endl;
     }
   }
 

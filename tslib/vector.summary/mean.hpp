@@ -45,7 +45,7 @@ namespace tslib {
     template<typename T>
     static inline ReturnType apply(T beg, T end) {
       ReturnType ans = 0;
-      ReturnType len =  static_cast<ReturnType>(distance(beg,end));
+      ReturnType len =  static_cast<ReturnType>(std::distance(beg,end));
 
       while(beg != end) {
 	if(numeric_traits<typename std::iterator_traits<T>::value_type>::ISNA(*beg)) {

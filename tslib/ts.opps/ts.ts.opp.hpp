@@ -55,9 +55,9 @@ namespace tslib {
     std::copy(range.getDates(),range.getDates()+range.getSize(),ans.getDates());
 
     // set new colnames
-    vector<string> lhs_cnames = lhs.getColnames();
-    vector<string> rhs_cnames = rhs.getColnames();
-    vector<string> ans_cnames;
+    std::vector<std::string> lhs_cnames = lhs.getColnames();
+    std::vector<std::string> rhs_cnames = rhs.getColnames();
+    std::vector<std::string> ans_cnames;
 
     if(lhs_cnames==rhs_cnames) {
       ans_cnames = lhs_cnames;
@@ -103,11 +103,11 @@ namespace tslib {
            template<class U, class V, class W, template<typename,typename,typename> class DATABACKEND, template<typename> class DP> class TSeries,
            class opptype>
 
-  const vector<bool> apply_boolean_opp(const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& lhs,
+  const std::vector<bool> apply_boolean_opp(const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& lhs,
                                        const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& rhs,
                                        opptype opp) {
 
-    vector<bool> ans;
+    std::vector<bool> ans;
 
     if(lhs.ncol() != rhs.ncol())
       return ans;
@@ -121,7 +121,7 @@ namespace tslib {
     // allocate new answer
     ans.reserve(range.getSize()*lhs.ncol);
 
-    vector<bool>::iterator ans_data = ans.begin();
+    std::vector<bool>::iterator ans_data = ans.begin();
     TDATA* lhs_data = lhs.getData();
     TDATA* rhs_data = rhs.getData();
 

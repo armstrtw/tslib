@@ -21,9 +21,6 @@
 #include <vector>
 #include <string>
 
-using std::vector;
-using std::string;
-
 namespace tslib {
 
   template <typename TDATE,typename TDATA, typename TSDIM = long>
@@ -31,7 +28,7 @@ namespace tslib {
   private:
     int refcount_;
     bool release_data_;
-    vector<string> colnames_;
+    std::vector<std::string> colnames_;
     TSDIM rows_;
     TSDIM cols_;
     TDATE* dates_;
@@ -70,8 +67,8 @@ namespace tslib {
     TSDIM ncol() const;
     TDATA* getData() const;
     TDATE* getDates() const;
-    void setColnames(const vector<string>& cnames);
-    vector<string> getColnames() const;
+    void setColnames(const std::vector<std::string>& cnames);
+    std::vector<std::string> getColnames() const;
     const size_t getColnamesSize() const;
   };
 
@@ -181,13 +178,13 @@ namespace tslib {
   }
 
   template <typename TDATE,typename TDATA, typename TSDIM>
-  void TSdataSingleThreaded<TDATE,TDATA,TSDIM>::setColnames(const vector<string>& cnames) {
+  void TSdataSingleThreaded<TDATE,TDATA,TSDIM>::setColnames(const std::vector<std::string>& cnames) {
     colnames_ = cnames;
   }
 
   template <typename TDATE,typename TDATA, typename TSDIM>
   inline
-  vector<string> TSdataSingleThreaded<TDATE,TDATA,TSDIM>::getColnames() const {
+  std::vector<std::string> TSdataSingleThreaded<TDATE,TDATA,TSDIM>::getColnames() const {
     return colnames_;
   }
 
