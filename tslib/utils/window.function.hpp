@@ -38,7 +38,7 @@ namespace tslib {
   inline
   const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> window_function(const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& lhs,
                                                                                  const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& rhs,
-                                                                                 const int window) {
+                                                                                 const size_t window) {
     TSDIM lhs_ncol = lhs.ncol();
     TSDIM rhs_ncol = rhs.ncol();
 
@@ -54,10 +54,14 @@ namespace tslib {
     TSDIM ans_ncol = (lhs_ncol > rhs_ncol) ? lhs_ncol : rhs_ncol;
 
     // allocate new answer
-    TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> ans(range.getSize(),ans_ncol);
+    TSDIM ans_nrow = range.getSize() - (window - 1);
+    if(ans_nrow <= 0)
+      return TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy>();
+
+    TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> ans(ans_nrow, ans_ncol);
 
     // copy over dates
-    std::copy(range.getDates(),range.getDates()+range.getSize(),ans.getDates());
+    std::copy(range.getDates() + (window - 1), range.getDates()+range.getSize(), ans.getDates());
 
     // set new colnames
     std::vector<std::string> lhs_cnames = lhs.getColnames();

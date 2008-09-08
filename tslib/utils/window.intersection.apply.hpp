@@ -18,6 +18,7 @@
 #ifndef WINDOW_INTERSECTION_APPLY_HPP
 #define WINDOW_INTERSECTION_APPLY_HPP
 
+#include <iterator>
 #include <tslib/utils/numeric.traits.hpp>
 
 namespace tslib {
@@ -27,24 +28,11 @@ namespace tslib {
   class windowIntersectionApply {
   public:
     template<typename T, class DataIter, typename TSDIM>
-    static inline void apply(T ans, DataIter x_iter, DataIter y_iter, TSDIM size, const int window) {
+    static inline void apply(T ans, DataIter x_iter, DataIter y_iter, TSDIM size, const size_t window) {
 
-      // if window is bigger than len, return all NA
-      if(size < static_cast<TSDIM>(window)) {
-	for(TSDIM i = 0; i < size; i++) {
-	  *ans = numeric_traits<ReturnType>::NA();
-	  ++ans;
-	}
-	return;
-      }
+      std::advance(x_iter, window - 1);
+      std::advance(y_iter, window - 1);
 
-      // set 1st (N-1) to NA
-      for(int i = 1; i < window; i++, x_iter++, y_iter++, ans++) {
-	*ans = numeric_traits<ReturnType>::NA();
-      }
-
-      // apply fun to rest
-      // FIXME: check this range to make sure it's right
       for(TSDIM i = (window-1); i < size; i++) {
 	*ans = F<ReturnType>::apply(x_iter-(window-1),x_iter+1,y_iter-(window-1),y_iter+1);
 	++x_iter;
@@ -53,7 +41,6 @@ namespace tslib {
       }
     }
   };
-
 } // namespace tslib
 
 #endif // WINDOW_INTERSECTION_APPLY_HPP

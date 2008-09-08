@@ -165,8 +165,6 @@ void operators_test() {
   BOOST_CHECK_EQUAL( Zdivides.nrow(), y.nrow() );
   BOOST_CHECK_EQUAL( Zdivides.ncol(), 10 );
 
-  cout << Zmultiplies << endl;
-
   // add test for all== later
   TSeries<double,double> XplusS = x + 100.0;
   TSeries<double,double> SplusX = 100.0 + x;
@@ -229,16 +227,18 @@ void vector_window_apply_test() {
   typedef meanTraits<double>::ReturnType ansType;
 
   // gernate data
-  int N = 100;
+  const int N = 100;
+  const int window = 20;
   double* x = new double[N];
-  ansType* ans = new ansType[N];
+  ansType* ans = new ansType[N - (window - 1)];
+
   // gernate data
   for(long vi = 0; vi < N; vi++)
     x[vi] = vi+1;
 
-  windowApply<ansType,Mean>::apply(ans,x,x+N,20);
+  windowApply<ansType,Mean>::apply(ans,x,x+N,window);
 
-  BOOST_CHECK_EQUAL(ans[19],10.5);
+  BOOST_CHECK_EQUAL(ans[0],10.5);
 }
 
 void window_apply_test() {
@@ -261,15 +261,13 @@ void window_apply_test() {
     x.getDates()[xi] = xi+1;
 
   TSeries<double,mean_ansType> mean_ans = x.window<mean_ansType,Mean>(5);
-  BOOST_CHECK_EQUAL(mean_ans.getData()[4],3);
+  BOOST_CHECK_EQUAL(mean_ans.getData()[0],3);
 
   TSeries<double,sum_ansType> sum_ans = x.window<sum_ansType,Sum>(5);
-  BOOST_CHECK_EQUAL(sum_ans.getData()[4],(5.0*6.0)/2.0);
+  BOOST_CHECK_EQUAL(sum_ans.getData()[0],(5.0*6.0)/2.0);
 
   TSeries<double,rank_ansType> rank_ans = x.window<rank_ansType,Rank>(5);
-  BOOST_CHECK_EQUAL(rank_ans.getData()[4],5);
-
-  cout << rank_ans << endl;
+  BOOST_CHECK_EQUAL(rank_ans.getData()[0],5);
 }
 
 void vector_transform_test() {
@@ -347,7 +345,6 @@ void lag_lead_test() {
 
   //TSeries<double,double> ans = x(1);
   //TSeries<double,double> ans = x(-1);
-  cout << x(-2) << endl;
 }
 
 void expanding_max_test() {
@@ -365,10 +362,7 @@ void expanding_max_test() {
 
   //ans.reserve(x.size());
   //ExpandingMaximum<double>::apply(back_insert_iterator<std::vector<double> >(ans),x.begin(),x.end());;
-  ExpandingMaximum<double>::apply(back_inserter(ans),x.begin(),x.end());;
-  
-  cout << ans.size() << endl;
-  copy(ans.begin(), ans.end(), ostream_iterator<double>(cout, " "));
+  ExpandingMaximum<double>::apply(back_inserter(ans),x.begin(),x.end());
 }
 
 
@@ -422,6 +416,7 @@ void quarterly_breaks_test() {
   QuarterlyBreaks<PosixDate,int>(dts.begin(),dts.end(),ans);
 
   copy(ans.begin(), ans.end(), ostream_iterator<int>(cout, " "));
+  cout << endl;
 }
 
 void quarterly_tseries_test() {
@@ -443,10 +438,6 @@ void quarterly_tseries_test() {
   for(int i = 0; i < xnr; i++) {
     x.getDates()[i] = PosixDate<long>::AddDays(dt,i);
   }
-
-  cout << x << endl;
-  cout << x.toQuarterly() << endl;
-
 }
 
 void window_function_test() {
@@ -481,8 +472,6 @@ const char* jan_01_2007 = "01/01/2007";
 
   TSeries<long,corTraits<double>::ReturnType> ans =  window_function<corTraits<double>::ReturnType,Cor>(x,x,20);
   TSeries<long,corTraits<double>::ReturnType> ans2 =  window_function<corTraits<double>::ReturnType,Cor>(x,y,5);
-  cout << ans << endl;
-  cout << ans2 << endl;
 }
 
 test_suite*

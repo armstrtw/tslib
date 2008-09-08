@@ -18,6 +18,7 @@
 #ifndef WINDOW_APPLY_HPP
 #define WINDOW_APPLY_HPP
 
+#include <iterator>
 #include <tslib/utils/numeric.traits.hpp>
 
 namespace tslib {
@@ -27,32 +28,17 @@ namespace tslib {
   class windowApply {
   public:
     template<typename T, typename U>
-    static inline void apply(T ans, U beg, U end, const int window) {
+    static inline void apply(T ans, U beg, U end, const size_t window) {
 
-      // if window is bigger than len, return all NA
-      if(static_cast<int>(std::distance(beg,end)) < window) {
-	while(beg != end) {
-	  *ans = numeric_traits<ReturnType>::NA();
-	  ++ans;
-	  ++beg;
-	}
-	return;
-      }
+      std::advance(beg, window - 1);
 
-      // set 1st (N-1) to NA
-      for(int i = 1; i < window; i++, beg++, ans++) {
-	*ans = numeric_traits<ReturnType>::NA();
-      }
-
-      // apply fun to rest
       while(beg != end) {
-	*ans = F<ReturnType>::apply(beg-(window-1),beg+1);
+	*ans = F<ReturnType>::apply( beg - (window - 1), beg+1);
 	++beg;
 	++ans;
       }
     }
   };
-
 } // namespace tslib
 
 #endif // WINDOW_APPLY_HPP
