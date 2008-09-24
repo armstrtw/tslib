@@ -100,7 +100,11 @@ namespace tslib {
     TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& operator=(const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& x);
     TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& operator=(const TDATA x);
 
+    // lag lead
     const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> operator() (const int n);
+
+    // matix index
+    TDATA& operator() (const TSDIM row, const TSDIM col);
 
     // binary TS TS opps
     friend TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> operator+ <> (const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& lhs,
@@ -223,6 +227,12 @@ namespace tslib {
       }
     }
     return ans;
+  }
+
+  template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
+  TDATA& TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::operator() (const TSDIM row, const TSDIM col) {
+    TDATA* data = getData();
+    return data[offset(row, col)];
   }
 
   template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
