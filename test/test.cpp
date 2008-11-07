@@ -239,6 +239,8 @@ void vector_window_apply_test() {
   windowApply<ansType,Mean>::apply(ans,x,x+N,window);
 
   BOOST_CHECK_EQUAL(ans[0],10.5);
+  delete []x;
+  delete []ans;
 }
 
 void window_apply_test() {
@@ -291,6 +293,9 @@ void vector_transform_test() {
   // 6 because 5 is NA and 6 is next ele
   BOOST_CHECK_EQUAL(ans[4],6);
 
+  delete []x;
+  delete []ans;
+
   /*
   cout << "data" << endl;
   copy(x, x+N,
@@ -330,7 +335,7 @@ void transform_test() {
 
 void lag_lead_test() {
 
-  long xnr = 50;
+  long xnr = 10;
   long xnc = 5;
 
   TSeries<double,double> x(xnr,xnc);
@@ -343,8 +348,14 @@ void lag_lead_test() {
   for(long xi = 0; xi < x.nrow(); xi++)
     x.getDates()[xi] = xi+1;
 
-  //TSeries<double,double> ans = x(1);
-  //TSeries<double,double> ans = x(-1);
+  cout << "original" << endl;
+  cout << x << endl;
+  TSeries<double,double> ans_lag = x(1);
+  cout << "lag:" << endl;
+  cout << ans_lag << endl;
+  TSeries<double,double> ans_lead = x(-1);
+  cout << "lead:" << endl;
+  cout << ans_lead << endl;
 }
 
 void expanding_max_test() {
