@@ -39,7 +39,7 @@ using std::ostream_iterator;
 
 
 void null_constructor_test() {
-  TSeries<double,double> x;
+  TSeries<double,double,long,TSdataSingleThreaded,PosixDate> x;
 
   // so we have the same type
   long zero = 0;
@@ -55,7 +55,7 @@ void std_constructor_test() {
   long nc = 10;
   long zero = 0;
 
-  TSeries<double,double> x(nr,nc);
+  TSeries<double,double,long,TSdataSingleThreaded,PosixDate> x(nr,nc);
 
   BOOST_CHECK_EQUAL( x.nrow(), nr );
   BOOST_CHECK_EQUAL( x.ncol(), nc );
@@ -70,7 +70,7 @@ void tsdata_constructor_test() {
   long zero = 0;
 
   TSdataSingleThreaded<double,double>* ts_data = TSdataSingleThreaded<double,double>::init(nr,nc);
-  TSeries<double,double> x(ts_data);
+  TSeries<double,double,long,TSdataSingleThreaded,PosixDate> x(ts_data);
 
   BOOST_CHECK_EQUAL( x.nrow(), nr );
   BOOST_CHECK_EQUAL( x.ncol(), nc );
@@ -80,7 +80,7 @@ void tsdata_constructor_test() {
 }
 
 void set_colnames_test() {
-  TSeries<double,double> x;
+  TSeries<double,double,long,TSdataSingleThreaded,PosixDate> x;
 
   std::vector<std::string> newColnames;
 
@@ -90,7 +90,7 @@ void set_colnames_test() {
   // not allowed to set colnames not equal to number of cols
   BOOST_CHECK_EQUAL(x.setColnames(newColnames) , 1 );
 
-  TSeries<double,double> y(100,2);
+  TSeries<double,double,long,TSdataSingleThreaded,PosixDate> y(100,2);
 
   // test set colnames success
   BOOST_CHECK_EQUAL(y.setColnames(newColnames) , 0 );
@@ -133,8 +133,8 @@ void operators_test() {
   long ynr = 10;
   long nc = 10;
 
-  TSeries<double,double> x(xnr,nc);
-  TSeries<double,double> y(ynr,nc);
+  TSeries<double,double,long,TSdataSingleThreaded,PosixDate> x(xnr,nc);
+  TSeries<double,double,long,TSdataSingleThreaded,PosixDate> y(ynr,nc);
 
   // gernate data
   fill_n(x.getData(),x.nrow()*x.ncol(),100.0);
@@ -148,10 +148,10 @@ void operators_test() {
   for(long yi = 0; yi < y.nrow(); yi++)
     y.getDates()[yi] = yi;
 
-  TSeries<double,double> Zplus = x + y;
-  TSeries<double,double> Zminus = x - y;
-  TSeries<double,double> Zmultiplies = x * y;
-  TSeries<double,double> Zdivides = x / y;
+  TSeries<double,double,long,TSdataSingleThreaded,PosixDate> Zplus = x + y;
+  TSeries<double,double,long,TSdataSingleThreaded,PosixDate> Zminus = x - y;
+  TSeries<double,double,long,TSdataSingleThreaded,PosixDate> Zmultiplies = x * y;
+  TSeries<double,double,long,TSdataSingleThreaded,PosixDate> Zdivides = x / y;
 
   BOOST_CHECK_EQUAL( Zplus.nrow(), y.nrow() );
   BOOST_CHECK_EQUAL( Zplus.ncol(), 10 );
@@ -166,17 +166,17 @@ void operators_test() {
   BOOST_CHECK_EQUAL( Zdivides.ncol(), 10 );
 
   // add test for all== later
-  TSeries<double,double> XplusS = x + 100.0;
-  TSeries<double,double> SplusX = 100.0 + x;
+  TSeries<double,double,long,TSdataSingleThreaded,PosixDate> XplusS = x + 100.0;
+  TSeries<double,double,long,TSdataSingleThreaded,PosixDate> SplusX = 100.0 + x;
 
-  TSeries<double,double> XminusS = x - 100.0;
-  TSeries<double,double> SminusX = 100.0 - x;
+  TSeries<double,double,long,TSdataSingleThreaded,PosixDate> XminusS = x - 100.0;
+  TSeries<double,double,long,TSdataSingleThreaded,PosixDate> SminusX = 100.0 - x;
 
-  TSeries<double,double> XmultS = x * 100.0;
-  TSeries<double,double> SmultX = 100.0 * x;
+  TSeries<double,double,long,TSdataSingleThreaded,PosixDate> XmultS = x * 100.0;
+  TSeries<double,double,long,TSdataSingleThreaded,PosixDate> SmultX = 100.0 * x;
 
-  TSeries<double,double> XdivS = x / 100.0;
-  TSeries<double,double> SdivX = 100.0 * x;
+  TSeries<double,double,long,TSdataSingleThreaded,PosixDate> XdivS = x / 100.0;
+  TSeries<double,double,long,TSdataSingleThreaded,PosixDate> SdivX = 100.0 * x;
 }
 
 void assignment_test() {
@@ -186,8 +186,8 @@ void assignment_test() {
   long ynr = 100;
   long ync = 50;
 
-  TSeries<double,double> x(xnr,xnc);
-  TSeries<double,double> y(ynr,ync);
+  TSeries<double,double,long,TSdataSingleThreaded,PosixDate> x(xnr,xnc);
+  TSeries<double,double,long,TSdataSingleThreaded,PosixDate> y(ynr,ync);
 
   fill_n(x.getData(),x.nrow()*x.ncol(),1.0);
   fill_n(y.getData(),y.nrow()*y.ncol(),2.0);
@@ -252,7 +252,7 @@ void window_apply_test() {
   long xnr = 50;
   long xnc = 5;
 
-  TSeries<double,double> x(xnr,xnc);
+  TSeries<double,double,long,TSdataSingleThreaded,PosixDate> x(xnr,xnc);
 
   // gernate data
   for(long vi = 0; vi < x.nrow()*x.ncol(); vi++)
@@ -262,13 +262,13 @@ void window_apply_test() {
   for(long xi = 0; xi < x.nrow(); xi++)
     x.getDates()[xi] = xi+1;
 
-  TSeries<double,mean_ansType> mean_ans = x.window<mean_ansType,Mean>(5);
+  TSeries<double,mean_ansType,long,TSdataSingleThreaded,PosixDate> mean_ans = x.window<mean_ansType,Mean>(5);
   BOOST_CHECK_EQUAL(mean_ans.getData()[0],3);
 
-  TSeries<double,sum_ansType> sum_ans = x.window<sum_ansType,Sum>(5);
+  TSeries<double,sum_ansType,long,TSdataSingleThreaded,PosixDate> sum_ans = x.window<sum_ansType,Sum>(5);
   BOOST_CHECK_EQUAL(sum_ans.getData()[0],(5.0*6.0)/2.0);
 
-  TSeries<double,rank_ansType> rank_ans = x.window<rank_ansType,Rank>(5);
+  TSeries<double,rank_ansType,long,TSdataSingleThreaded,PosixDate> rank_ans = x.window<rank_ansType,Rank>(5);
   BOOST_CHECK_EQUAL(rank_ans.getData()[0],5);
 }
 
@@ -316,7 +316,7 @@ void transform_test() {
   long xnr = 50;
   long xnc = 5;
 
-  TSeries<double,double> x(xnr,xnc);
+  TSeries<double,double,long,TSdataSingleThreaded,PosixDate> x(xnr,xnc);
 
   // gernate data
   for(long vi = 0; vi < x.nrow()*x.ncol(); vi++)
@@ -328,7 +328,7 @@ void transform_test() {
 
   x.getData()[21] = NAN;
 
-  TSeries<double,fill_ansType> fillbwd_ans = x.transform<fill_ansType,FillBwd>();
+  TSeries<double,fill_ansType,long,TSdataSingleThreaded,PosixDate> fillbwd_ans = x.transform<fill_ansType,FillBwd>();
   BOOST_CHECK_EQUAL(fillbwd_ans.getData()[21], static_cast<double>(23));
 }
 
@@ -338,7 +338,7 @@ void lag_lead_test() {
   long xnr = 10;
   long xnc = 5;
 
-  TSeries<double,double> x(xnr,xnc);
+  TSeries<double,double,long,TSdataSingleThreaded,PosixDate> x(xnr,xnc);
 
   // gernate data
   for(long vi = 0; vi < x.nrow()*x.ncol(); vi++)
@@ -350,10 +350,10 @@ void lag_lead_test() {
 
   cout << "original" << endl;
   cout << x << endl;
-  TSeries<double,double> ans_lag = x(1);
+  TSeries<double,double,long,TSdataSingleThreaded,PosixDate> ans_lag = x(1);
   cout << "lag:" << endl;
   cout << ans_lag << endl;
-  TSeries<double,double> ans_lead = x(-1);
+  TSeries<double,double,long,TSdataSingleThreaded,PosixDate> ans_lead = x(-1);
   cout << "lead:" << endl;
   cout << ans_lead << endl;
 }
@@ -438,7 +438,7 @@ void quarterly_tseries_test() {
   long xnr = 365*2;
   long xnc = 5;
 
-  TSeries<long,double> x(xnr,xnc);
+  TSeries<long,double,long,TSdataSingleThreaded,PosixDate> x(xnr,xnc);
 
   // gernate data
   for(long vi = 0; vi < x.nrow()*x.ncol(); vi++)
@@ -462,8 +462,8 @@ const char* jan_01_2007 = "01/01/2007";
   long ynr = 100;
   long ync = 1;
 
-  TSeries<long,double> x(xnr,xnc);
-  TSeries<long,double> y(ynr,ync);
+  TSeries<long,double,long,TSdataSingleThreaded,PosixDate> x(xnr,xnc);
+  TSeries<long,double,long,TSdataSingleThreaded,PosixDate> y(ynr,ync);
 
   // gernate data for x
   for(long vi = 0; vi < x.nrow()*x.ncol(); vi++)
@@ -481,8 +481,8 @@ const char* jan_01_2007 = "01/01/2007";
   for(int i = 0; i < ynr; i++)
     y.getDates()[i] = PosixDate<long>::AddDays(dt,i);
 
-  TSeries<long,corTraits<double>::ReturnType> ans =  window_function<corTraits<double>::ReturnType,Cor>(x,x,20);
-  TSeries<long,corTraits<double>::ReturnType> ans2 =  window_function<corTraits<double>::ReturnType,Cor>(x,y,5);
+  TSeries<long,corTraits<double>::ReturnType,long,TSdataSingleThreaded,PosixDate> ans =  window_function<corTraits<double>::ReturnType,Cor>(x,x,20);
+  TSeries<long,corTraits<double>::ReturnType,long,TSdataSingleThreaded,PosixDate> ans2 =  window_function<corTraits<double>::ReturnType,Cor>(x,y,5);
 }
 
 test_suite*
