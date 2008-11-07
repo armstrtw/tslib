@@ -54,9 +54,9 @@ namespace tslib {
   };
 
   template <typename TDATE, typename TDATA,
-            typename TSDIM = long,
-            template<typename,typename,typename> class TSDATABACKEND = TSdataSingleThreaded,
-            template<typename> class DatePolicy = PosixDate>
+            typename TSDIM,
+            template<typename,typename,typename> class TSDATABACKEND,
+            template<typename> class DatePolicy>
   class TSeries {
   private:
     TSDATABACKEND<TDATE,TDATA,TSDIM>* tsdata_;
