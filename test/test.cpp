@@ -18,11 +18,13 @@
 #include <ctime>
 #include <iostream>
 #include <iterator>
+#include <vector>
 #include <boost/test/included/unit_test_framework.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <tslib/tseries.hpp>
 #include <tslib/utils/window.function.hpp>
+#include <tslib/utils/cbind.hpp>
 #include <tslib/vector.summary.hpp>
 #include <tslib/vector.transform.hpp>
 
@@ -32,6 +34,7 @@ using std::cout;
 using std::endl;
 using std::fill_n;
 using std::ostream_iterator;
+using std::vector;
 
 // seed random number generator
 // srand((unsigned)time(0));
@@ -485,6 +488,24 @@ const char* jan_01_2007 = "01/01/2007";
   TSeries<long,corTraits<double>::ReturnType,long,TSdataSingleThreaded,PosixDate> ans2 =  window_function<corTraits<double>::ReturnType,Cor>(x,y,5);
 }
 
+void cbind_test() {
+  long xnr = 365;
+  long xnc = 1;
+
+  long ynr = 100;
+  long ync = 1;
+
+  TSeries<long,double,long,TSdataSingleThreaded,PosixDate> x(xnr,xnc);
+  TSeries<long,double,long,TSdataSingleThreaded,PosixDate> y(ynr,ync);
+
+  vector< TSeries<long,double,long,TSdataSingleThreaded,PosixDate> > seq;
+
+  seq.push_back(x);
+  seq.push_back(y);
+
+  TSeries<long,double,long,TSdataSingleThreaded,PosixDate> z(cbind(seq));
+}
+
 test_suite*
 init_unit_test_suite( int argc, char* argv[] ) {
 
@@ -507,5 +528,6 @@ init_unit_test_suite( int argc, char* argv[] ) {
   test->add( BOOST_TEST_CASE( &quarterly_tseries_test ) );
   test->add( BOOST_TEST_CASE( &window_function_test ) );
   test->add( BOOST_TEST_CASE( &expanding_max_test ) );
+  test->add( BOOST_TEST_CASE( &cbind_test ) );
   return test;
 }
