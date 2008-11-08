@@ -36,6 +36,8 @@ using std::fill_n;
 using std::ostream_iterator;
 using std::vector;
 
+typedef TSeries<long,double,long,TSdataSingleThreaded,PosixDate> normalTS;
+
 // seed random number generator
 // srand((unsigned)time(0));
 
@@ -495,15 +497,15 @@ void cbind_test() {
   long ynr = 100;
   long ync = 1;
 
-  TSeries<long,double,long,TSdataSingleThreaded,PosixDate> x(xnr,xnc);
-  TSeries<long,double,long,TSdataSingleThreaded,PosixDate> y(ynr,ync);
-
-  vector< TSeries<long,double,long,TSdataSingleThreaded,PosixDate> > seq;
+  normalTS x(xnr,xnc);
+  normalTS y(ynr,ync);
+  vector< normalTS > seq;
 
   seq.push_back(x);
   seq.push_back(y);
 
-  TSeries<long,double,long,TSdataSingleThreaded,PosixDate> z(cbind(seq));
+  //TSeries<long,double,long,TSdataSingleThreaded,PosixDate> z(cbind(seq));
+  normalTS z = cbind(seq,true);
 }
 
 test_suite*
