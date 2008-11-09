@@ -35,7 +35,7 @@ namespace tslib {
 	   template<typename ELEM, typename = std::allocator<ELEM> > class CONT>
 
   TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>
-  cbind(CONT<TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> >& cont,
+  cbind(const CONT<TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> >& cont,
 	const bool intersection)
   {
     size_t sz = cont.size();
@@ -46,7 +46,29 @@ namespace tslib {
       return *cont.begin();
     }
 
-    return *cont.begin();
+    std::vector<TDATE> ans_dates;
+    if(intersection) {
+      date_intersection(cont,std::inserter(ans_dates,ans_dates.begin()));
+    } else {
+      date_union(cont,std::inserter(ans_dates,ans_dates.begin()));
+    }
+    if(ans_dates.size() == 0) {
+      return TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>();
+    }
+
+    TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> ans(ans_dates.size(),cbind_total_cols(cont));
+    // FIXME: set colnames
+
+    typename CONT<TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> >::const_iterator it = cont.begin();
+
+    // walk along iterator and map values into ans
+    TSDIM offset = 0;
+    while(it != cont.end()) {
+      cbind_map_values(ans, *it, offset);
+      offset += it->ncol();
+      ++it;
+    }
+    return ans;
   }
 
   template<class TDATE,
@@ -58,13 +80,14 @@ namespace tslib {
 		    template<typename,typename,typename> class DATABACKEND,
 		    template<typename> class DP> class TSeries,
 	   template<typename ELEM, typename = std::allocator<ELEM> > class CONT,
-	   class I>
+	   typename II>
+
   void
-  date_intersection(CONT<TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> >& cont,
-		    I& output_dates)
+  date_intersection(const CONT<TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> >& cont,
+		    II output_dates)
   {
 
-    typename CONT<TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> >::iterator it = cont.begin();
+    typename CONT<TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> >::const_iterator it = cont.begin();
     std::vector<TDATE> inBuff;
     std::vector<TDATE> outBuff;
 
@@ -73,12 +96,12 @@ namespace tslib {
     while(it != cont.end()) {
       set_intersection(inBuff.begin(),inBuff.end(),
 		       it->getDates(),it->getDates() + it->nrow(),
-		       insert_iterator(outBuff));
+		       std::inserter(outBuff,outBuff.begin()));
       // swap buffs
-      inBuff.erase();
+      inBuff.clear();
       std::copy(outBuff.begin(),outBuff.end(),
 		std::inserter(inBuff,inBuff.begin()));
-      outBuff.erase();
+      outBuff.clear();
       ++it;
     }
     std::copy(outBuff.begin(),outBuff.end(),output_dates);
@@ -93,18 +116,17 @@ namespace tslib {
 		    template<typename,typename,typename> class DATABACKEND,
 		    template<typename> class DP> class TSeries,
 	   template<typename ELEM, typename = std::allocator<ELEM> > class CONT,
-	   class I>
+	   typename II>
   void
-  date_union(CONT<TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> >& cont,
-	     I& output_dates)
+  date_union(const CONT<TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> >& cont,
+	     II output_dates)
   {
     std::set<TDATE> ans;
-    typename CONT<TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> >::iterator it = cont.begin();
+    typename CONT<TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> >::const_iterator it = cont.begin();
 
     // walk through all tseries adding all dates
     // let std::set drop dups for us
     while(it != cont.end()) {
-      TSDIM nrow = it->nrow();
       TDATE* dts = it->getDates();
       for(TSDIM i = 0; i < it->nrow(); i++) {
 	ans.insert(dts[i]);
@@ -123,10 +145,10 @@ namespace tslib {
 		    template<typename> class DP> class TSeries,
 	   template<typename ELEM, typename = std::allocator<ELEM> > class CONT>
   TSDIM
-  cbind_total_cols(CONT<TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> >& cont)
+  cbind_total_cols(const CONT<TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> >& cont)
   {
     TSDIM ans = 0;
-    typename CONT<TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> >::iterator it;
+    typename CONT<TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> >::const_iterator it;
     for(it = cont.begin(); it != cont.end(); it++) {
       ans += it->ncol();
     }
@@ -143,14 +165,44 @@ namespace tslib {
 		    template<typename> class DP> class TSeries,
 	   template<typename ELEM, typename = std::allocator<ELEM> > class CONT>
   TSDIM
-  cbind_max_nrow(CONT<TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> >& cont)
+  cbind_max_nrow(const CONT<TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> >& cont)
   {
     std::vector<TSDIM> nrows;
-    typename CONT<TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> >::iterator it;
+    typename CONT<TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> >::const_iterator it;
     for(it = cont.begin(); it != cont.end(); it++) {
       nrows.push_back(it->nrow());
     }
     return *max_element(nrows.begin(), nrows.end());
+  }
+
+  template<class TDATE,
+	   class TDATA,
+	   class TSDIM,
+	   template<typename,typename,typename> class TSDATABACKEND,
+	   template<typename> class DatePolicy,
+	   template<class U, class V, class W,
+		    template<typename,typename,typename> class DATABACKEND,
+		    template<typename> class DP> class TSeries>
+  void
+  cbind_map_values(TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& ans,
+		   const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& ts_values,
+		   const TSDIM offset)
+  {
+    RangeSpecifier<TDATE,TSDIM> range(ans.getDates(),
+				      ts_values.getDates(),
+				      ans.nrow(),
+				      ts_values.nrow());
+
+    TDATA* ans_data = ans.getData();
+
+    //advanec ans_data by offset
+    ans_data += ans.nrow() * offset;
+
+    for(TSDIM col = 0; col < ts_values.ncol(); col++) {
+      RangeIterator<const TDATA*, const TSDIM*> ts_data_iter(ts_values.getData(), range.getArg2());
+      std::copy(ts_data_iter,ts_data_iter + range.getSize(),ans_data);
+      ans_data += ans.nrow();
+    }
   }
 
 } // namespace tslib
