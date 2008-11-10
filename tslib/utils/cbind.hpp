@@ -52,11 +52,21 @@ namespace tslib {
     } else {
       date_union(cont,std::inserter(ans_dates,ans_dates.begin()));
     }
+
     if(ans_dates.size() == 0) {
       return TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>();
     }
 
     TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> ans(ans_dates.size(),cbind_total_cols(cont));
+
+    // if union, then we must initialize the values of ans to NA
+    if(!intersection) {
+      for(TSDIM i = 0; i < ans.nrow() * ans.ncol(); i++) {
+	ans.getData()[i] = numeric_traits<TDATA>::NA();
+      }
+    }
+
+    std::copy(ans_dates.begin(), ans_dates.end(), ans.getDates());
     // FIXME: set colnames
 
     typename CONT<TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> >::const_iterator it = cont.begin();
@@ -86,14 +96,17 @@ namespace tslib {
   date_intersection(const CONT<TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> >& cont,
 		    II output_dates)
   {
-
-    typename CONT<TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> >::const_iterator it = cont.begin();
     std::vector<TDATE> inBuff;
     std::vector<TDATE> outBuff;
 
+    typename CONT<TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> >::const_iterator it = cont.begin();
+
+    // pre-load dates for first series
     std::copy(it->getDates(),it->getDates() + it->nrow(),
 	      std::inserter(inBuff,inBuff.begin()));
-    while(it != cont.end()) {
+
+    for(it = cont.begin() + 1; it != cont.end(); it++) {
+      outBuff.clear();
       set_intersection(inBuff.begin(),inBuff.end(),
 		       it->getDates(),it->getDates() + it->nrow(),
 		       std::inserter(outBuff,outBuff.begin()));
@@ -101,8 +114,6 @@ namespace tslib {
       inBuff.clear();
       std::copy(outBuff.begin(),outBuff.end(),
 		std::inserter(inBuff,inBuff.begin()));
-      outBuff.clear();
-      ++it;
     }
     std::copy(outBuff.begin(),outBuff.end(),output_dates);
   }
@@ -122,11 +133,11 @@ namespace tslib {
 	     II output_dates)
   {
     std::set<TDATE> ans;
-    typename CONT<TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> >::const_iterator it = cont.begin();
+    typename CONT<TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> >::const_iterator it;
 
     // walk through all tseries adding all dates
     // let std::set drop dups for us
-    while(it != cont.end()) {
+    for(it = cont.begin(); it != cont.end(); it++) {
       TDATE* dts = it->getDates();
       for(TSDIM i = 0; i < it->nrow(); i++) {
 	ans.insert(dts[i]);
@@ -195,11 +206,12 @@ namespace tslib {
 
     TDATA* ans_data = ans.getData();
 
-    //advanec ans_data by offset
+    //advance ans_data by offset
     ans_data += ans.nrow() * offset;
 
     for(TSDIM col = 0; col < ts_values.ncol(); col++) {
-      RangeIterator<const TDATA*, const TSDIM*> ts_data_iter(ts_values.getData(), range.getArg2());
+      RangeIterator<const TDATA*, const TSDIM*> ts_data_iter(ts_values.getData()+ ts_values.nrow()*col,
+							     range.getArg2());
       std::copy(ts_data_iter,ts_data_iter + range.getSize(),ans_data);
       ans_data += ans.nrow();
     }
