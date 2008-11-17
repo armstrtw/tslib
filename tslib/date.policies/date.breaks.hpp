@@ -15,8 +15,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>. //
 ///////////////////////////////////////////////////////////////////////////
 
-#ifndef PERIOD_BREAKS
-#define PERIOD_BREAKS
+#ifndef DATE_BREAKS
+#define DATE_BREAKS
 
 #include <algorithm>
 #include <iterator>
@@ -108,4 +108,4 @@ void MonthlyBreaks(T beg, T end, COLL<TSDIM>& coll) {
 
 }  // namespace tslib
 
-#endif // PERIOD_BREAKS
+#endif // DATE_BREAKS
