@@ -79,13 +79,13 @@ namespace tslib {
 
     // transforms
     template<typename ReturnType, template<class> class F>
-    const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> window(const size_t window);
+    const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> window(const size_t window) const;
 
     template<typename ReturnType, template<class> class F>
-    const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> transform();
+    const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> transform() const;
 
     template<typename ReturnType, template<class> class F, typename T>
-    const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> transform_1arg(T arg1);
+    const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> transform_1arg(T arg1) const;
 
     // frequency conversion (only highfreq to lowfreq conversion)
     const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> toQuarterly() const;
@@ -101,7 +101,7 @@ namespace tslib {
     TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& operator=(const TDATA x);
 
     // lag lead
-    const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> operator() (const int n);
+    const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> operator() (const int n) const;
 
     // matix index
     TDATA operator() (const TSDIM row, const TSDIM col) const;
@@ -146,17 +146,17 @@ namespace tslib {
                                                                              const TDATA rhs);
 
     friend std::vector<bool> operator> <> (const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& lhs,
-                                      const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& rhs);
+                                           const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& rhs);
     friend std::vector<bool> operator< <> (const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& lhs,
-                                      const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& rhs);
+                                           const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& rhs);
     friend std::vector<bool> operator>= <> (const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& lhs,
-                                       const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& rhs);
+                                            const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& rhs);
     friend std::vector<bool> operator<= <> (const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& lhs,
-                                       const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& rhs);
+                                            const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& rhs);
     friend std::vector<bool> operator== <> (const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& lhs,
-                                       const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& rhs);
+                                            const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& rhs);
     friend std::vector<bool> operator!= <> (const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& lhs,
-                                       const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& rhs);
+                                            const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& rhs);
 
     friend std::ostream& operator<< <> (std::ostream& os,
                                         const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& ts);
@@ -196,7 +196,7 @@ namespace tslib {
   }
 
   template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
-  const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::operator() (const int n) {
+  const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::operator() (const int n) const {
     if(n == 0) {
       return *this;
     }
@@ -449,7 +449,7 @@ namespace tslib {
 
   template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
   template<typename ReturnType, template<class> class F>
-  const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::window(const size_t window) {
+  const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::window(const size_t window) const {
 
     // allocate new answer
     TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> ans(nrow() - (window - 1), ncol());
@@ -473,7 +473,7 @@ namespace tslib {
 
   template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
   template<typename ReturnType, template<class> class F>
-  const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::transform() {
+  const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::transform() const {
 
     // allocate new answer
     TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> ans(nrow(), ncol());
@@ -497,7 +497,7 @@ namespace tslib {
 
   template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
   template<typename ReturnType, template<class> class F, typename T>
-  const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::transform_1arg(T arg1) {
+  const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::transform_1arg(T arg1) const {
 
     // allocate new answer
     TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> ans(nrow(), ncol());
