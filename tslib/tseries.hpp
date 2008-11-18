@@ -491,23 +491,29 @@ namespace tslib {
     TDATA* data = getData();
     TDATE* dates = getDates();
 
-    TDATE* sdate_iter = dates;
-    TDATE* edate_iter = NULL;
+    typename std::vector<PTYPE>::iterator sdate_iter = partitions.begin();
+    typename std::vector<PTYPE>::iterator edate_iter;
     TSDIM ans_row = 0;
-    for(typename std::vector<PTYPE>::iterator p = unique_partitions.begin() + 1; p != unique_partitions.end(); p++) {
-      // set date to first date in partition (should add option later for last date in parittion)
-      ans_dates[ans_row] = *sdate_iter;
+    for(typename std::vector<PTYPE>::iterator p = unique_partitions.begin(); p != unique_partitions.end() - 1; p++) {
 
       // find end of partition
-      edate_iter = std::find(sdate_iter,dates+nrow(),*p);
-      std::cout << std::distance(dates, sdate_iter) <<  ":" << std::distance(dates, edate_iter) << std::endl;
+      edate_iter = std::find(sdate_iter, partitions.end(), *(p+1));
+      ans_dates[ans_row] = dates[std::distance(partitions.begin(),sdate_iter)];
+      std::cout << std::distance(partitions.begin(), sdate_iter) <<  ":" << std::distance(partitions.begin(), edate_iter) << std::endl;
       for(TSDIM ans_col = 0; ans_col < ans.ncol(); ans_col++) {
-        ans_data[ans.offset(ans_row, ans_col)] = F<ReturnType>::apply(data + nrow()*ans_col + std::distance(dates, sdate_iter), data + nrow()*ans_col + std::distance(dates, edate_iter));
+        ans_data[ans.offset(ans_row, ans_col)] = F<ReturnType>::apply(data + nrow()*ans_col + std::distance(partitions.begin(), sdate_iter),
+                                                                      data + nrow()*ans_col + std::distance(partitions.begin(), edate_iter));
       }
       // advance sdate iterator
       sdate_iter = edate_iter;
       // advance row
       ++ans_row;
+    }
+    ans_dates[ans_row] = dates[std::distance(partitions.begin(),edate_iter)];
+    // last row
+    for(TSDIM ans_col = 0; ans_col < ans.ncol(); ans_col++) {
+      ans_data[ans.offset(ans_row, ans_col)] = F<ReturnType>::apply(data + nrow()*ans_col + std::distance(partitions.begin(), sdate_iter),
+                                                                    data + nrow()*ans_col + nrow());
     }
     return ans;
   }

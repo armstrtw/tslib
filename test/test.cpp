@@ -18,6 +18,8 @@
 #include <ctime>
 #include <iostream>
 #include <iterator>
+#include <algorithm>
+#include <numeric>
 #include <boost/test/included/unit_test_framework.hpp>
 #include <boost/test/unit_test.hpp>
 
@@ -474,6 +476,23 @@ const char* jan_01_2007 = "01/01/2007";
   TSeries<long,corTraits<double>::ReturnType> ans2 =  window_function<corTraits<double>::ReturnType,Cor>(x,y,5);
 }
 
+void time_window_test() {
+  // define our answer type
+  typedef meanTraits<double>::ReturnType mean_ansType;
+
+  long xnr = 50;
+  long xnc = 5;
+
+  TSeries<double,double> x(xnr,xnc);
+
+  // generate dates/data
+  for(int i = 0; i < x.nrow(); i++) { x.getDates()[i] = i * 60*60*24; }
+  std::generate(x.getData(), x.getData() + x.nrow() * x.ncol(), rand);
+
+  TSeries<double,mean_ansType> mean_ans = x.time_window<mean_ansType,Mean,int,yyyymm>();
+  cout << mean_ans << endl;
+}
+
 test_suite*
 init_unit_test_suite( int argc, char* argv[] ) {
 
@@ -496,5 +515,6 @@ init_unit_test_suite( int argc, char* argv[] ) {
   test->add( BOOST_TEST_CASE( &quarterly_tseries_test ) );
   test->add( BOOST_TEST_CASE( &window_function_test ) );
   test->add( BOOST_TEST_CASE( &expanding_max_test ) );
+  test->add( BOOST_TEST_CASE( &time_window_test ) );
   return test;
 }
