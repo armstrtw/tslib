@@ -469,51 +469,27 @@ namespace tslib {
   template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
   template<typename ReturnType, template<class> class F, typename PTYPE, template<class, template<typename> class,class> class PFUNC>
   const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::time_window() const {
-    // find partitions
-    typename std::vector<PTYPE> partitions;
-    partitions.resize(nrow());
-    std::transform(getDates(), getDates()+nrow(), partitions.begin(), PFUNC<TDATE,DatePolicy,PTYPE>());
-    typename std::vector<PTYPE> unique_partitions;
-    std::unique_copy(partitions.begin(),partitions.end(),std::inserter(unique_partitions,unique_partitions.begin()));
-    //std::copy(partitions.begin(), partitions.end(), std::ostream_iterator<int>(std::cout, " "));
+    typedef typename std::iterator_traits<TDATE*>::difference_type DT;
+    typedef typename std::vector<std::pair<DT,DT> >::const_iterator pair_iterator;
+    std::vector<std::pair<DT,DT> > partition_ranges;
 
-    std::copy(unique_partitions.begin(), unique_partitions.end(), std::ostream_iterator<int>(std::cout, " "));
-    std::cout << "***" << unique_partitions.size() << "***" << std::endl;
-    // allocate new answer
-    TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> ans(unique_partitions.size(), ncol());
-
-    // set ans colnames
+    calcPartitionRanges<PTYPE, DatePolicy, PFUNC>(getDates(), getDates() + nrow(), std::inserter(partition_ranges, partition_ranges.begin()));
+    TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> ans(partition_ranges.size(), ncol());
     ans.setColnames(getColnames());
+    TDATE* dates = getDates();
+    TDATE* ans_dates = ans.getDates();
+    TSDIM ans_row = 0;
+    for(pair_iterator it = partition_ranges.begin(); it != partition_ranges.end(); it++, ans_dates++) {
+      ans_dates[ans_row] = dates[it->first]; //FIXME: add option for (it->second - 1) end of period timestamp
+    }
 
     ReturnType* ans_data = ans.getData();
-    TDATE* ans_dates = ans.getDates();
-
     TDATA* data = getData();
-    TDATE* dates = getDates();
-
-    typename std::vector<PTYPE>::iterator sdate_iter = partitions.begin();
-    typename std::vector<PTYPE>::iterator edate_iter;
-    TSDIM ans_row = 0;
-    for(typename std::vector<PTYPE>::iterator p = unique_partitions.begin(); p != unique_partitions.end() - 1; p++) {
-
-      // find end of partition
-      edate_iter = std::find(sdate_iter, partitions.end(), *(p+1));
-      ans_dates[ans_row] = dates[std::distance(partitions.begin(),sdate_iter)];
-      std::cout << std::distance(partitions.begin(), sdate_iter) <<  ":" << std::distance(partitions.begin(), edate_iter) << std::endl;
-      for(TSDIM ans_col = 0; ans_col < ans.ncol(); ans_col++) {
-        ans_data[ans.offset(ans_row, ans_col)] = F<ReturnType>::apply(data + nrow()*ans_col + std::distance(partitions.begin(), sdate_iter),
-                                                                      data + nrow()*ans_col + std::distance(partitions.begin(), edate_iter));
+    for(TSDIM ans_col = 0; ans_col < ans.ncol(); ans_col++, data+=nrow()) {
+      TSDIM ans_row = 0;
+      for(pair_iterator it = partition_ranges.begin(); it != partition_ranges.end(); it++, ans_row++) {
+        ans_data[ans.offset(ans_row, ans_col)] = F<ReturnType>::apply(data + it->first,data + it->second);
       }
-      // advance sdate iterator
-      sdate_iter = edate_iter;
-      // advance row
-      ++ans_row;
-    }
-    ans_dates[ans_row] = dates[std::distance(partitions.begin(),edate_iter)];
-    // last row
-    for(TSDIM ans_col = 0; ans_col < ans.ncol(); ans_col++) {
-      ans_data[ans.offset(ans_row, ans_col)] = F<ReturnType>::apply(data + nrow()*ans_col + std::distance(partitions.begin(), sdate_iter),
-                                                                    data + nrow()*ans_col + nrow());
     }
     return ans;
   }

@@ -23,6 +23,31 @@
 
 namespace tslib {
 
+  template<typename PTYPE, template<typename> class DatePolicy, template<class, template<typename> class, class> class PFUNC, typename T, typename U>
+  void calcPartitionRanges(T beg, T end, U oiter) {
+    typedef typename std::vector<PTYPE>::iterator partition_iter;
+    typedef typename std::iterator_traits<partition_iter>::difference_type DT;
+    typedef typename std::iterator_traits<T>::value_type VT;
+
+    typename std::vector<PTYPE> partitions;
+    typename std::vector<PTYPE> unique_partitions;
+
+    partitions.resize(std::distance(beg, end));
+    std::transform(beg, end, partitions.begin(), PFUNC<VT, DatePolicy, PTYPE>());
+    std::unique_copy(partitions.begin(), partitions.end(), std::inserter(unique_partitions,unique_partitions.begin()));
+    partition_iter pbeg = partitions.begin();
+    partition_iter siter = pbeg;
+    partition_iter eiter;
+
+    for(partition_iter p = unique_partitions.begin(); p != unique_partitions.end() - 1; p++) {
+      eiter = std::find(siter, partitions.end(), *(p+1));
+      *oiter++ = std::pair<DT, DT>(std::distance(pbeg,siter), std::distance(pbeg,eiter));
+      siter = eiter;
+    }
+    // last row
+    *oiter = std::pair<DT, DT>(std::distance(pbeg,siter),std::distance(pbeg,partitions.end()));
+  }
+
   template<typename T,
            template<typename> class DatePolicy,
            typename ReturnType>

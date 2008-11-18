@@ -127,7 +127,7 @@ void range_specifier_test() {
   BOOST_CHECK(r.getArg2()[1] == 1);
   BOOST_CHECK(r.getArg2()[2] == 2);
 
-  r.print();
+  //r.print();
 }
 
 void operators_test() {
@@ -410,15 +410,13 @@ void quarterly_breaks_test() {
 
 
   for(std::vector<long>::iterator beg = dts.begin(); beg != dts.end(); beg++) {
-    cout << PosixDate<long>::toString(*beg,fmt_america);
-    cout << endl;
+    //cout << PosixDate<long>::toString(*beg,fmt_america) << endl;
   }
 
   std::vector<int> ans;
   QuarterlyBreaks<PosixDate,int>(dts.begin(),dts.end(),ans);
 
-  copy(ans.begin(), ans.end(), ostream_iterator<int>(cout, " "));
-  cout << endl;
+  //copy(ans.begin(), ans.end(), ostream_iterator<int>(cout, " ")); cout << endl;
 }
 
 void quarterly_tseries_test() {
@@ -478,7 +476,7 @@ const char* jan_01_2007 = "01/01/2007";
 
 void time_window_test() {
   // define our answer type
-  typedef meanTraits<double>::ReturnType mean_ansType;
+  typedef sumTraits<double>::ReturnType sum_ansType;
 
   long xnr = 50;
   long xnc = 5;
@@ -487,10 +485,11 @@ void time_window_test() {
 
   // generate dates/data
   for(int i = 0; i < x.nrow(); i++) { x.getDates()[i] = i * 60*60*24; }
-  std::generate(x.getData(), x.getData() + x.nrow() * x.ncol(), rand);
+  std::fill(x.getData(), x.getData() + x.nrow() * x.ncol(), 1.0);
 
-  TSeries<double,mean_ansType> mean_ans = x.time_window<mean_ansType,Mean,int,yyyymm>();
-  cout << mean_ans << endl;
+  TSeries<double,sum_ansType> sum_ans = x.time_window<sum_ansType,Sum,int,yyyymm>();
+  cout << x << endl;
+  cout << sum_ans << endl;
 }
 
 test_suite*
