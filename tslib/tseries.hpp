@@ -22,6 +22,7 @@
 #include <algorithm>
 #include <numeric>
 #include <functional>
+#include <iterator>
 
 #include <tslib/tseries.data.hpp>
 #include <tslib/range.specifier/rangeSpecifier.hpp>
@@ -33,6 +34,7 @@
 #include <tslib/vector.transform.hpp>
 #include <tslib/date.policies/posix.date.policy.hpp>
 #include <tslib/date.policies/date.breaks.hpp>
+#include <tslib/date.policies/date.partition.hpp>
 
 namespace tslib {
 
@@ -81,6 +83,9 @@ namespace tslib {
     template<typename ReturnType, template<class> class F>
     const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> window(const size_t window) const;
 
+    template<typename ReturnType, template<class> class F, typename PTYPE, template<class, template<typename> class,class> class PFUNC>
+    const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> time_window() const;
+
     template<typename ReturnType, template<class> class F>
     const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> transform() const;
 
@@ -110,38 +115,28 @@ namespace tslib {
     // binary TS TS opps
     friend TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> operator+ <> (const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& lhs,
                                                                              const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& rhs);
-
     friend TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> operator- <> (const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& lhs,
                                                                              const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& rhs);
-
     friend TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> operator* <> (const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& lhs,
                                                                              const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& rhs);
-
     friend TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> operator/ <> (const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& lhs,
                                                                              const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& rhs);
     // binary TDATA TS opps
     friend TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> operator+ <> (const TDATA lhs,
                                                                              const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& rhs);
-
     friend TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> operator- <> (const TDATA lhs,
                                                                              const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& rhs);
-
     friend TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> operator* <> (const TDATA lhs,
                                                                              const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& rhs);
-
     friend TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> operator/ <> (const TDATA lhs,
                                                                              const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& rhs);
-
     // binary TS TDATA opps
     friend TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> operator+ <> (const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& lhs,
                                                                              const TDATA rhs);
-
     friend TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> operator- <> (const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& lhs,
                                                                              const TDATA rhs);
-
     friend TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> operator* <> (const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& lhs,
                                                                              const TDATA rhs);
-
     friend TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> operator/ <> (const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& lhs,
                                                                              const TDATA rhs);
 
@@ -467,6 +462,52 @@ namespace tslib {
       windowApply<ReturnType,F>::apply(ans_data, data, data + nrow(), window);
       ans_data += ans.nrow();
       data += nrow();
+    }
+    return ans;
+  }
+
+  template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
+  template<typename ReturnType, template<class> class F, typename PTYPE, template<class, template<typename> class,class> class PFUNC>
+  const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::time_window() const {
+    // find partitions
+    typename std::vector<PTYPE> partitions;
+    partitions.resize(nrow());
+    std::transform(getDates(), getDates()+nrow(), partitions.begin(), PFUNC<TDATE,DatePolicy,PTYPE>());
+    typename std::vector<PTYPE> unique_partitions;
+    std::unique_copy(partitions.begin(),partitions.end(),std::inserter(unique_partitions,unique_partitions.begin()));
+    //std::copy(partitions.begin(), partitions.end(), std::ostream_iterator<int>(std::cout, " "));
+
+    std::copy(unique_partitions.begin(), unique_partitions.end(), std::ostream_iterator<int>(std::cout, " "));
+    std::cout << "***" << unique_partitions.size() << "***" << std::endl;
+    // allocate new answer
+    TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> ans(unique_partitions.size(), ncol());
+
+    // set ans colnames
+    ans.setColnames(getColnames());
+
+    ReturnType* ans_data = ans.getData();
+    TDATE* ans_dates = ans.getDates();
+
+    TDATA* data = getData();
+    TDATE* dates = getDates();
+
+    TDATE* sdate_iter = dates;
+    TDATE* edate_iter = NULL;
+    TSDIM ans_row = 0;
+    for(typename std::vector<PTYPE>::iterator p = unique_partitions.begin() + 1; p != unique_partitions.end(); p++) {
+      // set date to first date in partition (should add option later for last date in parittion)
+      ans_dates[ans_row] = *sdate_iter;
+
+      // find end of partition
+      edate_iter = std::find(sdate_iter,dates+nrow(),*p);
+      std::cout << std::distance(dates, sdate_iter) <<  ":" << std::distance(dates, edate_iter) << std::endl;
+      for(TSDIM ans_col = 0; ans_col < ans.ncol(); ans_col++) {
+        ans_data[ans.offset(ans_row, ans_col)] = F<ReturnType>::apply(data + nrow()*ans_col + std::distance(dates, sdate_iter), data + nrow()*ans_col + std::distance(dates, edate_iter));
+      }
+      // advance sdate iterator
+      sdate_iter = edate_iter;
+      // advance row
+      ++ans_row;
     }
     return ans;
   }
