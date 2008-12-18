@@ -494,27 +494,43 @@ const char* jan_01_2007 = "01/01/2007";
 }
 
 void cbind_test() {
-  long xnr = 365;
+  long xnr = 5;
   long xnc = 1;
 
-  long ynr = 100;
-  long ync = 1;
+  long ynr = 10;
+  long ync = 3;
 
   LDL_ts x(xnr,xnc);
   LDL_ts y(ynr,ync);
-  vector< LDL_ts > seq;
 
+  for(int i = 0; i < x.nrow(); i++) { x.getDates()[i] = i; }
+  for(int i = 0; i < x.nrow()*x.ncol(); i++) { x.getData()[i] = 1; }
+  for(int i = 0; i < y.nrow(); i++) { y.getDates()[i] = i; }
+  for(int i = 0; i < y.nrow()*y.ncol(); i++) { y.getData()[i] = i; }
+  vector< LDL_ts > seq;
   seq.push_back(x);
   seq.push_back(y);
 
-  //TSeries<long,double,long,TSdataSingleThreaded,PosixDate> z(cbind(seq));
-  LDL_ts z = cbind(seq,true);
+  cout << "cbind:" << endl;
+  cout << "x" << x << endl;
+  cout << "y" << y << endl;
+
+  LDL_ts z_union = cbind(seq,false);
+  cout << z_union.nrow() << endl;
+  cout << z_union.ncol() << endl;
+  cout << "z_union" << z_union << endl;
+
+  LDL_ts z_intersect = cbind(seq,true);
+  cout << z_intersect.nrow() << endl;
+  cout << z_intersect.ncol() << endl;
+  cout << "z_intersect:" << z_intersect << endl;
 }
 
 test_suite*
 init_unit_test_suite( int argc, char* argv[] ) {
 
   test_suite* test= BOOST_TEST_SUITE("tslib test");
+
 
   test->add( BOOST_TEST_CASE( &null_constructor_test ) );
   test->add( BOOST_TEST_CASE( &std_constructor_test ) );

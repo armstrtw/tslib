@@ -58,6 +58,8 @@ namespace tslib {
     }
 
     TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> ans(ans_dates.size(),cbind_total_cols(cont));
+    std::copy(ans_dates.begin(), ans_dates.end(), ans.getDates());
+    // FIXME: set colnames
 
     // if union, then we must initialize the values of ans to NA
     if(!intersection) {
@@ -65,9 +67,6 @@ namespace tslib {
 	ans.getData()[i] = numeric_traits<TDATA>::NA();
       }
     }
-
-    std::copy(ans_dates.begin(), ans_dates.end(), ans.getDates());
-    // FIXME: set colnames
 
     typename CONT<TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> >::const_iterator it = cont.begin();
 
@@ -215,6 +214,39 @@ namespace tslib {
       std::copy(ts_data_iter,ts_data_iter + range.getSize(),ans_data);
       ans_data += ans.nrow();
     }
+  }
+
+  template<class TDATE,
+	   class TDATA,
+	   class TSDIM,
+	   template<typename,typename,typename> class TSDATABACKEND,
+	   template<typename> class DatePolicy,
+	   template<class U, class V, class W,
+		    template<typename,typename,typename> class DATABACKEND,
+		    template<typename> class DP> class TSeries,
+	   template<typename ELEM, typename = std::allocator<ELEM> > class CONT,
+	   typename II>
+  void cbind_create_colnames(const CONT<TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> >& cont,
+			     II new_colnames)
+  {
+    typename CONT<TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> >::const_iterator it;
+    for(it = cont.begin(); it != cont.end(); it++) {
+      std::vector<std::string> this_cnames;
+      // if series has non-empty colnames, pad them into new_colnames
+      // otherwise pad empty strings
+
+      //FIXME: add a test for all series having empty colnames, then ans should not have blnk strings set as colnames
+      if(this_cnames.size()) {
+	for(std::vector<std::string>::const_iterator cn_it = this_cnames.begin();it != this_cnames.end(); cn_it++) {
+	  *new_colnames++ = *cn_it;
+	}
+      } else {
+	for(int i = 0; i < it->ncol(); i++) {
+	  *new_colnames++ = std::string("");
+	}
+      }
+    }
+
   }
 
 } // namespace tslib
