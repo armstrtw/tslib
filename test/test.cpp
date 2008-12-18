@@ -446,7 +446,7 @@ void quarterly_tseries_test() {
   long xnr = 365*2;
   long xnc = 5;
 
-  TSeries<long,double,long,TSdataSingleThreaded,PosixDate> x(xnr,xnc);
+  DDL_ts x(xnr,xnc);
 
   // gernate data
   for(long vi = 0; vi < x.nrow()*x.ncol(); vi++)
@@ -470,8 +470,8 @@ const char* jan_01_2007 = "01/01/2007";
   long ynr = 100;
   long ync = 1;
 
-  TSeries<long,double,long,TSdataSingleThreaded,PosixDate> x(xnr,xnc);
-  TSeries<long,double,long,TSdataSingleThreaded,PosixDate> y(ynr,ync);
+  LDL_ts x(xnr,xnc);
+  LDL_ts y(ynr,ync);
 
   // gernate data for x
   for(long vi = 0; vi < x.nrow()*x.ncol(); vi++)
@@ -518,12 +518,12 @@ void cbind_test() {
   LDL_ts z_union = cbind(seq,false);
   cout << z_union.nrow() << endl;
   cout << z_union.ncol() << endl;
-  cout << "z_union" << z_union << endl;
+  cout << "z_union" << endl << z_union << endl;
 
   LDL_ts z_intersect = cbind(seq,true);
   cout << z_intersect.nrow() << endl;
   cout << z_intersect.ncol() << endl;
-  cout << "z_intersect:" << z_intersect << endl;
+  cout << "z_intersect:" << endl << z_intersect << endl;
 }
 
 void time_window_test() {
@@ -533,13 +533,14 @@ void time_window_test() {
   long xnr = 50;
   long xnc = 5;
 
-  TSeries<double,double> x(xnr,xnc);
+  DDL_ts x(xnr,xnc);
 
   // generate dates/data
   for(int i = 0; i < x.nrow(); i++) { x.getDates()[i] = i * 60*60*24; }
   std::fill(x.getData(), x.getData() + x.nrow() * x.ncol(), 1.0);
 
-  TSeries<double,sum_ansType> sum_ans = x.time_window<sum_ansType,Sum,int,yyyymm>();
+  TSeries<double,sum_ansType,long,TSdataSingleThreaded,PosixDate> sum_ans = x.time_window<sum_ansType,Sum,int,yyyymm>();
+
   cout << x << endl;
   cout << sum_ans << endl;
 }
