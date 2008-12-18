@@ -24,8 +24,6 @@
 #include <tslib/vector.transform/fill.fwd.hpp>
 #include <tslib/vector.transform/fill.value.hpp>
 #include <tslib/vector.transform/lag.lead.traits.hpp>
-#include <tslib/vector.transform/lag.hpp>
-#include <tslib/vector.transform/lead.hpp>
 #include <tslib/vector.transform/since.na.traits.hpp>
 #include <tslib/vector.transform/since.na.hpp>
 #include <tslib/vector.transform/expanding.maximum.hpp>

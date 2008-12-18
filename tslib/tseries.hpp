@@ -23,6 +23,7 @@
 #include <numeric>
 #include <functional>
 #include <iterator>
+#include <stdexcept>
 
 #include <tslib/tseries.data.hpp>
 #include <tslib/range.specifier/rangeSpecifier.hpp>
@@ -49,10 +50,15 @@ namespace tslib {
   using std::equal_to;
   using std::not_equal_to;
 
+  class TSeriesError : public std::runtime_error {
+  public:
+    TSeriesError(const std::string& msg = "") : std::runtime_error(msg) {}
+  };
+
   template <typename TDATE, typename TDATA,
-            typename TSDIM = long,
-            template<typename,typename,typename> class TSDATABACKEND = TSdataSingleThreaded,
-            template<typename> class DatePolicy = PosixDate>
+            typename TSDIM,
+            template<typename,typename,typename> class TSDATABACKEND,
+            template<typename> class DatePolicy>
   class TSeries {
   private:
     TSDATABACKEND<TDATE,TDATA,TSDIM>* tsdata_;
@@ -107,6 +113,8 @@ namespace tslib {
 
     // lag lead
     const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> operator() (const int n) const;
+    const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> lag(const unsigned int n) const;
+    const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> lead(const unsigned int n) const;
 
     // matix index
     TDATA operator() (const TSDIM row, const TSDIM col) const;
@@ -192,35 +200,66 @@ namespace tslib {
 
   template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
   const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::operator() (const int n) const {
-    if(n == 0) {
-      return *this;
+    if( n > 0 ) {
+      return lag(n);
+    } else if( n < 0) {
+      return lead(abs(n));
+    }
+    return *this;
+  }
+
+  template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
+  const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::lag(const unsigned int n) const {
+    if(nrow() < 2) {
+      throw TSeriesError("lag: series too small (nrow < 2), can't lag.");
+    }
+    if(n > nrow()) {
+      throw TSeriesError("lag: n > nrow of time seires.");
     }
 
-    // positive value is lag
-    // negative value is lead
-    TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> ans(nrow(), ncol());
+    const TSDIM new_size = nrow() - n;
+    TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> ans(new_size, ncol());
+    TDATA* ans_data = ans.getData();
+    const TDATA* data = getData();
 
     // copy over dates
-    std::copy(getDates(),getDates()+nrow(),ans.getDates());
+    std::copy(getDates() + n, getDates() + n + new_size, ans.getDates());
 
     // set new colnames
     ans.setColnames(getColnames());
 
-    TDATA* ans_data = ans.getData();
-    TDATA* data = getData();
+    for(TSDIM c = 0; c < ncol(); c++) {
+      std::copy(data, data + new_size, ans_data);
+      ans_data += ans.nrow();
+      data += nrow();
+    }
+    return ans;
+  }
 
-    if(n > 0) {
-      for(TSDIM c = 0; c < ncol(); c++) {
-        Lag<TDATA>::apply(ans_data,data,data+nrow(),std::abs(n));
-        ans_data+=ans.nrow();
-        data+=nrow();
-      }
-    } else {
-      for(TSDIM c = 0; c < ncol(); c++) {
-        Lead<TDATA>::apply(ans_data,data,data+nrow(),std::abs(n));
-        ans_data+=ans.nrow();
-        data+=nrow();
-      }
+  template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
+  const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::lead(const unsigned int n) const {
+    if(nrow() < 2) {
+      throw TSeriesError("lead: series too small (nrow < 2), can't lag.");
+    }
+    if(n > nrow()) {
+      throw TSeriesError("lead: n > nrow of time seires.");
+    }
+
+    const TSDIM new_size = nrow() - n;
+    TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> ans(new_size, ncol());
+    TDATA* ans_data = ans.getData();
+    const TDATA* data = getData();
+
+    // copy over dates
+    std::copy(getDates(), getDates() + new_size - n + 1, ans.getDates());
+
+    // set new colnames
+    ans.setColnames(getColnames());
+
+    for(TSDIM c = 0; c < ncol(); c++) {
+      std::copy(data + n, data + n + new_size, ans_data);
+      ans_data += ans.nrow();
+      data += nrow();
     }
     return ans;
   }
