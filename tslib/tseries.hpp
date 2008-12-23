@@ -210,13 +210,9 @@ namespace tslib {
 
   template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
   const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::lag(const unsigned int n) const {
-    if(nrow() < 2) {
-      throw TSeriesError("lag: series too small (nrow < 2), can't lag.");
+    if(n >= nrow()) {
+      throw TSeriesError("lead: n >= nrow of time seires.");
     }
-    if(n > nrow()) {
-      throw TSeriesError("lag: n > nrow of time seires.");
-    }
-
     const TSDIM new_size = nrow() - n;
     TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> ans(new_size, ncol());
     TDATA* ans_data = ans.getData();
@@ -238,20 +234,16 @@ namespace tslib {
 
   template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
   const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::lead(const unsigned int n) const {
-    if(nrow() < 2) {
-      throw TSeriesError("lead: series too small (nrow < 2), can't lag.");
+    if(n >= nrow()) {
+      throw TSeriesError("lead: n >= nrow of time seires.");
     }
-    if(n > nrow()) {
-      throw TSeriesError("lead: n > nrow of time seires.");
-    }
-
     const TSDIM new_size = nrow() - n;
     TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> ans(new_size, ncol());
     TDATA* ans_data = ans.getData();
     const TDATA* data = getData();
 
     // copy over dates
-    std::copy(getDates(), getDates() + new_size - n + 1, ans.getDates());
+    std::copy(getDates(), getDates() + new_size, ans.getDates());
 
     // set new colnames
     ans.setColnames(getColnames());
