@@ -66,7 +66,7 @@ namespace tslib {
   public:
     yyyymmdd() {}
     ReturnType operator()(const T date) {
-      return DatePolicy<T>::year(date) * 1000  + DatePolicy<T>::month(date) * 100 + DatePolicy<T>::month(date);
+      return DatePolicy<T>::year(date) * 10000  + DatePolicy<T>::month(date) * 100 + DatePolicy<T>::dayofmonth(date);
     }
   };
 
