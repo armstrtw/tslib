@@ -211,7 +211,7 @@ namespace tslib {
   template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
   const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::lag(const unsigned int n) const {
     if(n >= nrow()) {
-      throw TSeriesError("lead: n >= nrow of time seires.");
+      throw TSeriesError("lag: n >= nrow of time seires.");
     }
     const TSDIM new_size = nrow() - n;
     TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> ans(new_size, ncol());
