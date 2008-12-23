@@ -58,6 +58,18 @@ namespace tslib {
       return DatePolicy<T>::year(date) * 100  + DatePolicy<T>::month(date);
     }
   };
+
+  template<typename T,
+           template<typename> class DatePolicy,
+           typename ReturnType>
+  class yyyymmdd {
+  public:
+    yyyymmdd() {}
+    ReturnType operator()(const T date) {
+      return DatePolicy<T>::year(date) * 1000  + DatePolicy<T>::month(date) * 100 + DatePolicy<T>::month(date);
+    }
+  };
+
 }  // namespace tslib
 
 #endif // DATE_PARTITION
