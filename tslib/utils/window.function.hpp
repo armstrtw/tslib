@@ -23,7 +23,7 @@
 #include <tslib/tseries.data.hpp>
 #include <tslib/range.specifier/rangeSpecifier.hpp>
 #include <tslib/utils/window.intersection.apply.hpp>
-//#include <tslib/range.specifier/range.opp.hpp>
+#include <tslib/range.specifier/range.iterator.hpp>
 
 namespace tslib {
 

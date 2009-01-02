@@ -15,20 +15,24 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>. //
 ///////////////////////////////////////////////////////////////////////////
 
-#ifndef RANGE_OPP_HPP
-#define RANGE_OPP_HPP
+#ifndef TS_PROMOTION_HPP
+#define TS_PROMOTION_HPP
 
-#include <tslib/range.specifier/range.iterator.hpp>
+namespace tslib {
 
-template<typename T, typename U, typename RangeIterator, typename BinaryOpp>
-inline
-void applyRangeOpp(T ans_iter, RangeIterator iter1, RangeIterator iter2, const U size, BinaryOpp opp) {
-  for(U i = 0; i < size; i++) {
-    *ans_iter = opp( *iter1 , *iter2 );
-    ++ans_iter;
-    ++iter1;
-    ++iter2;
-  }
-}
+  // default promotion using sizeof
+  template<typename T1, typename T2>
+  class Promotion {
+  public:
+    typedef T1 ResultT;
+  };
 
-#endif // RANGE_OPP_HPP
+  // partial specialization for two identical types
+  template<typename T>
+  class Promotion<T,T> {
+  public:
+    typedef T ResultT;
+  };
+} //namespace tslib
+
+#endif // TS_PROMOTION_HPP
