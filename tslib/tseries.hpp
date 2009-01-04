@@ -27,9 +27,7 @@
 
 #include <tslib/tseries.data.hpp>
 #include <tslib/range.specifier/rangeSpecifier.hpp>
-#include <tslib/ts.opps/ts.opps.predeclare.hpp>
-#include <tslib/ts.opps/ts.ts.opp.hpp>
-#include <tslib/ts.opps/ts.scalar.opp.hpp>
+#include <tslib/ts.opps/ts.opps.hpp>
 #include <tslib/utils/window.apply.hpp>
 #include <tslib/utils/window.function.hpp>
 #include <tslib/vector.transform.hpp>
@@ -51,7 +49,9 @@ namespace tslib {
   class TSeries {
   private:
     TSDATABACKEND<TDATE,TDATA,TSDIM>* tsdata_;
-    const TSDIM offset(const TSDIM row, const TSDIM col) const;
+    const TSDIM offset(const TSDIM row, const TSDIM col) const {
+      return row + col*nrow();
+    }
   public:
     // ctors dtors
     ~TSeries();
@@ -111,12 +111,6 @@ namespace tslib {
 
     friend std::ostream& operator<< <> (std::ostream& os, const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& ts);
   };
-
-  template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
-  inline
-  const TSDIM TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::offset(const TSDIM row, const TSDIM col) const {
-    return row + col*nrow();
-  }
 
   template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
   TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::operator=(const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& rhs) {
@@ -228,17 +222,16 @@ namespace tslib {
     }
 
     TDATE* dates = ts.getDates();
-    TDATA* data = ts.getData();
     TSDIM nr  = ts.nrow();
     TSDIM nc  = ts.ncol();
 
     for(TSDIM row = 0; row < nr; row++) {
       os << DatePolicy<TDATE>::toString(dates[row],"%Y-%m-%d %T") << "\t";
       for(TSDIM col = 0; col < nc; col++) {
-        if(numeric_traits<TDATA>::ISNA(data[ts.offset(row,col)])) {
+        if(numeric_traits<TDATA>::ISNA(ts(row,col))) {
           os << "NA" << " ";
         } else {
-          os << data[ts.offset(row,col)] << " ";
+          os << ts(row,col) << " ";
         }
       }
       os << std::endl;

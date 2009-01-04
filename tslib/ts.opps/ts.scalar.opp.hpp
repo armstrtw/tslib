@@ -84,6 +84,63 @@ namespace tslib {
     return ans;
   }
 
+
+  template<class TDATE,
+           class TDATA1,
+           class TDATA2,
+           class TSDIM,
+           template<typename,typename,typename> class TSDATABACKEND,
+           template<typename> class DatePolicy,
+           template<class U, class V, class W, template<typename,typename,typename> class DATABACKEND, template<typename> class DP> class TSeries,
+           class opptype>
+
+  const std::vector<bool> apply_boolean_opp(const TDATA1 lhs_scalar,
+					    const TSeries<TDATE,TDATA2,TSDIM,TSDATABACKEND,DatePolicy>& rhs,
+					    opptype opp) {
+
+    typedef typename Promotion<TDATA1,TDATA2>::ResultT ResultT;
+    std::vector<bool> ans;
+
+    // allocate new answer
+    ans.reserve(rhs.nrow()*rhs.ncol());
+
+    std::vector<bool>::iterator ans_data = ans.begin();
+    TDATA2* rhs_data = rhs.getData();
+
+    for(TSDIM i = 0; i < rhs.nrow() * rhs.ncol(); i++)
+      ans_data[i] = opp(static_cast<ResultT>(lhs_scalar),static_cast<ResultT>(rhs_data[i]));
+
+    return ans;
+  }
+
+  template<class TDATE,
+           class TDATA1,
+           class TDATA2,
+           class TSDIM,
+           template<typename,typename,typename> class TSDATABACKEND,
+           template<typename> class DatePolicy,
+           template<class U, class V, class W, template<typename,typename,typename> class DATABACKEND, template<typename> class DP> class TSeries,
+           class opptype>
+
+  const std::vector<bool> apply_boolean_opp(const TSeries<TDATE,TDATA1,TSDIM,TSDATABACKEND,DatePolicy>& lhs,
+					    const TDATA2 rhs_scalar,					    
+					    opptype opp) {
+
+    typedef typename Promotion<TDATA1,TDATA2>::ResultT ResultT;
+    std::vector<bool> ans;
+
+    // allocate new answer
+    ans.reserve(lhs.nrow()*lhs.ncol());
+
+    std::vector<bool>::iterator ans_data = ans.begin();
+    TDATA1* lhs_data = lhs.getData();
+
+    for(TSDIM i = 0; i < lhs.nrow() * lhs.ncol(); i++)
+      ans_data[i] = opp(static_cast<ResultT>(lhs_data[i]),static_cast<ResultT>(rhs_scalar));
+
+    return ans;
+  }
+
 } // namespace tslib
 
 #endif // TS_SCALAR_OPP_HPP

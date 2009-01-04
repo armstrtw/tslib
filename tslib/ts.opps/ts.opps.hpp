@@ -22,44 +22,87 @@
 #include <tslib/ts.opps/ts.ts.opp.hpp>
 #include <tslib/ts.opps/ts.scalar.opp.hpp>
 
+#define DEFINE_TS_TS_OPP(function_name,opp) \
+  template<typename TDATE, typename TDATA1, typename TDATA2, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy> \
+  TSeries<TDATE,typename Promotion<TDATA1,TDATA2>::ResultT,TSDIM,TSDATABACKEND,DatePolicy> function_name(const TSeries<TDATE,TDATA1,TSDIM,TSDATABACKEND,DatePolicy>& lhs, const TSeries<TDATE,TDATA2,TSDIM,TSDATABACKEND,DatePolicy>& rhs) { \
+    return apply_opp(lhs,rhs,opp<typename Promotion<TDATA1,TDATA2>::ResultT>()); \
+  }
+#define DEFINE_TS_SCALAR_OPP(function_name,opp) \
+  template<typename TDATE, typename TDATA1, typename TDATA2, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy> \
+  TSeries<TDATE,typename Promotion<TDATA1,TDATA2>::ResultT,TSDIM,TSDATABACKEND,DatePolicy> function_name(const TSeries<TDATE,TDATA1,TSDIM,TSDATABACKEND,DatePolicy>& lhs, const TDATA2 rhs) { \
+    return apply_opp(lhs,rhs,opp<typename Promotion<TDATA1,TDATA2>::ResultT>()); \
+  }
+#define DEFINE_SCALAR_TS_OPP(function_name,opp)	\
+  template<typename TDATE, typename TDATA1, typename TDATA2, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy> \
+  TSeries<TDATE,typename Promotion<TDATA1,TDATA2>::ResultT,TSDIM,TSDATABACKEND,DatePolicy> function_name(const TDATA1 lhs, const TSeries<TDATE,TDATA2,TSDIM,TSDATABACKEND,DatePolicy>& rhs) { \
+    return apply_opp(lhs,rhs,opp<typename Promotion<TDATA1,TDATA2>::ResultT>()); \
+  }
+#define DEFINE_TS_TS_BOOL_OPP(function_name,opp)			\
+  template<typename TDATE, typename TDATA1, typename TDATA2, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy> \
+  std::vector<bool> function_name(const TSeries<TDATE,TDATA1,TSDIM,TSDATABACKEND,DatePolicy>& lhs, const TSeries<TDATE,TDATA2,TSDIM,TSDATABACKEND,DatePolicy>& rhs) { \
+    return apply_boolean_opp(lhs,rhs,opp<typename Promotion<TDATA1,TDATA2>::ResultT>()); \
+  }
+#define DEFINE_SCALAR_TS_BOOL_OPP(function_name,opp) \
+  template<typename TDATE, typename TDATA1, typename TDATA2, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy> \
+  std::vector<bool> function_name(const TDATA1 lhs, const TSeries<TDATE,TDATA2,TSDIM,TSDATABACKEND,DatePolicy>& rhs) { \
+    return apply_boolean_opp(lhs,rhs,opp<typename Promotion<TDATA1,TDATA2>::ResultT>()); \
+  }
+#define DEFINE_TS_SCALAR_BOOL_OPP(function_name,opp) \
+  template<typename TDATE, typename TDATA1, typename TDATA2, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy> \
+  std::vector<bool> function_name(const TSeries<TDATE,TDATA1,TSDIM,TSDATABACKEND,DatePolicy>& lhs, const TDATA2 rhs) { \
+    return apply_boolean_opp(lhs,rhs,opp<typename Promotion<TDATA1,TDATA2>::ResultT>()); \
+  }
+
+
 namespace tslib {
-  using std::plus;
-  using std::minus;
-  using std::multiplies;
-  using std::divides;
-  using std::greater;
-  using std::less;
-  using std::greater_equal;
-  using std::less_equal;
-  using std::equal_to;
-  using std::not_equal_to;
 
-  template<typename TDATE, typename TDATA1, typename TDATA2, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
-  TSeries<TDATE,typename Promotion<TDATA1,TDATA2>::ResultT,TSDIM,TSDATABACKEND,DatePolicy> operator+(const TSeries<TDATE,TDATA1,TSDIM,TSDATABACKEND,DatePolicy>& lhs, const TSeries<TDATE,TDATA2,TSDIM,TSDATABACKEND,DatePolicy>& rhs) {
-    return apply_opp(lhs,rhs,plus<typename Promotion<TDATA1,TDATA2>::ResultT>());
-  }
-  template<typename TDATE, typename TDATA1, typename TDATA2, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
-  TSeries<TDATE,typename Promotion<TDATA1,TDATA2>::ResultT,TSDIM,TSDATABACKEND,DatePolicy> operator-(const TSeries<TDATE,TDATA1,TSDIM,TSDATABACKEND,DatePolicy>& lhs, const TSeries<TDATE,TDATA2,TSDIM,TSDATABACKEND,DatePolicy>& rhs) {
-    return apply_opp(lhs,rhs,minus<typename Promotion<TDATA1,TDATA2>::ResultT>());
-  }
-  template<typename TDATE, typename TDATA1, typename TDATA2, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
-  TSeries<TDATE,typename Promotion<TDATA1,TDATA2>::ResultT,TSDIM,TSDATABACKEND,DatePolicy> operator*(const TSeries<TDATE,TDATA1,TSDIM,TSDATABACKEND,DatePolicy>& lhs, const TSeries<TDATE,TDATA2,TSDIM,TSDATABACKEND,DatePolicy>& rhs) {
-    return apply_opp(lhs,rhs,multiplies<typename Promotion<TDATA1,TDATA2>::ResultT>());
-  }
-  template<typename TDATE, typename TDATA1, typename TDATA2, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
-  TSeries<TDATE,typename Promotion<TDATA1,TDATA2>::ResultT,TSDIM,TSDATABACKEND,DatePolicy> operator/(const TSeries<TDATE,TDATA1,TSDIM,TSDATABACKEND,DatePolicy>& lhs, const TSeries<TDATE,TDATA2,TSDIM,TSDATABACKEND,DatePolicy>& rhs) {
-    return apply_opp(lhs,rhs,divides<typename Promotion<TDATA1,TDATA2>::ResultT>());
-  }
+  // pre-declare template friends
+  template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy> class TSeries;
 
-  template<typename TDATE, typename TDATA1, typename TDATA2, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
-  TSeries<TDATE,typename Promotion<TDATA1,TDATA2>::ResultT,TSDIM,TSDATABACKEND,DatePolicy> operator+(const TDATA1 lhs, const TSeries<TDATE,TDATA2,TSDIM,TSDATABACKEND,DatePolicy>& rhs) {
-    return apply_opp(lhs,rhs,plus<typename Promotion<TDATA1,TDATA2>::ResultT>());
-  }
+  // predeclaration for friend template
+  template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
+  std::ostream& operator<<(std::ostream& os,
+			   const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& ts);
 
-  template<typename TDATE, typename TDATA1, typename TDATA2, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
-  TSeries<TDATE,typename Promotion<TDATA1,TDATA2>::ResultT,TSDIM,TSDATABACKEND,DatePolicy> operator+(const TSeries<TDATE,TDATA1,TSDIM,TSDATABACKEND,DatePolicy>& lhs, const TDATA2 rhs) {
-    return apply_opp(lhs,rhs,plus<typename Promotion<TDATA1,TDATA2>::ResultT>());
-  }
+  DEFINE_TS_TS_OPP(operator+,std::plus)
+  DEFINE_TS_SCALAR_OPP(operator+,std::plus)
+  DEFINE_SCALAR_TS_OPP(operator+,std::plus)
+
+  DEFINE_TS_TS_OPP(operator-,std::minus)
+  DEFINE_TS_SCALAR_OPP(operator-,std::minus)
+  DEFINE_SCALAR_TS_OPP(operator-,std::minus)
+
+  DEFINE_TS_TS_OPP(operator*,std::multiplies)
+  DEFINE_TS_SCALAR_OPP(operator*,std::multiplies)
+  DEFINE_SCALAR_TS_OPP(operator*,std::multiplies)
+
+  DEFINE_TS_TS_OPP(operator/,std::divides)
+  DEFINE_TS_SCALAR_OPP(operator/,std::divides)
+  DEFINE_SCALAR_TS_OPP(operator/,std::divides)
+
+  DEFINE_TS_TS_BOOL_OPP(operator==,std::equal_to)
+  DEFINE_SCALAR_TS_BOOL_OPP(operator==,std::equal_to)
+  DEFINE_TS_SCALAR_BOOL_OPP(operator==,std::equal_to)
+
+  DEFINE_TS_TS_BOOL_OPP(operator!=,std::not_equal_to)
+  DEFINE_SCALAR_TS_BOOL_OPP(operator!=,std::not_equal_to)
+  DEFINE_TS_SCALAR_BOOL_OPP(operator!=,std::not_equal_to)
+
+  DEFINE_TS_TS_BOOL_OPP(operator>,std::greater)
+  DEFINE_SCALAR_TS_BOOL_OPP(operator>,std::greater)
+  DEFINE_TS_SCALAR_BOOL_OPP(operator>,std::greater)
+
+  DEFINE_TS_TS_BOOL_OPP(operator>=,std::greater_equal)
+  DEFINE_SCALAR_TS_BOOL_OPP(operator>=,std::greater_equal)
+  DEFINE_TS_SCALAR_BOOL_OPP(operator>=,std::greater_equal)
+
+  DEFINE_TS_TS_BOOL_OPP(operator<,std::less)
+  DEFINE_SCALAR_TS_BOOL_OPP(operator<,std::less)
+  DEFINE_TS_SCALAR_BOOL_OPP(operator<,std::less)
+
+  DEFINE_TS_TS_BOOL_OPP(operator<=,std::less_equal)
+  DEFINE_SCALAR_TS_BOOL_OPP(operator<=,std::less_equal)
+  DEFINE_TS_SCALAR_BOOL_OPP(operator<=,std::less_equal)
 
 } // namespace tslib
 #endif // TS_OPPS_HPP

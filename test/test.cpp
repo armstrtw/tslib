@@ -25,6 +25,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include <tslib/tseries.hpp>
+#include <tslib/ts.opps/ts.opps.hpp>
 #include <tslib/utils/window.function.hpp>
 #include <tslib/utils/cbind.hpp>
 #include <tslib/vector.summary.hpp>
@@ -41,6 +42,7 @@ using std::vector;
 //LDL = long, double, long
 //DDL = double, double, long
 typedef TSeries<long,double,long,TSdataSingleThreaded,PosixDate> LDL_ts;
+typedef TSeries<long,int,long,TSdataSingleThreaded,PosixDate> LIL_ts;
 typedef TSeries<double,double,long,TSdataSingleThreaded,PosixDate> DDL_ts;
 
 // seed random number generator
@@ -187,6 +189,58 @@ void operators_test() {
 
   LDL_ts XdivS = x / 100.0;
   LDL_ts SdivX = 100.0 * x;
+
+  vector<bool> xb_eq_scalar = x == 10;
+  vector<bool> xb_neq_ts = x != y;
+  vector<bool> xb_gt_ts = x > y;
+  vector<bool> xb_gte_ts = x >= y;
+  vector<bool> xb_lt_ts = x < y;
+  vector<bool> xb_lte_ts = x <= y;
+}
+
+void mixed_operators_test() {
+  long xnr = 100;
+  long ynr = 10;
+  long nc = 10;
+
+  LDL_ts x(xnr,nc);
+  LIL_ts y(ynr,nc);
+
+  // gernate data
+  fill_n(x.getData(),x.nrow()*x.ncol(),100.0);
+  fill_n(y.getData(),y.nrow()*y.ncol(),5.0);
+
+  // generate dates
+  for(long xi = 0; xi < x.nrow(); xi++)
+    x.getDates()[xi] = xi;
+
+  // generate dates
+  for(long yi = 0; yi < y.nrow(); yi++)
+    y.getDates()[yi] = yi;
+
+  LDL_ts Zplus = x + y;
+  LDL_ts Zminus = x - y;
+  LDL_ts Zmultiplies = x * y;
+  LDL_ts Zdivides = x / y;
+
+  BOOST_CHECK_EQUAL( Zplus.nrow(), y.nrow() );
+  BOOST_CHECK_EQUAL( Zplus.ncol(), 10 );
+
+  BOOST_CHECK_EQUAL( Zminus.nrow(), y.nrow() );
+  BOOST_CHECK_EQUAL( Zminus.ncol(), 10 );
+
+  BOOST_CHECK_EQUAL( Zmultiplies.nrow(), y.nrow() );
+  BOOST_CHECK_EQUAL( Zmultiplies.ncol(), 10 );
+
+  BOOST_CHECK_EQUAL( Zdivides.nrow(), y.nrow() );
+  BOOST_CHECK_EQUAL( Zdivides.ncol(), 10 );
+
+  vector<bool> xb_eq_scalar = x == static_cast<int>(10);
+  vector<bool> xb_neq_ts = x != y;
+  vector<bool> xb_gt_ts = x > y;
+  vector<bool> xb_gte_ts = x >= y;
+  vector<bool> xb_lt_ts = x < y;
+  vector<bool> xb_lte_ts = x <= y;
 }
 
 void assignment_test() {
@@ -576,6 +630,7 @@ init_unit_test_suite( int argc, char* argv[] ) {
   test->add( BOOST_TEST_CASE( &set_colnames_test ) );
   test->add( BOOST_TEST_CASE( &range_specifier_test ) );
   test->add( BOOST_TEST_CASE( &operators_test ) );
+  test->add( BOOST_TEST_CASE( &mixed_operators_test ) );
   test->add( BOOST_TEST_CASE( &assignment_test ) );
   test->add( BOOST_TEST_CASE( &vector_window_apply_test ) );
   test->add( BOOST_TEST_CASE( &window_apply_test ) );

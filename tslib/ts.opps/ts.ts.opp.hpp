@@ -126,7 +126,7 @@ namespace tslib {
       return ans;
 
     // allocate new answer
-    ans.reserve(range.getSize()*lhs.ncol);
+    ans.reserve(range.getSize()*lhs.ncol());
 
     std::vector<bool>::iterator ans_data = ans.begin();
     TDATA1* lhs_data = lhs.getData();

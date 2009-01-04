@@ -25,34 +25,25 @@
  * This software is provided "as is" without express or implied
  * warranty, and with no claim as to its suitability for any purpose.
  */
+#ifndef IFTHENELSE_HPP
+#define IFTHENELSE_HPP
 
-#ifndef TS_PROMOTION_HPP
-#define TS_PROMOTION_HPP
+// primary template: yield second or third argument depending on first argument
+template<bool C, typename Ta, typename Tb>
+class IfThenElse;
 
-#include <tslib/ts.opps/ifthenelse.hpp>
-
-namespace tslib {
-
-  // primary template for type promotion
-  template<typename T1, typename T2>
-  class Promotion {
+// partial specialization: true yields second argument
+template<typename Ta, typename Tb>
+class IfThenElse<true, Ta, Tb> {
   public:
-    typedef typename 
-    IfThenElse<(sizeof(T1)>sizeof(T2)),
-      T1,
-      typename IfThenElse<(sizeof(T1)<sizeof(T2)),
-      T2,
-      void
-      >::ResultT
-    >::ResultT ResultT;
-  };
+    typedef Ta ResultT;
+};
 
-  // partial specialization for two identical types
-  template<typename T>
-  class Promotion<T,T> {
+// partial specialization: false yields third argument
+template<typename Ta, typename Tb>
+class IfThenElse<false, Ta, Tb> {
   public:
-    typedef T ResultT;
-  };
-} //namespace tslib
+    typedef Tb ResultT;
+};
 
-#endif // TS_PROMOTION_HPP
+#endif // IFTHENELSE_HPP
