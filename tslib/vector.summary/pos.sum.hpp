@@ -15,22 +15,48 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>. //
 ///////////////////////////////////////////////////////////////////////////
 
-#ifndef VECTOR_SUMMARY_HPP
-#define VECTOR_SUMMARY_HPP
+#ifndef POS_SUM_HPP
+#define POS_SUM_HPP
 
-// taking 1 vector an argument
-#include <tslib/vector.summary/max.hpp>
-#include <tslib/vector.summary/min.hpp>
-#include <tslib/vector.summary/mean.hpp>
-#include <tslib/vector.summary/sum.hpp>
-#include <tslib/vector.summary/pos.sum.hpp>
-#include <tslib/vector.summary/neg.sum.hpp>
-#include <tslib/vector.summary/prod.hpp>
-#include <tslib/vector.summary/stdev.hpp>
-#include <tslib/vector.summary/rank.hpp>
+#include <iterator>
+#include <tslib/utils/numeric.traits.hpp>
 
-// taking 2 vectors as arguments
-#include <tslib/vector.summary/cov.hpp>
-#include <tslib/vector.summary/cor.hpp>
+namespace tslib {
 
-#endif // VECTOR_SUMMARY_HPP
+  template<typename T>
+  class posSumTraits;
+
+  template<>
+  class posSumTraits<double> {
+  public:
+    typedef double ReturnType;
+  };
+
+  template<>
+  class posSumTraits<int> {
+  public:
+    typedef int ReturnType;
+  };
+
+
+  template<typename ReturnType>
+  class PosSum {
+  public:
+    template<typename T>
+    static inline ReturnType apply(T beg, T end) {
+      ReturnType ans = 0;
+
+      while(beg != end) {
+	if(numeric_traits<typename std::iterator_traits<T>::value_type>::ISNA(*beg)) {
+	  return numeric_traits<ReturnType>::NA();
+	}
+	ans += *beg > 0 ? *beg : 0;
+	++beg;
+      }
+      return ans;
+    }
+  };
+
+} // namespace tslib
+
+#endif // POS_SUM_HPP
