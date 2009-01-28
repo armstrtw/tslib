@@ -208,7 +208,7 @@ void mixed_operators_test() {
 
   // gernate data
   fill_n(x.getData(),x.nrow()*x.ncol(),100.0);
-  fill_n(y.getData(),y.nrow()*y.ncol(),5.0);
+  fill_n(y.getData(),y.nrow()*y.ncol(),5);
 
   // generate dates
   for(long xi = 0; xi < x.nrow(); xi++)
