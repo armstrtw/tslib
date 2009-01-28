@@ -379,9 +379,6 @@ void vector_transform_test() {
   // 6 because 5 is NA and 6 is next ele
   BOOST_CHECK_EQUAL(ans[4],6);
 
-  delete []x;
-  delete []ans;
-
   /*
   cout << "data" << endl;
   copy(x, x+N,
@@ -392,7 +389,38 @@ void vector_transform_test() {
        ostream_iterator<double>(cout, " "));
   cout << endl;
   */
+  delete []x;
+  delete []ans;
+}
 
+void vector_ema_test() {
+
+  // define our answer type
+  typedef meanTraits<double>::ReturnType ansType;
+
+  // gernate data
+  int N = 28;
+  double* x = new double[N];
+  ansType* ans = new ansType[N];
+
+  // gernate data
+  for(long vi = 0; vi < N; vi++)
+    x[vi] = vi+1;
+
+  int periods = 14;
+  EMA<ansType>::apply(ans,x,x+N, periods);
+
+  cout << "data" << endl;
+  copy(x, x+N,
+       ostream_iterator<double>(cout, " "));
+  cout << endl;
+  cout << "ans" << endl;
+  copy(ans, ans+N,
+       ostream_iterator<double>(cout, " "));
+  cout << endl;
+
+  delete []x;
+  delete []ans;
 }
 
 void transform_test() {
@@ -433,7 +461,7 @@ void lag_lead_test() {
   // generate dates
   for(long xi = 0; xi < x.nrow(); xi++)
     x.getDates()[xi] = xi+1;
-
+  /*
   cout << "original" << endl;
   cout << x << endl;
   LDL_ts ans_lag = x(1);
@@ -442,6 +470,7 @@ void lag_lead_test() {
   LDL_ts ans_lead = x(-1);
   cout << "lead:" << endl;
   cout << ans_lead << endl;
+  */
 }
 
 void expanding_max_test() {
@@ -587,6 +616,7 @@ void cbind_test() {
   seq.push_back(x);
   seq.push_back(y);
 
+  /*
   cout << "cbind:" << endl;
   cout << "x" << x << endl;
   cout << "y" << y << endl;
@@ -600,6 +630,7 @@ void cbind_test() {
   cout << z_intersect.nrow() << endl;
   cout << z_intersect.ncol() << endl;
   cout << "z_intersect:" << endl << z_intersect << endl;
+  */
 }
 
 void time_window_test_monthly() {
@@ -617,8 +648,10 @@ void time_window_test_monthly() {
 
   TSeries<double,sum_ansType,long,TSdataSingleThreaded,PosixDate> sum_ans = x.time_window<sum_ansType,Sum,int,yyyymm>();
 
+  /*
   cout << x << endl;
   cout << sum_ans << endl;
+  */
 }
 
 void time_window_test_daily() {
@@ -636,8 +669,10 @@ void time_window_test_daily() {
 
   TSeries<double,sum_ansType,long,TSdataSingleThreaded,PosixDate> sum_ans = x.time_window<sum_ansType,Sum,int,yyyymmdd>();
 
+  /*
   cout << x << endl;
   cout << sum_ans << endl;
+  */
 }
 
 test_suite*
@@ -659,6 +694,7 @@ init_unit_test_suite( int argc, char* argv[] ) {
   test->add( BOOST_TEST_CASE( &lag_lead_test ) );
   test->add( BOOST_TEST_CASE( &posix_date_test ) );
   test->add( BOOST_TEST_CASE( &vector_transform_test ) );
+  test->add( BOOST_TEST_CASE( &vector_ema_test ) );
   test->add( BOOST_TEST_CASE( &transform_test ) );
   test->add( BOOST_TEST_CASE( &quarterly_breaks_test ) );
   test->add( BOOST_TEST_CASE( &quarterly_tseries_test ) );
