@@ -15,23 +15,47 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>. //
 ///////////////////////////////////////////////////////////////////////////
 
-#ifndef VECTOR_SUMMARY_HPP
-#define VECTOR_SUMMARY_HPP
+#ifndef RSI_HPP
+#define RSI_HPP
 
-// taking 1 vector an argument
-#include <tslib/vector.summary/max.hpp>
-#include <tslib/vector.summary/min.hpp>
-#include <tslib/vector.summary/mean.hpp>
-#include <tslib/vector.summary/sum.hpp>
-#include <tslib/vector.summary/prod.hpp>
-#include <tslib/vector.summary/stdev.hpp>
-#include <tslib/vector.summary/rank.hpp>
+#include <iterator>
+#include <tslib/utils/numeric.traits.hpp>
+#include <tslib/vector.summary/pos.sum.hpp>
+#include <tslib/vector.summary/neg.sum.hpp>
 
-// technical analysis
-#include <tslib/vector.summary/rsi.hpp>
+namespace tslib {
 
-// taking 2 vectors as arguments
-#include <tslib/vector.summary/cov.hpp>
-#include <tslib/vector.summary/cor.hpp>
+  template<typename T>
+  class rsiTraits;
 
-#endif // VECTOR_SUMMARY_HPP
+  template<>
+  class rsiTraits<double> {
+  public:
+    typedef double ReturnType;
+  };
+
+  template<>
+  class rsiTraits<int> {
+  public:
+    typedef double ReturnType;
+  };
+
+  template<typename ReturnType>
+  class RSI {
+  public:
+    template<typename T>
+    static inline ReturnType apply(T beg, T end) {
+      ReturnType pos_sum = PosSum<ReturnType>::apply(beg,end);
+      ReturnType neg_sum = PosSum<ReturnType>::apply(beg,end);
+      if(numeric_traits<ReturnType>::ISNA(pos_sum) || numeric_traits<ReturnType>::ISNA(neg_sum)) {
+        return numeric_traits<ReturnType>::NA();
+      } else {
+        return 100.0 - 100.0 / (1.0 + pos_sum/neg_sum);
+      }
+    }
+  };
+
+
+} // namespace tslib
+
+#endif // RSI_HPP

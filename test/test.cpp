@@ -307,6 +307,28 @@ void vector_window_apply_test() {
   delete []ans;
 }
 
+void rsi_test() {
+
+  // define our answer type
+  typedef rsiTraits<double>::ReturnType ansType;
+
+  // gernate data
+  const int N = 100;
+  const int window = 20;
+  double* x = new double[N];
+  ansType* ans = new ansType[N - (window - 1)];
+
+  // gernate data
+  for(long vi = 0; vi < N; vi++)
+    x[vi] = vi+1;
+
+  windowApply<ansType,RSI>::apply(ans,x,x+N,window);
+
+  delete []x;
+  delete []ans;
+}
+
+
 void window_apply_test() {
   // define our answer type
   typedef meanTraits<double>::ReturnType mean_ansType;
