@@ -15,19 +15,44 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>. //
 ///////////////////////////////////////////////////////////////////////////
 
-#ifndef VECTOR_TRANSFORM_HPP
-#define VECTOR_TRANSFORM_HPP
+#ifndef EMA_HPP
+#define EMA_HPP
 
-#include <tslib/vector.transform/diff.hpp>
-#include <tslib/vector.transform/fill.traits.hpp>
-#include <tslib/vector.transform/fill.bwd.hpp>
-#include <tslib/vector.transform/fill.fwd.hpp>
-#include <tslib/vector.transform/fill.value.hpp>
-#include <tslib/vector.transform/lag.lead.traits.hpp>
-#include <tslib/vector.transform/since.na.traits.hpp>
-#include <tslib/vector.transform/since.na.hpp>
-#include <tslib/vector.transform/expanding.maximum.hpp>
-#include <tslib/vector.transform/expanding.minimum.hpp>
-#include <tslib/vector.transform/ema.hpp>
+#include <iterator>
+#include <tslib/vector.summary/mean.hpp>
 
-#endif // VECTOR_TRANSFORM_HPP
+namespace tslib {
+
+
+  template<typename ReturnType>
+  class EMA {
+  public:
+    template<typename T, typename U, typename V>
+    static inline void apply(T dest, U beg, U end, V periods) {
+      ReturnType initial_value = Mean<ReturnType>::apply(beg,beg+periods);
+
+      // fill with NA until we have initial window
+      int initial_count = 0;
+      while(initial_count < (periods - 1)  && beg != end) {
+        *dest++ = numeric_traits<ReturnType>::NA();
+        ++beg;
+        ++initial_count;
+      }
+      *dest++ = initial_value;
+      ++beg;
+
+      while(beg != end) {
+	if(numeric_traits<typename std::iterator_traits<T>::value_type>::ISNA(*beg)) {
+	  *dest = numeric_traits<typename std::iterator_traits<T>::value_type>::NA();
+	} else {
+	  *dest = (*(dest-1) * (static_cast<ReturnType>(periods) - 1.0)  + *beg)/static_cast<ReturnType>(periods);
+	}
+	++beg;
+	++dest;
+      }
+    }
+  };
+
+} // namespace tslib
+
+#endif // EMA_HPP
