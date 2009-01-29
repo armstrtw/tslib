@@ -473,6 +473,25 @@ void lag_lead_test() {
   */
 }
 
+void diff_test() {
+
+  long xnr = 10;
+  long xnc = 5;
+
+  LDL_ts x(xnr,xnc);
+
+  // gernate data
+  for(long vi = 0; vi < x.nrow()*x.ncol(); vi++)
+    x.getData()[vi] = vi+1;
+
+  // generate dates
+  for(long xi = 0; xi < x.nrow(); xi++)
+    x.getDates()[xi] = xi+1;
+
+  LDL_ts y(x.diff(1));
+  cout << y << endl;
+}
+
 void expanding_max_test() {
 
   std::vector<double> x;
@@ -692,6 +711,7 @@ init_unit_test_suite( int argc, char* argv[] ) {
   test->add( BOOST_TEST_CASE( &vector_window_apply_test ) );
   test->add( BOOST_TEST_CASE( &window_apply_test ) );
   test->add( BOOST_TEST_CASE( &lag_lead_test ) );
+  test->add( BOOST_TEST_CASE( &diff_test ) );
   test->add( BOOST_TEST_CASE( &posix_date_test ) );
   test->add( BOOST_TEST_CASE( &vector_transform_test ) );
   test->add( BOOST_TEST_CASE( &vector_ema_test ) );

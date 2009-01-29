@@ -104,6 +104,7 @@ namespace tslib {
     const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> operator() (const int n) const;
     const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> lag(const unsigned int n) const;
     const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> lead(const unsigned int n) const;
+    const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> diff(const unsigned int n) const;
 
     // matix index
     TDATA operator() (const TSDIM row, const TSDIM col) const;
@@ -196,6 +197,37 @@ namespace tslib {
     }
     return ans;
   }
+
+  template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
+  const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::diff(const unsigned int n) const {
+    if(n >= nrow()) {
+      throw TSeriesError("diff: n >= nrow of time seires.");
+    }
+    const TSDIM new_size = nrow() - n;
+    TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> ans(new_size, ncol());
+    TDATA* ans_data = ans.getData();
+    const TDATA* data = getData();
+
+    // copy over dates
+    std::copy(getDates() + n, getDates() + n + new_size, ans.getDates());
+
+    // set new colnames
+    ans.setColnames(getColnames());
+
+    for(TSDIM c = 0; c < ncol(); c++) {
+      for(TSDIM r = n; r < nrow(); r++) {
+        if(numeric_traits<TDATA>::ISNA(data[r]) || numeric_traits<TDATA>::ISNA(data[r-1])) {
+          ans_data[r-n] = numeric_traits<TDATA>::NA();
+        } else {
+          ans_data[r-n] = data[r] - data[r-1];
+        }
+      }
+      ans_data += ans.nrow();
+      data += nrow();
+    }
+    return ans;
+  }
+
 
   template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
   TDATA TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::operator() (const TSDIM row, const TSDIM col) const {
