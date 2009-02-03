@@ -15,20 +15,25 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>. //
 ///////////////////////////////////////////////////////////////////////////
 
-#ifndef VECTOR_TRANSFORM_HPP
-#define VECTOR_TRANSFORM_HPP
+#ifndef EMA_TRAITS_HPP
+#define EMA_TRAITS_HPP
 
-#include <tslib/vector.transform/diff.hpp>
-#include <tslib/vector.transform/fill.traits.hpp>
-#include <tslib/vector.transform/fill.bwd.hpp>
-#include <tslib/vector.transform/fill.fwd.hpp>
-#include <tslib/vector.transform/fill.value.hpp>
-#include <tslib/vector.transform/lag.lead.traits.hpp>
-#include <tslib/vector.transform/since.na.traits.hpp>
-#include <tslib/vector.transform/since.na.hpp>
-#include <tslib/vector.transform/expanding.maximum.hpp>
-#include <tslib/vector.transform/expanding.minimum.hpp>
-#include <tslib/vector.transform/ema.hpp>
-#include <tslib/vector.transform/ema.traits.hpp>
+template<typename T>
+class emaTraits;
 
-#endif // VECTOR_TRANSFORM_HPP
+template<>
+class emaTraits<double> {
+public:
+  typedef double ReturnType;
+  typedef int ArgType;  // for periods
+};
+
+template<>
+class emaTraits<int> {
+public:
+  typedef double ReturnType;
+  typedef int ArgType; // for periods
+};
+
+
+#endif // EMA_TRAITS_HPP

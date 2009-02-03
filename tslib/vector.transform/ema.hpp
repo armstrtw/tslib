@@ -29,6 +29,7 @@ namespace tslib {
   public:
     template<typename T, typename U, typename V>
     static inline void apply(T dest, U beg, U end, V periods) {
+      const double p = static_cast<double>(periods);
       ReturnType initial_value = Mean<ReturnType>::apply(beg,beg+periods);
 
       // fill with NA until we have initial window
@@ -45,7 +46,7 @@ namespace tslib {
 	if(numeric_traits<typename std::iterator_traits<T>::value_type>::ISNA(*beg)) {
 	  *dest = numeric_traits<typename std::iterator_traits<T>::value_type>::NA();
 	} else {
-	  *dest = (*(dest-1) * (static_cast<ReturnType>(periods) - 1.0)  + *beg)/static_cast<ReturnType>(periods);
+	  *dest = (*(dest-1) * (p - 1.0) + *beg)/p;
 	}
 	++beg;
 	++dest;
