@@ -153,7 +153,9 @@ namespace tslib {
   template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
   const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::lag(const unsigned int n) const {
     if(n >= nrow()) {
-      throw TSeriesError("lag: n >= nrow of time seires.");
+      TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> bad_ans(0,ncol());
+      bad_ans.setColnames(getColnames());
+      return bad_ans;
     }
     const TSDIM new_size = nrow() - n;
     TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> ans(new_size, ncol());
@@ -177,7 +179,9 @@ namespace tslib {
   template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
   const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::lead(const unsigned int n) const {
     if(n >= nrow()) {
-      throw TSeriesError("lead: n >= nrow of time seires.");
+      TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> bad_ans(0,ncol());
+      bad_ans.setColnames(getColnames());
+      return bad_ans;
     }
     const TSDIM new_size = nrow() - n;
     TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> ans(new_size, ncol());
@@ -201,7 +205,9 @@ namespace tslib {
   template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
   const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::diff(const unsigned int n) const {
     if(n >= nrow()) {
-      throw TSeriesError("diff: n >= nrow of time seires.");
+      TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> bad_ans(0,ncol());
+      bad_ans.setColnames(getColnames());
+      return bad_ans;
     }
     const TSDIM new_size = nrow() - n;
     TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> ans(new_size, ncol());
