@@ -88,6 +88,7 @@ namespace tslib {
     const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> transform_1arg(T arg1) const;
 
     // frequency conversion (only highfreq to lowfreq conversion)
+    const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> toYearly() const;
     const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> toQuarterly() const;
     const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> toMonthly() const;
     const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> toWeekly() const;
@@ -459,6 +460,13 @@ namespace tslib {
       data += nrow();
     }
     return ans;
+  }
+
+  template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
+  const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::toYearly() const {
+    std::vector<TSDIM> breaks;
+    YearlyBreaks<DatePolicy>(getDates(), getDates()+nrow(), breaks);
+    return row_subset(breaks.begin(), breaks.end());
   }
 
 
