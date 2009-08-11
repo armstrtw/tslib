@@ -78,7 +78,7 @@ namespace tslib {
     template<typename ReturnType, template<class> class F>
     const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> window(const size_t window) const;
 
-    template<typename ReturnType, template<class> class F, typename PTYPE, template<class, template<typename> class,class> class PFUNC>
+    template<typename ReturnType, template<class> class F, template<class, template<typename> class> class PFUNC>
     const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> time_window() const;
 
     template<typename ReturnType, template<class> class F>
@@ -387,13 +387,13 @@ namespace tslib {
   }
 
   template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
-  template<typename ReturnType, template<class> class F, typename PTYPE, template<class, template<typename> class,class> class PFUNC>
+  template<typename ReturnType, template<class> class F, template<class, template<typename> class> class PFUNC>
   const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::time_window() const {
     typedef typename std::iterator_traits<TDATE*>::difference_type DT;
     typedef typename std::vector<std::pair<DT,DT> >::const_iterator pair_iterator;
     std::vector<std::pair<DT,DT> > partition_ranges;
 
-    calcPartitionRanges<PTYPE, DatePolicy, PFUNC>(getDates(), getDates() + nrow(), std::inserter(partition_ranges, partition_ranges.begin()));
+    calcPartitionRanges<DatePolicy, PFUNC>(getDates(), getDates() + nrow(), std::inserter(partition_ranges, partition_ranges.begin()));
     TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> ans(partition_ranges.size(), ncol());
     ans.setColnames(getColnames());
     TDATE* dates = getDates();

@@ -23,23 +23,23 @@
 
 namespace tslib {
 
-  template<typename PTYPE, template<typename> class DatePolicy, template<class, template<typename> class, class> class PFUNC, typename T, typename U>
+  template<template<typename> class DatePolicy, template<class, template<typename> class> class PFUNC, typename T, typename U>
   void calcPartitionRanges(T beg, T end, U oiter) {
-    typedef typename std::vector<PTYPE>::iterator partition_iter;
-    typedef typename std::iterator_traits<partition_iter>::difference_type DT;
+    typedef typename std::iterator_traits<T>::difference_type DT;
     typedef typename std::iterator_traits<T>::value_type VT;
 
-    typename std::vector<PTYPE> partitions;
-    typename std::vector<PTYPE> unique_partitions;
+    typename std::vector<VT> partitions;
+    typename std::vector<VT> unique_partitions;
+    //typedef std::vector<VT>::iterator partition_iter;
 
     partitions.resize(std::distance(beg, end));
-    std::transform(beg, end, partitions.begin(), PFUNC<VT, DatePolicy, PTYPE>());
+    std::transform(beg, end, partitions.begin(), PFUNC<VT, DatePolicy>());
     std::unique_copy(partitions.begin(), partitions.end(), std::inserter(unique_partitions,unique_partitions.begin()));
-    partition_iter pbeg = partitions.begin();
-    partition_iter siter = pbeg;
-    partition_iter eiter;
+    typename std::vector<VT>::iterator pbeg = partitions.begin();
+    typename std::vector<VT>::iterator siter = pbeg;
+    typename std::vector<VT>::iterator eiter;
 
-    for(partition_iter p = unique_partitions.begin(); p != unique_partitions.end() - 1; p++) {
+    for(typename std::vector<VT>::iterator p = unique_partitions.begin(); p != unique_partitions.end() - 1; p++) {
       eiter = std::find(siter, partitions.end(), *(p+1));
       *oiter++ = std::pair<DT, DT>(std::distance(pbeg,siter), std::distance(pbeg,eiter));
       siter = eiter;
@@ -49,24 +49,22 @@ namespace tslib {
   }
 
   template<typename T,
-           template<typename> class DatePolicy,
-           typename ReturnType>
+           template<typename> class DatePolicy>
   class yyyymm {
   public:
     yyyymm() {}
-    ReturnType operator()(const T date) {
-      return DatePolicy<T>::year(date) * 100  + DatePolicy<T>::month(date);
+    T operator()(const T date) {
+      return DatePolicy<T>::toDate(DatePolicy<T>::year(date), DatePolicy<T>::month(date), 1);
     }
   };
 
   template<typename T,
-           template<typename> class DatePolicy,
-           typename ReturnType>
+           template<typename> class DatePolicy>
   class yyyymmdd {
   public:
     yyyymmdd() {}
-    ReturnType operator()(const T date) {
-      return DatePolicy<T>::year(date) * 10000  + DatePolicy<T>::month(date) * 100 + DatePolicy<T>::dayofmonth(date);
+    T operator()(const T date) {
+      return DatePolicy<T>::toDate(DatePolicy<T>::year(date), DatePolicy<T>::month(date), DatePolicy<T>::dayofmonth(date));
     }
   };
 
