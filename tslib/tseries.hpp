@@ -32,7 +32,6 @@
 #include <tslib/utils/window.function.hpp>
 #include <tslib/vector.transform.hpp>
 #include <tslib/date.policies/posix.date.policy.hpp>
-#include <tslib/date.policies/date.breaks.hpp>
 #include <tslib/date.policies/date.partition.hpp>
 
 namespace tslib {
@@ -88,10 +87,8 @@ namespace tslib {
     const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> transform_1arg(T arg1) const;
 
     // frequency conversion (only highfreq to lowfreq conversion)
-    const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> toYearly() const;
-    const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> toQuarterly() const;
-    const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> toMonthly() const;
-    const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> toWeekly() const;
+    template<template<class, template<typename> class> class PFUNC>
+    const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> freq() const;
 
     // subsets
     template<typename T>
@@ -462,35 +459,6 @@ namespace tslib {
     return ans;
   }
 
-  template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
-  const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::toYearly() const {
-    std::vector<TSDIM> breaks;
-    YearlyBreaks<DatePolicy>(getDates(), getDates()+nrow(), breaks);
-    return row_subset(breaks.begin(), breaks.end());
-  }
-
-
-  template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
-  const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::toQuarterly() const {
-    std::vector<TSDIM> breaks;
-    QuarterlyBreaks<DatePolicy>(getDates(), getDates()+nrow(), breaks);
-    return row_subset(breaks.begin(), breaks.end());
-  }
-
-  template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
-  const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::toMonthly() const {
-    std::vector<TSDIM> breaks;
-    MonthlyBreaks<DatePolicy>(getDates(), getDates()+nrow(), breaks);
-    return row_subset(breaks.begin(), breaks.end());
-  }
-
-  template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
-  const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::toWeekly() const {
-    std::vector<TSDIM> breaks;
-    WeeklyBreaks<DatePolicy>(getDates(), getDates()+nrow(), breaks);
-    return row_subset(breaks.begin(), breaks.end());
-  }
-
   // this is for a positive row subset (positive and negative rowsets cannot mix)
   template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
   template<typename T>
@@ -522,6 +490,32 @@ namespace tslib {
     return ans;
   }
 
+  template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
+  template<template<class, template<typename> class> class PFUNC>
+  const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::freq() const {
+
+    // pre-allocate vector for transformed dates
+    typename std::vector<TDATE> partitions;
+    partitions.resize(nrow());
+
+    // transform dates
+    std::transform(getDates(), getDates() + nrow(), partitions.begin(), PFUNC<TDATE, DatePolicy>());
+
+    // vector for selected rows
+    std::vector<TSDIM> ans_rows;
+
+    TSDIM i = 0;
+    for(typename std::vector<TDATE>::const_iterator iter = partitions.begin(); iter != partitions.end() - 1; iter++) {
+      if(*iter != *(iter+1)) {
+        back_inserter(ans_rows) = i;
+      }
+      ++i;
+    }
+    // last element is always in
+    back_inserter(ans_rows) = i;
+
+    return row_subset(ans_rows.begin(), ans_rows.end());
+  }
 }  // namespace tslib
 
 #endif // TSERIES_HPP

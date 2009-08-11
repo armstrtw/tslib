@@ -539,50 +539,6 @@ void posix_date_test() {
 
 }
 
-
-void quarterly_breaks_test() {
-  const char* jan_01_2007 = "01/01/2007";
-  const char* fmt_america = "%m/%d/%Y";
-  std::vector<long> dts;
-
-  long dt = PosixDate<long>::toDate(jan_01_2007,fmt_america);
-
-  for(int i = 0; i < 24; i++) {
-    back_inserter(dts) = PosixDate<long>::AddMonths(dt,i);
-  }
-
-
-  for(std::vector<long>::iterator beg = dts.begin(); beg != dts.end(); beg++) {
-    //cout << PosixDate<long>::toString(*beg,fmt_america) << endl;
-  }
-
-  std::vector<int> ans;
-  QuarterlyBreaks<PosixDate,int>(dts.begin(),dts.end(),ans);
-
-  //copy(ans.begin(), ans.end(), ostream_iterator<int>(cout, " ")); cout << endl;
-}
-
-void quarterly_tseries_test() {
-  const char* jan_01_2007 = "01/01/2007";
-  const char* fmt_america = "%m/%d/%Y";
-  std::vector<long> dts;
-
-  long xnr = 365*2;
-  long xnc = 5;
-
-  DDL_ts x(xnr,xnc);
-
-  // gernate data
-  for(long vi = 0; vi < x.nrow()*x.ncol(); vi++)
-    x.getData()[vi] = vi+1;
-
-  long dt = PosixDate<long>::toDate(jan_01_2007,fmt_america);
-
-  for(int i = 0; i < xnr; i++) {
-    x.getDates()[i] = PosixDate<long>::AddDays(dt,i);
-  }
-}
-
 void window_function_test() {
 const char* jan_01_2007 = "01/01/2007";
   const char* fmt_america = "%m/%d/%Y";
@@ -652,11 +608,83 @@ void cbind_test() {
   */
 }
 
+void freq_conv_test_month() {
+  long xnr = 365;
+  long xnc = 5;
+  DDL_ts x(xnr,xnc);
+  // generate dates/data
+  for(int i = 0; i < x.nrow(); i++) { x.getDates()[i] = i * 60*60*24; }
+  std::fill(x.getData(), x.getData() + x.nrow() * x.ncol(), 1.0);
+  DDL_ts ans = x.freq<yyyymm>();
+  cout << "freq months:" << endl;
+  cout << ans << endl;
+}
+
+void freq_conv_test_week() {
+  long xnr = 240;
+  long xnc = 5;
+  DDL_ts x(xnr,xnc);
+  // generate dates/data -- 1 day increments
+  for(int i = 0; i < x.nrow(); i++) { x.getDates()[i] = i * 60*60*24; }
+  std::fill(x.getData(), x.getData() + x.nrow() * x.ncol(), 1.0);
+  DDL_ts ans = x.freq<yyyyww>();
+  cout << "freq week:" << endl;
+  cout << ans << endl;
+}
+
+void freq_conv_test_day() {
+  long xnr = 240;
+  long xnc = 5;
+  DDL_ts x(xnr,xnc);
+  // generate dates/data -- 1 hour increments
+  for(int i = 0; i < x.nrow(); i++) { x.getDates()[i] = i * 60*60; }
+  std::fill(x.getData(), x.getData() + x.nrow() * x.ncol(), 1.0);
+  DDL_ts ans = x.freq<yyyymmdd>();
+  cout << "freq day:" << endl;
+  cout << ans << endl;
+}
+
+void freq_conv_test_hour() {
+  long xnr = 240;
+  long xnc = 5;
+  DDL_ts x(xnr,xnc);
+  // generate dates/data -- 1 min increments
+  for(int i = 0; i < x.nrow(); i++) { x.getDates()[i] = i * 60; }
+  std::fill(x.getData(), x.getData() + x.nrow() * x.ncol(), 1.0);
+  DDL_ts ans = x.freq<yyyymmddHH>();
+  cout << "freq hour:" << endl;
+  cout << ans << endl;
+}
+
+void freq_conv_test_minute() {
+  long xnr = 240;
+  long xnc = 5;
+  DDL_ts x(xnr,xnc);
+  // generate dates/data -- 1 sec increments
+  for(int i = 0; i < x.nrow(); i++) { x.getDates()[i] = i; }
+  std::fill(x.getData(), x.getData() + x.nrow() * x.ncol(), 1.0);
+  DDL_ts ans = x.freq<yyyymmddHHMM>();
+  cout << "freq minute:" << endl;
+  cout << ans << endl;
+}
+
+void freq_conv_test_second() {
+  long xnr = 240;
+  long xnc = 5;
+  DDL_ts x(xnr,xnc);
+  // generate dates/data -- 1/10 sec increments
+  for(int i = 0; i < x.nrow(); i++) { x.getDates()[i] = static_cast<double>(i)/10; }
+  std::fill(x.getData(), x.getData() + x.nrow() * x.ncol(), 1.0);
+  DDL_ts ans = x.freq<yyyymmddHHMMSS>();
+  cout << "freq second:" << endl;
+  cout << ans << endl;
+}
+
 void time_window_test_month() {
   // define our answer type
   typedef sumTraits<double>::ReturnType sum_ansType;
 
-  long xnr = 50;
+  long xnr = 500;
   long xnc = 5;
 
   DDL_ts x(xnr,xnc);
@@ -769,15 +797,22 @@ init_unit_test_suite( int argc, char* argv[] ) {
   test->add( BOOST_TEST_CASE( &vector_transform_test ) );
   test->add( BOOST_TEST_CASE( &vector_ema_test ) );
   test->add( BOOST_TEST_CASE( &transform_test ) );
-  test->add( BOOST_TEST_CASE( &quarterly_breaks_test ) );
-  test->add( BOOST_TEST_CASE( &quarterly_tseries_test ) );
   test->add( BOOST_TEST_CASE( &window_function_test ) );
   test->add( BOOST_TEST_CASE( &expanding_max_test ) );
+
   test->add( BOOST_TEST_CASE( &time_window_test_month ) );
   test->add( BOOST_TEST_CASE( &time_window_test_day ) );
   test->add( BOOST_TEST_CASE( &time_window_test_hour ) );
   test->add( BOOST_TEST_CASE( &time_window_test_minute ) );
   test->add( BOOST_TEST_CASE( &time_window_test_second ) );
+
   test->add( BOOST_TEST_CASE( &cbind_test ) );
+
+  test->add( BOOST_TEST_CASE( &freq_conv_test_month ) );
+  test->add( BOOST_TEST_CASE( &freq_conv_test_week ) );
+  test->add( BOOST_TEST_CASE( &freq_conv_test_day ) );
+  test->add( BOOST_TEST_CASE( &freq_conv_test_hour ) );
+  test->add( BOOST_TEST_CASE( &freq_conv_test_minute ) );
+  test->add( BOOST_TEST_CASE( &freq_conv_test_second ) );
   return test;
 }
