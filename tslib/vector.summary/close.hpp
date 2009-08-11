@@ -15,25 +15,29 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>. //
 ///////////////////////////////////////////////////////////////////////////
 
-#ifndef VECTOR_SUMMARY_HPP
-#define VECTOR_SUMMARY_HPP
+#ifndef CLOSE_HPP
+#define CLOSE_HPP
 
-// taking 1 vector an argument
-#include <tslib/vector.summary/max.hpp>
-#include <tslib/vector.summary/min.hpp>
-#include <tslib/vector.summary/mean.hpp>
-#include <tslib/vector.summary/sum.hpp>
-#include <tslib/vector.summary/prod.hpp>
-#include <tslib/vector.summary/stdev.hpp>
-#include <tslib/vector.summary/rank.hpp>
-#include <tslib/vector.summary/open.hpp>
-#include <tslib/vector.summary/close.hpp>
+#include <iterator>
+#include <tslib/utils/numeric.traits.hpp>
 
-// technical analysis
-#include <tslib/vector.summary/rsi.hpp>
+namespace tslib {
 
-// taking 2 vectors as arguments
-#include <tslib/vector.summary/cov.hpp>
-#include <tslib/vector.summary/cor.hpp>
+  template<typename T>
+  class closeTraits {
+  public:
+    typedef T ReturnType;
+  };
 
-#endif // VECTOR_SUMMARY_HPP
+  template<typename ReturnType>
+  class Close {
+  public:
+    template<typename T>
+    static inline ReturnType apply(T beg, T end) {
+      return *(end-1);
+    }
+  };
+
+} // namespace tslib
+
+#endif // CLOSE_HPP
