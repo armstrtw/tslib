@@ -98,6 +98,17 @@ namespace tslib {
     }
   };
 
+  template<typename T,
+           template<typename> class DatePolicy>
+  class yyyyww {
+  public:
+    yyyyww() {}
+    T operator()(const T date) {
+      int adj = 6 - DatePolicy<T>::dayofweek(date);
+      return DatePolicy<T>::toDate(DatePolicy<T>::year(date), DatePolicy<T>::month(date), DatePolicy<T>::dayofmonth(date) + adj);
+    }
+  };
+
 }  // namespace tslib
 
 #endif // DATE_PARTITION
