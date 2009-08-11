@@ -30,6 +30,7 @@
 #include <tslib/ts.opps/ts.opps.hpp>
 #include <tslib/utils/window.apply.hpp>
 #include <tslib/utils/window.function.hpp>
+#include <tslib/utils/breaks.hpp>
 #include <tslib/vector.transform.hpp>
 #include <tslib/date.policies/posix.date.policy.hpp>
 #include <tslib/date.policies/date.partition.hpp>
@@ -503,17 +504,7 @@ namespace tslib {
 
     // vector for selected rows
     std::vector<TSDIM> ans_rows;
-
-    TSDIM i = 0;
-    for(typename std::vector<TDATE>::const_iterator iter = partitions.begin(); iter != partitions.end() - 1; iter++) {
-      if(*iter != *(iter+1)) {
-        back_inserter(ans_rows) = i;
-      }
-      ++i;
-    }
-    // last element is always in
-    back_inserter(ans_rows) = i;
-
+    breaks(partitions.begin(),partitions.end(),std::back_inserter(ans_rows));
     return row_subset(ans_rows.begin(), ans_rows.end());
   }
 }  // namespace tslib
