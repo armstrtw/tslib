@@ -665,7 +665,7 @@ void time_window_test_monthly() {
   for(int i = 0; i < x.nrow(); i++) { x.getDates()[i] = i * 60*60*24; }
   std::fill(x.getData(), x.getData() + x.nrow() * x.ncol(), 1.0);
 
-  TSeries<double,sum_ansType,long,TSdataSingleThreaded,PosixDate> sum_ans = x.time_window<sum_ansType,Sum,int,yyyymm>();
+  TSeries<double,sum_ansType,long,TSdataSingleThreaded,PosixDate> sum_ans = x.time_window<sum_ansType,Sum,yyyymm>();
 
   /*
   cout << x << endl;
@@ -686,12 +686,10 @@ void time_window_test_daily() {
   for(int i = 0; i < x.nrow(); i++) { x.getDates()[i] = i * 60*60; }
   std::fill(x.getData(), x.getData() + x.nrow() * x.ncol(), 1.0);
 
-  TSeries<double,sum_ansType,long,TSdataSingleThreaded,PosixDate> sum_ans = x.time_window<sum_ansType,Sum,int,yyyymmdd>();
+  TSeries<double,sum_ansType,long,TSdataSingleThreaded,PosixDate> sum_ans = x.time_window<sum_ansType,Sum,yyyymmdd>();
 
-  /*
   cout << x << endl;
   cout << sum_ans << endl;
-  */
 }
 
 test_suite*
