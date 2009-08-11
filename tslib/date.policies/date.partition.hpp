@@ -23,31 +23,6 @@
 
 namespace tslib {
 
-  template<template<typename> class DatePolicy, template<class, template<typename> class> class PFUNC, typename T, typename U>
-  void calcPartitionRanges(T beg, T end, U oiter) {
-    typedef typename std::iterator_traits<T>::difference_type DT;
-    typedef typename std::iterator_traits<T>::value_type VT;
-
-    typename std::vector<VT> partitions;
-    typename std::vector<VT> unique_partitions;
-    //typedef std::vector<VT>::iterator partition_iter;
-
-    partitions.resize(std::distance(beg, end));
-    std::transform(beg, end, partitions.begin(), PFUNC<VT, DatePolicy>());
-    std::unique_copy(partitions.begin(), partitions.end(), std::inserter(unique_partitions,unique_partitions.begin()));
-    typename std::vector<VT>::iterator pbeg = partitions.begin();
-    typename std::vector<VT>::iterator siter = pbeg;
-    typename std::vector<VT>::iterator eiter;
-
-    for(typename std::vector<VT>::iterator p = unique_partitions.begin(); p != unique_partitions.end() - 1; p++) {
-      eiter = std::find(siter, partitions.end(), *(p+1));
-      *oiter++ = std::pair<DT, DT>(std::distance(pbeg,siter), std::distance(pbeg,eiter));
-      siter = eiter;
-    }
-    // last row
-    *oiter = std::pair<DT, DT>(std::distance(pbeg,siter),std::distance(pbeg,partitions.end()));
-  }
-
   template<typename T,
            template<typename> class DatePolicy>
   class yyyymm {

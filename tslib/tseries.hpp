@@ -387,26 +387,30 @@ namespace tslib {
   template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
   template<typename ReturnType, template<class> class F, template<class, template<typename> class> class PFUNC>
   const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::time_window() const {
-    typedef typename std::iterator_traits<TDATE*>::difference_type DT;
-    typedef typename std::vector<std::pair<DT,DT> >::const_iterator pair_iterator;
-    std::vector<std::pair<DT,DT> > partition_ranges;
+    // pre-allocate vector for transformed dates
+    typename std::vector<TDATE> partitions;
+    partitions.resize(nrow());
+    // transform dates
+    std::transform(getDates(), getDates() + nrow(), partitions.begin(), PFUNC<TDATE, DatePolicy>());
+    // vector for selected rows
+    std::vector<TSDIM> ans_rows;
+    breaks(partitions.begin(),partitions.end(),std::back_inserter(ans_rows));
 
-    calcPartitionRanges<DatePolicy, PFUNC>(getDates(), getDates() + nrow(), std::inserter(partition_ranges, partition_ranges.begin()));
-    TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> ans(partition_ranges.size(), ncol());
+    TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> ans(ans_rows.size(), ncol());
     ans.setColnames(getColnames());
     TDATE* dates = getDates();
     TDATE* ans_dates = ans.getDates();
-    TSDIM ans_row = 0;
-    for(pair_iterator it = partition_ranges.begin(); it != partition_ranges.end(); it++, ans_dates++) {
-      ans_dates[ans_row] = dates[it->first]; //FIXME: add option for (it->second - 1) end of period timestamp
+    for(size_t i = 0; i < ans_rows.size(); i++) {
+      ans_dates[i] = dates[ans_rows[i]];
     }
 
     ReturnType* ans_data = ans.getData();
     TDATA* data = getData();
     for(TSDIM ans_col = 0; ans_col < ans.ncol(); ans_col++, data+=nrow()) {
-      TSDIM ans_row = 0;
-      for(pair_iterator it = partition_ranges.begin(); it != partition_ranges.end(); it++, ans_row++) {
-        ans_data[ans.offset(ans_row, ans_col)] = F<ReturnType>::apply(data + it->first,data + it->second);
+      size_t range_start = 0;
+      for(size_t i = 0; i < ans_rows.size(); i++) {
+        ans_data[ans.offset(i, ans_col)] = F<ReturnType>::apply(data + range_start, data + ans_rows[i] + 1);
+        range_start = ans_rows[i] + 1;
       }
     }
     return ans;
@@ -498,10 +502,8 @@ namespace tslib {
     // pre-allocate vector for transformed dates
     typename std::vector<TDATE> partitions;
     partitions.resize(nrow());
-
     // transform dates
     std::transform(getDates(), getDates() + nrow(), partitions.begin(), PFUNC<TDATE, DatePolicy>());
-
     // vector for selected rows
     std::vector<TSDIM> ans_rows;
     breaks(partitions.begin(),partitions.end(),std::back_inserter(ans_rows));
