@@ -25,6 +25,27 @@ namespace tslib {
 
   template<typename T,
            template<typename> class DatePolicy>
+  class yyyy {
+  public:
+    yyyy() {}
+    T operator()(const T date) {
+      return DatePolicy<T>::toDate(DatePolicy<T>::year(date), 1, 1);
+    }
+  };
+
+  template<typename T,
+           template<typename> class DatePolicy>
+  class yyyyqq {
+  public:
+    yyyyqq() {}
+    T operator()(const T date) {
+      int adj_month = (static_cast<int>((DatePolicy<T>::month(date) - 1)/3) + 1) * 3 - 2;
+      return DatePolicy<T>::toDate(DatePolicy<T>::year(date), adj_month, 1);
+    }
+  };
+
+  template<typename T,
+           template<typename> class DatePolicy>
   class yyyymm {
   public:
     yyyymm() {}

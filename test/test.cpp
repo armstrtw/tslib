@@ -608,6 +608,30 @@ void cbind_test() {
   */
 }
 
+void freq_conv_test_year() {
+  long xnr = 365 * 5;
+  long xnc = 5;
+  DDL_ts x(xnr,xnc);
+  // generate dates/data
+  for(int i = 0; i < x.nrow(); i++) { x.getDates()[i] = i * 60*60*24; }
+  std::fill(x.getData(), x.getData() + x.nrow() * x.ncol(), 1.0);
+  DDL_ts ans = x.freq<yyyy>();
+  cout << "freq year:" << endl;
+  cout << ans << endl;
+}
+
+void freq_conv_test_quarter() {
+  long xnr = 365 * 5;
+  long xnc = 5;
+  DDL_ts x(xnr,xnc);
+  // generate dates/data
+  for(int i = 0; i < x.nrow(); i++) { x.getDates()[i] = i * 60*60*24; }
+  std::fill(x.getData(), x.getData() + x.nrow() * x.ncol(), 1.0);
+  DDL_ts ans = x.freq<yyyyqq>();
+  cout << "freq quarter:" << endl;
+  cout << ans << endl;
+}
+
 void freq_conv_test_month() {
   long xnr = 365;
   long xnc = 5;
@@ -808,6 +832,8 @@ init_unit_test_suite( int argc, char* argv[] ) {
 
   test->add( BOOST_TEST_CASE( &cbind_test ) );
 
+  test->add( BOOST_TEST_CASE( &freq_conv_test_year ) );
+  test->add( BOOST_TEST_CASE( &freq_conv_test_quarter ) );
   test->add( BOOST_TEST_CASE( &freq_conv_test_month ) );
   test->add( BOOST_TEST_CASE( &freq_conv_test_week ) );
   test->add( BOOST_TEST_CASE( &freq_conv_test_day ) );
