@@ -33,7 +33,7 @@ namespace tslib {
     static const bool is_leap_year(const int year);
   public:
     static const T toDate(const char* date, const char* format);
-    static const T toDate(const int year, const int month, const int day, const int hour, const int minute, const int second, const int millisecond = 0);
+    static const T toDate(const int year, const int month, const int day, const int hour = 0, const int minute = 0, const int second = 0, const int millisecond = 0);
     static const std::string toString(const T x, const char* format);
     static const int dayofweek(const T x);
     static const int dayofmonth(const T x);
