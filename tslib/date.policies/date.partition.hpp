@@ -68,6 +68,36 @@ namespace tslib {
     }
   };
 
+  template<typename T,
+           template<typename> class DatePolicy>
+  class yyyymmddHH {
+  public:
+    yyyymmddHH() {}
+    T operator()(const T date) {
+      return DatePolicy<T>::toDate(DatePolicy<T>::year(date), DatePolicy<T>::month(date), DatePolicy<T>::dayofmonth(date), DatePolicy<T>::hour(date));
+    }
+  };
+
+  template<typename T,
+           template<typename> class DatePolicy>
+  class yyyymmddHHMM {
+  public:
+    yyyymmddHHMM() {}
+    T operator()(const T date) {
+      return DatePolicy<T>::toDate(DatePolicy<T>::year(date), DatePolicy<T>::month(date), DatePolicy<T>::dayofmonth(date), DatePolicy<T>::hour(date), DatePolicy<T>::minute(date));
+    }
+  };
+
+  template<typename T,
+           template<typename> class DatePolicy>
+  class yyyymmddHHMMSS {
+  public:
+    yyyymmddHHMMSS() {}
+    T operator()(const T date) {
+      return DatePolicy<T>::toDate(DatePolicy<T>::year(date), DatePolicy<T>::month(date), DatePolicy<T>::dayofmonth(date), DatePolicy<T>::hour(date), DatePolicy<T>::minute(date), DatePolicy<T>::second(date));
+    }
+  };
+
 }  // namespace tslib
 
 #endif // DATE_PARTITION

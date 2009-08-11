@@ -652,7 +652,7 @@ void cbind_test() {
   */
 }
 
-void time_window_test_monthly() {
+void time_window_test_month() {
   // define our answer type
   typedef sumTraits<double>::ReturnType sum_ansType;
 
@@ -667,13 +667,11 @@ void time_window_test_monthly() {
 
   TSeries<double,sum_ansType,long,TSdataSingleThreaded,PosixDate> sum_ans = x.time_window<sum_ansType,Sum,yyyymm>();
 
-  /*
-  cout << x << endl;
+  cout << "months:" << endl;
   cout << sum_ans << endl;
-  */
 }
 
-void time_window_test_daily() {
+void time_window_test_day() {
   // define our answer type
   typedef sumTraits<double>::ReturnType sum_ansType;
 
@@ -688,7 +686,64 @@ void time_window_test_daily() {
 
   TSeries<double,sum_ansType,long,TSdataSingleThreaded,PosixDate> sum_ans = x.time_window<sum_ansType,Sum,yyyymmdd>();
 
-  cout << x << endl;
+  cout << "days:" << endl;
+  cout << sum_ans << endl;
+}
+
+void time_window_test_hour() {
+  // define our answer type
+  typedef sumTraits<double>::ReturnType sum_ansType;
+
+  long xnr = 240;
+  long xnc = 5;
+
+  DDL_ts x(xnr,xnc);
+
+  // generate dates/data -- 1 min increments
+  for(int i = 0; i < x.nrow(); i++) { x.getDates()[i] = i * 60; }
+  std::fill(x.getData(), x.getData() + x.nrow() * x.ncol(), 1.0);
+
+  TSeries<double,sum_ansType,long,TSdataSingleThreaded,PosixDate> sum_ans = x.time_window<sum_ansType,Sum,yyyymmddHH>();
+
+  cout << "hours:" << endl;
+  cout << sum_ans << endl;
+}
+
+void time_window_test_minute() {
+  // define our answer type
+  typedef sumTraits<double>::ReturnType sum_ansType;
+
+  long xnr = 240;
+  long xnc = 5;
+
+  DDL_ts x(xnr,xnc);
+
+  // generate dates/data -- 1 sec increments
+  for(int i = 0; i < x.nrow(); i++) { x.getDates()[i] = i; }
+  std::fill(x.getData(), x.getData() + x.nrow() * x.ncol(), 1.0);
+
+  TSeries<double,sum_ansType,long,TSdataSingleThreaded,PosixDate> sum_ans = x.time_window<sum_ansType,Sum,yyyymmddHHMM>();
+
+  cout << "minutes:" << endl;
+  cout << sum_ans << endl;
+}
+
+void time_window_test_second() {
+  // define our answer type
+  typedef sumTraits<double>::ReturnType sum_ansType;
+
+  long xnr = 240;
+  long xnc = 5;
+
+  DDL_ts x(xnr,xnc);
+
+  // generate dates/data -- 1/10 sec increments
+  for(int i = 0; i < x.nrow(); i++) { x.getDates()[i] = static_cast<double>(i)/10; }
+  std::fill(x.getData(), x.getData() + x.nrow() * x.ncol(), 1.0);
+
+  TSeries<double,sum_ansType,long,TSdataSingleThreaded,PosixDate> sum_ans = x.time_window<sum_ansType,Sum,yyyymmddHHMMSS>();
+
+  cout << "seconds:" << endl;
   cout << sum_ans << endl;
 }
 
@@ -718,8 +773,11 @@ init_unit_test_suite( int argc, char* argv[] ) {
   test->add( BOOST_TEST_CASE( &quarterly_tseries_test ) );
   test->add( BOOST_TEST_CASE( &window_function_test ) );
   test->add( BOOST_TEST_CASE( &expanding_max_test ) );
-  test->add( BOOST_TEST_CASE( &time_window_test_monthly ) );
-  test->add( BOOST_TEST_CASE( &time_window_test_daily ) );
+  test->add( BOOST_TEST_CASE( &time_window_test_month ) );
+  test->add( BOOST_TEST_CASE( &time_window_test_day ) );
+  test->add( BOOST_TEST_CASE( &time_window_test_hour ) );
+  test->add( BOOST_TEST_CASE( &time_window_test_minute ) );
+  test->add( BOOST_TEST_CASE( &time_window_test_second ) );
   test->add( BOOST_TEST_CASE( &cbind_test ) );
   return test;
 }
