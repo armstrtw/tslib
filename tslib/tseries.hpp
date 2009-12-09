@@ -79,7 +79,7 @@ namespace tslib {
     const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> window(const size_t window) const;
 
     template<typename ReturnType, template<class> class F, template<class, template<typename> class> class PFUNC>
-    const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> time_window() const;
+    const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> time_window(const int n = 1) const;
 
     template<typename ReturnType, template<class> class F>
     const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> transform() const;
@@ -89,7 +89,7 @@ namespace tslib {
 
     // frequency conversion (only highfreq to lowfreq conversion)
     template<template<class, template<typename> class> class PFUNC>
-    const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> freq() const;
+    const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> freq(const int n = 1) const;
 
     // subsets
     template<typename T>
@@ -386,12 +386,16 @@ namespace tslib {
 
   template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
   template<typename ReturnType, template<class> class F, template<class, template<typename> class> class PFUNC>
-  const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::time_window() const {
+  const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::time_window(const int n) const {
     // pre-allocate vector for transformed dates
     typename std::vector<TDATE> partitions;
     partitions.resize(nrow());
+    TDATE* dts = getDates();
     // transform dates
-    std::transform(getDates(), getDates() + nrow(), partitions.begin(), PFUNC<TDATE, DatePolicy>());
+    for(TSDIM row = 0; row < nrow(); row++) {
+      partitions[row] = PFUNC<TDATE, DatePolicy>()(dts[row],n);
+    }
+    //std::transform(getDates(), getDates() + nrow(), partitions.begin(), std::bind2nd(PFUNC<TDATE, DatePolicy>(), n));
     // vector for selected rows
     std::vector<TSDIM> ans_rows;
     breaks(partitions.begin(),partitions.end(),std::back_inserter(ans_rows));
@@ -497,13 +501,17 @@ namespace tslib {
 
   template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
   template<template<class, template<typename> class> class PFUNC>
-  const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::freq() const {
+  const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::freq(const int n) const {
 
     // pre-allocate vector for transformed dates
     typename std::vector<TDATE> partitions;
     partitions.resize(nrow());
     // transform dates
-    std::transform(getDates(), getDates() + nrow(), partitions.begin(), PFUNC<TDATE, DatePolicy>());
+    TDATE* dts = getDates();
+    for(TSDIM row = 0; row < nrow(); row++) {
+      partitions[row] = PFUNC<TDATE, DatePolicy>()(dts[row],n);
+    }
+    //std::transform(getDates(), getDates() + nrow(), partitions.begin(), std::bind2nd(PFUNC<TDATE, DatePolicy>, n));
     // vector for selected rows
     std::vector<TSDIM> ans_rows;
     breaks(partitions.begin(),partitions.end(),std::back_inserter(ans_rows));

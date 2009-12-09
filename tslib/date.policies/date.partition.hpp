@@ -28,8 +28,9 @@ namespace tslib {
   class yyyy {
   public:
     yyyy() {}
-    T operator()(const T date) {
-      return DatePolicy<T>::toDate(DatePolicy<T>::year(date), 1, 1);
+    T operator()(const T date, const int n) {
+      int year = DatePolicy<T>::year(date);
+      return DatePolicy<T>::toDate(year - year % n, 1, 1);
     }
   };
 
@@ -38,9 +39,9 @@ namespace tslib {
   class yyyyqq {
   public:
     yyyyqq() {}
-    T operator()(const T date) {
+    T operator()(const T date, const int n) {
       int adj_month = (static_cast<int>((DatePolicy<T>::month(date) - 1)/3) + 1) * 3 - 2;
-      return DatePolicy<T>::toDate(DatePolicy<T>::year(date), adj_month, 1);
+      return DatePolicy<T>::toDate(DatePolicy<T>::year(date), adj_month - adj_month % n, 1);
     }
   };
 
@@ -49,8 +50,9 @@ namespace tslib {
   class yyyymm {
   public:
     yyyymm() {}
-    T operator()(const T date) {
-      return DatePolicy<T>::toDate(DatePolicy<T>::year(date), DatePolicy<T>::month(date), 1);
+    T operator()(const T date, const int n) {
+      int month = DatePolicy<T>::month(date);
+      return DatePolicy<T>::toDate(DatePolicy<T>::year(date), month - month % n, 1);
     }
   };
 
@@ -59,8 +61,9 @@ namespace tslib {
   class yyyymmdd {
   public:
     yyyymmdd() {}
-    T operator()(const T date) {
-      return DatePolicy<T>::toDate(DatePolicy<T>::year(date), DatePolicy<T>::month(date), DatePolicy<T>::dayofmonth(date));
+    T operator()(const T date, const int n) {
+      int day = DatePolicy<T>::dayofmonth(date);
+      return DatePolicy<T>::toDate(DatePolicy<T>::year(date), DatePolicy<T>::month(date), day - day % n);
     }
   };
 
@@ -69,8 +72,9 @@ namespace tslib {
   class yyyymmddHH {
   public:
     yyyymmddHH() {}
-    T operator()(const T date) {
-      return DatePolicy<T>::toDate(DatePolicy<T>::year(date), DatePolicy<T>::month(date), DatePolicy<T>::dayofmonth(date), DatePolicy<T>::hour(date));
+    T operator()(const T date, const int n) {
+      int hour = DatePolicy<T>::hour(date);
+      return DatePolicy<T>::toDate(DatePolicy<T>::year(date), DatePolicy<T>::month(date), DatePolicy<T>::dayofmonth(date), hour - hour % n);
     }
   };
 
@@ -79,8 +83,9 @@ namespace tslib {
   class yyyymmddHHMM {
   public:
     yyyymmddHHMM() {}
-    T operator()(const T date) {
-      return DatePolicy<T>::toDate(DatePolicy<T>::year(date), DatePolicy<T>::month(date), DatePolicy<T>::dayofmonth(date), DatePolicy<T>::hour(date), DatePolicy<T>::minute(date));
+    T operator()(const T date, const int n) {
+      int minute = DatePolicy<T>::minute(date);
+      return DatePolicy<T>::toDate(DatePolicy<T>::year(date), DatePolicy<T>::month(date), DatePolicy<T>::dayofmonth(date), DatePolicy<T>::hour(date), minute - minute % n);
     }
   };
 
@@ -89,8 +94,9 @@ namespace tslib {
   class yyyymmddHHMMSS {
   public:
     yyyymmddHHMMSS() {}
-    T operator()(const T date) {
-      return DatePolicy<T>::toDate(DatePolicy<T>::year(date), DatePolicy<T>::month(date), DatePolicy<T>::dayofmonth(date), DatePolicy<T>::hour(date), DatePolicy<T>::minute(date), DatePolicy<T>::second(date));
+    T operator()(const T date, const int n) {
+      int second = DatePolicy<T>::second(date);
+      return DatePolicy<T>::toDate(DatePolicy<T>::year(date), DatePolicy<T>::month(date), DatePolicy<T>::dayofmonth(date), DatePolicy<T>::hour(date), DatePolicy<T>::minute(date), second - second % n);
     }
   };
 
@@ -99,9 +105,10 @@ namespace tslib {
   class yyyyww {
   public:
     yyyyww() {}
-    T operator()(const T date) {
+    T operator()(const T date, const int n) {
       int adj = 6 - DatePolicy<T>::dayofweek(date);
-      return DatePolicy<T>::toDate(DatePolicy<T>::year(date), DatePolicy<T>::month(date), DatePolicy<T>::dayofmonth(date) + adj);
+      int week = DatePolicy<T>::dayofmonth(date) + adj;
+      return DatePolicy<T>::toDate(DatePolicy<T>::year(date), DatePolicy<T>::month(date), week - week % n);
     }
   };
 
