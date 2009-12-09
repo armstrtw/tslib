@@ -95,6 +95,10 @@ namespace tslib {
     template<typename T>
     const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> row_subset(T beg, T end) const;
 
+    // pad
+    template<typename T>
+    const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> pad(T beg, T end) const;
+
     //operators
     TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& operator=(const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& x);
     TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& operator=(const TDATA x);
@@ -498,6 +502,43 @@ namespace tslib {
     }
     return ans;
   }
+
+  // this is for a positive row subset (positive and negative rowsets cannot mix)
+  template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
+  template<typename T>
+  const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::pad(T beg, T end) const {
+    std::set<TDATE> new_dts;
+    // add existing dates
+    for(TDATE* d = getDates(); d < getDates() + nrow(); d++) { new_dts.insert(*d); }
+
+    // add new dates
+    while(beg!=end) { new_dts.insert(static_cast<TDATE>(*beg++)); }
+
+    // allocate new answer
+    TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> ans(new_dts.size(), ncol());
+
+    // copy colnames
+    ans.setColnames(getColnames());
+
+    // init dates
+    TDATE* dts = ans.getDates();
+    for(typename std::set<TDATE>::iterator iter = new_dts.begin(); iter != new_dts.end(); iter++) {
+      *dts++ = *iter;
+    }
+
+    // init to NA
+    for(TSDIM i = 0; i < ans.nrow() * ans.ncol(); i++) {
+      ans.getData()[i] = numeric_traits<TDATA>::NA();
+    }
+
+    RangeSpecifier<TDATE,TSDIM> range(ans.getDates(),getDates(),ans.nrow(),nrow());
+    for(TSDIM col = 0; col < ans.ncol(); col++) {
+      RangeIterator<const TDATA*, const TSDIM*> ts_data_iter(getData() + offset(0,col),range.getArg2());
+      std::copy(ts_data_iter, ts_data_iter + range.getSize(),ans.getData() + ans.offset(0,col));
+    }
+    return ans;
+  }
+
 
   template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
   template<template<class, template<typename> class> class PFUNC>

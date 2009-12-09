@@ -446,6 +446,29 @@ void transform_test() {
   BOOST_CHECK_EQUAL(fillbwd_ans.getData()[21], static_cast<double>(23));
 }
 
+void pad_test() {
+  long xnr = 10;
+  long xnc = 5;
+
+  LDL_ts x(xnr,xnc);
+
+  // gernate data
+  for(long vi = 0; vi < x.nrow()*x.ncol(); vi++)
+    x.getData()[vi] = vi+1;
+
+  // generate dates
+  for(long xi = 0; xi < x.nrow(); xi++)
+    x.getDates()[xi] = xi+1;
+
+  vector<long> pad_dates;
+  pad_dates.push_back(x.nrow() + 10);
+  pad_dates.push_back(x.nrow() + 20);
+  LDL_ts ans = x.pad(pad_dates.begin(),pad_dates.end());
+  cout << "pad test:" << endl;
+  cout << x << endl;
+  cout << ans << endl;
+}
+
 
 void lag_lead_test() {
 
@@ -837,6 +860,7 @@ init_unit_test_suite( int argc, char* argv[] ) {
   test->add( BOOST_TEST_CASE( &transform_test ) );
   test->add( BOOST_TEST_CASE( &window_function_test ) );
   test->add( BOOST_TEST_CASE( &expanding_max_test ) );
+  test->add( BOOST_TEST_CASE( &pad_test ) );
 
   test->add( BOOST_TEST_CASE( &time_window_test_month ) );
   test->add( BOOST_TEST_CASE( &time_window_test_day ) );
@@ -854,5 +878,6 @@ init_unit_test_suite( int argc, char* argv[] ) {
   test->add( BOOST_TEST_CASE( &freq_conv_test_hour ) );
   test->add( BOOST_TEST_CASE( &freq_conv_test_minute ) );
   test->add( BOOST_TEST_CASE( &freq_conv_test_second ) );
+
   return test;
 }
