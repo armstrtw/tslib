@@ -18,6 +18,7 @@
 #ifndef TSERIES_HPP
 #define TSERIES_HPP
 
+#include <set>
 #include <cstdlib>
 #include <algorithm>
 #include <numeric>
@@ -531,10 +532,15 @@ namespace tslib {
       ans.getData()[i] = numeric_traits<TDATA>::NA();
     }
 
-    RangeSpecifier<TDATE,TSDIM> range(ans.getDates(),getDates(),ans.nrow(),nrow());
+    RangeSpecifier<TDATE,TSDIM> range(getDates(),ans.getDates(),nrow(),ans.nrow());
+    const TSDIM* r1 = range.getArg1();
+    const TSDIM* r2 = range.getArg2();
+    TDATA* ans_data = ans.getData();
+    TDATA* this_data = getData();
     for(TSDIM col = 0; col < ans.ncol(); col++) {
-      RangeIterator<const TDATA*, const TSDIM*> ts_data_iter(getData() + offset(0,col),range.getArg2());
-      std::copy(ts_data_iter, ts_data_iter + range.getSize(),ans.getData() + ans.offset(0,col));
+      for(TSDIM i = 0; i < range.getSize(); i++) {
+        ans_data[ans.offset(r2[i],col)] = this_data[offset(r1[i],col)];
+      }
     }
     return ans;
   }
