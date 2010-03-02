@@ -226,10 +226,10 @@ namespace tslib {
 
     for(TSDIM c = 0; c < ncol(); c++) {
       for(TSDIM r = n; r < nrow(); r++) {
-        if(numeric_traits<TDATA>::ISNA(data[r]) || numeric_traits<TDATA>::ISNA(data[r-1])) {
+        if(numeric_traits<TDATA>::ISNA(data[r]) || numeric_traits<TDATA>::ISNA(data[r-n])) {
           ans_data[r-n] = numeric_traits<TDATA>::NA();
         } else {
-          ans_data[r-n] = data[r] - data[r-1];
+          ans_data[r-n] = data[r] - data[r-n];
         }
       }
       ans_data += ans.nrow();
