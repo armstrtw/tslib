@@ -64,20 +64,7 @@ namespace tslib {
 
     // find size of smaller of the two arguments
     const U bufferSize = length_index1_ < length_index2_ ? length_index1_ : length_index2_;
-
-    // alloc new buffer for dates_, size_ is smallest of the two arguments
     dates_ = new T[bufferSize];
-
-    // if we can't get memory then print error and return NULL range specifier
-    if(dates_==NULL) {
-      std::cerr << "ERROR: RangeSpecifier" << std::endl;
-      std::cerr << "out of memory" << std::endl;
-      size_ = 0;
-      index1_ = NULL;
-      index2_ = NULL;
-      dates_ = NULL;
-      return;
-    }
 
     // find size of date intersection
     T* dates_end =  std::set_intersection(dates_1, dates_1+length_index1_, dates_2, dates_2+length_index2_, dates_);
@@ -97,20 +84,6 @@ namespace tslib {
     // we can alloc space for the intersection points
     index1_ = new U[size_];
     index2_ = new U[size_];
-
-    // if we cannot get memory, then print error, release any memory that was allocated and return
-    if(index1_==NULL || index2_==NULL) {
-      std::cerr << "ERROR: RangeSpecifier::RangeSpecifier" << std::endl;
-      std::cerr << "out of memory" << std::endl;
-      delete []index1_;
-      delete []index2_;
-      delete []dates_;
-      index1_ = NULL;
-      index2_ = NULL;
-      dates_ = NULL;
-      size_ = 0;
-      return;
-    }
 
     // placeholders to find intersecting dates_
     U date1_index = 0;
