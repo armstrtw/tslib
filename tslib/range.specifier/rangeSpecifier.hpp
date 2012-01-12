@@ -22,6 +22,10 @@
 
 namespace tslib {
 
+  // template friend must be pre-declared
+  template<typename T, typename U> class RangeSpecifier;
+  template<typename T, typename U> std::ostream& operator<< (std::ostream& os, const RangeSpecifier<T,U>& rs);
+
   template<typename T, typename U>
   class RangeSpecifier {
   private:
@@ -42,7 +46,7 @@ namespace tslib {
     const U* getArg1() const;
     const U* getArg2() const;
     const U getSize() const;
-    void print() const;
+    friend std::ostream& operator<< <> (std::ostream& os, const RangeSpecifier<T,U>& rs);
   };
 
   template<typename T, typename U>
@@ -157,13 +161,14 @@ namespace tslib {
     return index2_;
   }
 
-  template<typename T, typename U>
-  void RangeSpecifier<T,U>::print() const {
-    for(U i = 0; i < size_; i++) {
-      std::cout << dates_[i] << ":" << index1_[i] << ":" << index2_[i] << std::endl;
-    }
-  }
 
+  template<typename T, typename U>
+  std::ostream& operator<< (std::ostream& os, const RangeSpecifier<T,U>& rs) {
+    for(U i = 0; i < rs.size_; i++) {
+      os << rs.dates_[i] << ":" << rs.index1_[i] << ":" << rs.index2_[i] << std::endl;
+    }
+    return os;
+  }
 } // namespace tslib
 
 #endif
