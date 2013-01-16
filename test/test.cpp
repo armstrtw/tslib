@@ -81,7 +81,7 @@ void tsdata_constructor_test() {
   long nc = 10;
   long zero = 0;
 
-  TSdataSingleThreaded<double,double>* ts_data = TSdataSingleThreaded<double,double>::init(nr,nc);
+  TSdataSingleThreaded<double,double> ts_data = TSdataSingleThreaded<double,double>(nr,nc);
   DDL_ts x(ts_data);
 
   BOOST_CHECK_EQUAL( x.nrow(), nr );

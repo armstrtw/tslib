@@ -26,16 +26,16 @@ namespace tslib {
   template <typename TDATE,typename TDATA, typename TSDIM = long>
   class TSdataSingleThreaded {
   private:
-    int refcount_;
     bool release_data_;
     std::vector<std::string> colnames_;
     TSDIM rows_;
     TSDIM cols_;
     TDATE* dates_;
     TDATA* data_;
-
+  public:
+    ~TSdataSingleThreaded();
     TSdataSingleThreaded();
-    TSdataSingleThreaded(const TSdataSingleThreaded& t); // not allowed
+    TSdataSingleThreaded(const TSdataSingleThreaded& t);
 
     TSdataSingleThreaded(const TSDIM rows, const TSDIM cols);
 
@@ -45,23 +45,7 @@ namespace tslib {
                          const TSDIM cols,
                          const bool release = false);
 
-    TSdataSingleThreaded& operator=(const TSdataSingleThreaded& right);  // not allowed
-
-  public:
-    ~TSdataSingleThreaded();
-
-    static TSdataSingleThreaded* init();
-
-    static TSdataSingleThreaded* init(const TSDIM rows, const TSDIM cols);
-
-    static TSdataSingleThreaded* init(TDATA* external_data,
-                                      TDATE* external_dates,
-                                      const TSDIM rows,
-                                      const TSDIM cols,
-                                      const bool release = false);
-
-    void attach();
-    void detach();
+    TSdataSingleThreaded& operator=(const TSdataSingleThreaded& rhs);
 
     TSDIM nrow() const;
     TSDIM ncol() const;
@@ -82,99 +66,39 @@ namespace tslib {
   }
 
   template <typename TDATE,typename TDATA, typename TSDIM>
-  TSdataSingleThreaded<TDATE,TDATA,TSDIM>::TSdataSingleThreaded() {
-    refcount_ = 1;
-    release_data_ = true;
-    rows_ = 0;
-    cols_ = 0;
-    dates_ = NULL;
-    data_ = NULL;
+  TSdataSingleThreaded<TDATE,TDATA,TSDIM>::TSdataSingleThreaded():
+    release_data_(true), rows_(0), cols_(0), dates_(NULL), data_(NULL) {}
+
+  template <typename TDATE,typename TDATA, typename TSDIM>
+  TSdataSingleThreaded<TDATE,TDATA,TSDIM>::TSdataSingleThreaded(const TSdataSingleThreaded& t):
+  release_data_(true), rows_(t.rows_), cols_(t.cols_), dates_(new TDATE[t.rows_]), data_(new TDATA[t.rows_*t.cols_]) {
+    std::copy(t.dates_, t.dates_ + rows_, dates_);
+    std::copy(t.data_, t.data_ + t.rows_*t.cols_, data_);
   }
 
   template <typename TDATE,typename TDATA, typename TSDIM>
-  TSdataSingleThreaded<TDATE,TDATA,TSDIM>::TSdataSingleThreaded(const TSDIM rows, const TSDIM cols) {
-    refcount_ = 1;
-    release_data_ = true;
-    rows_ = rows;
-    cols_ = cols;
+  TSdataSingleThreaded<TDATE,TDATA,TSDIM>::TSdataSingleThreaded(const TSDIM rows, const TSDIM cols):
+    release_data_(true), rows_(rows), cols_(cols), dates_(new TDATE[rows]), data_(new TDATA[rows*cols]) {}
 
-    dates_ = new TDATE[rows];
-    data_ = new TDATA[rows*cols];
+  template <typename TDATE,typename TDATA, typename TSDIM>
+  TSdataSingleThreaded<TDATE,TDATA,TSDIM>::TSdataSingleThreaded(TDATA* external_data, TDATE* external_dates, const TSDIM nrows, const TSDIM ncols, const bool release):
+    release_data_(release), rows_(nrows), cols_(ncols), dates_(external_dates), data_(external_data) {}
 
-    if(data_==NULL || dates_==NULL) {
-      //cerr << "memory allocation error." << endl;
-      delete []data_;
+  template <typename TDATE,typename TDATA, typename TSDIM>
+  TSdataSingleThreaded<TDATE,TDATA,TSDIM>& TSdataSingleThreaded<TDATE,TDATA,TSDIM>::operator=(const TSdataSingleThreaded& rhs) {
+    // release old data
+    if(release_data_) {
       delete []dates_;
-      data_ = NULL;
-      dates_ = NULL;
-      rows_ = 0;
-      cols_ = 0;
+      delete []data_;
     }
-  }
-
-  template <typename TDATE,typename TDATA, typename TSDIM>
-  TSdataSingleThreaded<TDATE,TDATA,TSDIM>::TSdataSingleThreaded(TDATA* external_data,
-                                                                TDATE* external_dates,
-                                                                const TSDIM nrows,
-                                                                const TSDIM ncols,
-                                                                const bool release) {
-
-    // make null series if some data is null
-    if(external_data==NULL || external_dates==NULL) {
-      refcount_ = 1;
-      release_data_ = release;
-      data_ = NULL;
-      dates_ = NULL;
-      rows_ = 0;
-      cols_ = 0;
-    } else {
-      refcount_ = 1;
-      release_data_ = release;
-      data_ = external_data;
-      dates_ = external_dates;
-      rows_ = nrows;
-      cols_ = ncols;
-    }
-  }
-
-
-  template <typename TDATE,typename TDATA, typename TSDIM>
-  TSdataSingleThreaded<TDATE,TDATA,TSDIM>* TSdataSingleThreaded<TDATE,TDATA,TSDIM>::init() {
-    return new TSdataSingleThreaded();
-  }
-
-  template <typename TDATE,typename TDATA, typename TSDIM>
-  TSdataSingleThreaded<TDATE,TDATA,TSDIM>* TSdataSingleThreaded<TDATE,TDATA,TSDIM>::init(const TSDIM rows, const TSDIM cols) {
-    return new TSdataSingleThreaded(rows, cols);
-  }
-
-  template <typename TDATE,typename TDATA, typename TSDIM>
-  TSdataSingleThreaded<TDATE,TDATA,TSDIM>* TSdataSingleThreaded<TDATE,TDATA,TSDIM>::init(TDATA* external_data,
-                                                                                         TDATE* external_dates,
-                                                                                         const TSDIM nrows,
-                                                                                         const TSDIM ncols,
-                                                                                         const bool release) {
-
-    return new TSdataSingleThreaded(external_data,
-                                    external_dates,
-                                    nrows,
-                                    ncols,
-                                    release);
-  }
-
-  template <typename TDATE,typename TDATA, typename TSDIM>
-  void TSdataSingleThreaded<TDATE,TDATA,TSDIM>::attach() {
-    ++refcount_;
-    //cout << "attach, new refcount_: " << refcount_ << endl;
-  }
-
-  template <typename TDATE,typename TDATA, typename TSDIM>
-  void TSdataSingleThreaded<TDATE,TDATA,TSDIM>::detach() {
-    refcount_--;
-    //cout << "detach, refcount_: " << refcount_ << endl;
-    if(refcount_ == 0) {
-      delete this;
-    }
+    release_data_ = true;
+    rows_ = rhs.rows_;
+    cols_ = rhs.cols_;
+    dates_ = new TDATE[rhs.rows_];
+    data_ = new TDATA[rhs.rows_*rhs.cols_];
+    std::copy(rhs.dates_, rhs.dates_ + rhs.rows_, dates_);
+    std::copy(rhs.data_, rhs.data_ + rhs.rows_*rhs.cols_, data_);
+    return *this;
   }
 
   template <typename TDATE,typename TDATA, typename TSDIM>
