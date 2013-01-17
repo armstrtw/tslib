@@ -107,7 +107,7 @@ namespace tslib {
     const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> diff(const unsigned int n) const;
 
     // matix index
-    TDATA operator() (const TSDIM row, const TSDIM col) const;
+    const TDATA operator() (const TSDIM row, const TSDIM col) const;
     TDATA& operator() (const TSDIM row, const TSDIM col);
 
     friend std::ostream& operator<< <> (std::ostream& os, const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& ts);
@@ -230,8 +230,8 @@ namespace tslib {
 
 
   template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
-  TDATA TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::operator() (const TSDIM row, const TSDIM col) const {
-    TDATA* data = getData();
+  const TDATA TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::operator() (const TSDIM row, const TSDIM col) const {
+    const TDATA* data = getData();
     return data[offset(row, col)];
   }
 
