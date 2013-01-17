@@ -71,7 +71,7 @@ namespace tslib {
 
   template <typename TDATE,typename TDATA, typename TSDIM>
   TSdataSingleThreaded<TDATE,TDATA,TSDIM>::TSdataSingleThreaded(const TSdataSingleThreaded& t):
-  release_data_(true), rows_(t.rows_), cols_(t.cols_), dates_(new TDATE[t.rows_]), data_(new TDATA[t.rows_*t.cols_]) {
+  release_data_(true), colnames_(t.colnames_), rows_(t.rows_), cols_(t.cols_), dates_(new TDATE[t.rows_]), data_(new TDATA[t.rows_*t.cols_]) {
     std::copy(t.dates_, t.dates_ + rows_, dates_);
     std::copy(t.data_, t.data_ + t.rows_*t.cols_, data_);
   }
@@ -92,6 +92,7 @@ namespace tslib {
       delete []data_;
     }
     release_data_ = true;
+    colnames_ = rhs.colnames_;
     rows_ = rhs.rows_;
     cols_ = rhs.cols_;
     dates_ = new TDATE[rhs.rows_];
