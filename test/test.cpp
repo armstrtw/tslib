@@ -48,7 +48,19 @@ typedef TSeries<double,double,long,TSdataSingleThreaded,PosixDate> DDL_ts;
 // seed random number generator
 //srand (time(NULL));
 
+LDL_ts make_ascending_ts(long nr, long nc) {
+  LDL_ts x(nr,nc);
 
+  // gernate data
+  for(long vi = 0; vi < x.nrow()*x.ncol(); vi++)
+    x.getData()[vi] = vi+1;
+
+  // generate dates
+  for(long xi = 0; xi < x.nrow(); xi++)
+    x.getDates()[xi] = xi+1;
+
+  return x;
+}
 
 void null_constructor_test() {
   LDL_ts x;
@@ -89,6 +101,27 @@ void tsdata_constructor_test() {
   BOOST_CHECK( x.getData() != static_cast<double*>(NULL) );
   BOOST_CHECK( x.getDates() != static_cast<double*>(NULL) );
   BOOST_CHECK_EQUAL( static_cast<long>(x.getColnames().size()), zero );
+}
+
+void external_data_constructor_test() {
+  long nr = 1000;
+  long nc = 10;
+  long zero = 0;
+
+  double* dates_p = new double[nr];
+  double* data_p = new double[nr*nc];
+
+  DDL_ts x(data_p,dates_p,nr,nc,false);
+
+  BOOST_CHECK_EQUAL( x.nrow(), nr );
+  BOOST_CHECK_EQUAL( x.ncol(), nc );
+  BOOST_CHECK_EQUAL( x.getData(), data_p );
+  BOOST_CHECK_EQUAL( x.getDates(), dates_p );
+  BOOST_CHECK_EQUAL( static_cast<long>(x.getColnames().size()), zero );
+
+  // release these b/c we asked for release=false in the ctor
+  delete[] dates_p;
+  delete[] data_p;
 }
 
 void set_colnames_test() {
@@ -498,18 +531,7 @@ void lag_lead_test() {
 
 void diff_test() {
 
-  long xnr = 10;
-  long xnc = 5;
-
-  LDL_ts x(xnr,xnc);
-
-  // gernate data
-  for(long vi = 0; vi < x.nrow()*x.ncol(); vi++)
-    x.getData()[vi] = vi+1;
-
-  // generate dates
-  for(long xi = 0; xi < x.nrow(); xi++)
-    x.getDates()[xi] = xi+1;
+  LDL_ts x = make_ascending_ts(10,5);
 
   LDL_ts y(x.diff(1));
   cout << y << endl;
@@ -845,6 +867,7 @@ init_unit_test_suite( int argc, char* argv[] ) {
   test->add( BOOST_TEST_CASE( &null_constructor_test ) );
   test->add( BOOST_TEST_CASE( &std_constructor_test ) );
   test->add( BOOST_TEST_CASE( &tsdata_constructor_test) );
+  test->add( BOOST_TEST_CASE( &external_data_constructor_test) );
   test->add( BOOST_TEST_CASE( &set_colnames_test ) );
   test->add( BOOST_TEST_CASE( &range_specifier_test ) );
   test->add( BOOST_TEST_CASE( &operators_test ) );

@@ -59,6 +59,7 @@ namespace tslib {
     TSeries(TSDATABACKEND<TDATE,TDATA,TSDIM>& tsdata);
     TSeries(const TSDIM rows, const TSDIM cols);
     TSeries(const TSeries& T);
+    TSeries(TDATA* external_data, TDATE* external_dates, const TSDIM nrows, const TSDIM ncols, const bool release);
 
     // accessors
     TSDATABACKEND<TDATE,TDATA,TSDIM>* getIMPL() const;
@@ -124,6 +125,10 @@ namespace tslib {
 
   template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
   TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::TSeries(const TSeries& T): tsdata_(T.tsdata_) {}
+
+  template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
+  TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::TSeries(TDATA* external_data, TDATE* external_dates, const TSDIM nrows, const TSDIM ncols, const bool release):
+    tsdata_(external_data, external_dates, nrows, ncols, release) {}
 
   template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
   inline

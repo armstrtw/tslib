@@ -56,7 +56,6 @@ namespace tslib {
     const size_t getColnamesSize() const;
   };
 
-
   template <typename TDATE,typename TDATA, typename TSDIM>
   TSdataSingleThreaded<TDATE,TDATA,TSDIM>::~TSdataSingleThreaded() {
     if(release_data_) {
