@@ -62,7 +62,7 @@ namespace tslib {
     TSeries(TDATA* external_data, TDATE* external_dates, const TSDIM nrows, const TSDIM ncols, const bool release);
 
     // accessors
-    TSDATABACKEND<TDATE,TDATA,TSDIM>* getIMPL() const;
+    const TSDATABACKEND<TDATE,TDATA,TSDIM>* getIMPL() const;
     std::vector<std::string> getColnames() const;
     const TSDIM nrow() const;
     const TSDIM ncol() const;
@@ -132,7 +132,7 @@ namespace tslib {
 
   template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
   inline
-  TSDATABACKEND<TDATE,TDATA,TSDIM>* TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::getIMPL() const {
+  const TSDATABACKEND<TDATE,TDATA,TSDIM>* TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::getIMPL() const {
     return &tsdata_;
   }
 
