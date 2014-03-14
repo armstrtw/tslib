@@ -17,25 +17,35 @@
 
 #ifndef JULIAN_DATE_POLICY_HPP
 #define JULIAN_DATE_POLICY_HPP
+#include <boost/date_time/gregorian/gregorian_types.hpp>
 
 namespace tslib {
 
   template<typename T>
   class JulianDate {
+  private:
+    static const boost::gregorian::date fromRDate(const T x) { return boost::gregorian::date(1970,1,1) + boost::gregorian::date_duration(x); }
+    static const boost::gregorian::date toRDate(const boost::gregorian::date x) { return static_cast<int>(boost::gregorian::date::date_period(boost::gregorian::date(1970,1,1),x).length()); }
   public:
     static const T toDate(const char* date, const char* format);
-    static const T toDate(const int year, const int month, const int day, const int hour, const int minute, const int second);
+    static const T toDate(const int year, const int month, const int day, const int hour = 0, const int minute = 0, const int second = 0, const int millisecond = 0);
     static const std::string toString(const T x, const char* format);
-    static const int dayofweek(const T x);
-    static const int dayofmonth(const T x);
-    static const int month(const T x);
-    static const int year(const T x);
-    static const int last_day_of_month(const T x);
-    static const T AddYears(const T x, const int n);
-    static const T AddMonths(const T x, const int n);
-    static const T AddDays(const T x, const int n);
+    static const int second(const T x) { return 0; }
+    static const int minute(const T x) { return 0; }
+    static const int hour(const T x) { return 0; }
+    static const int dayofweek(const T x) { static_cast<int>(return day_of_week(fromRDate(x))); }
+    static const int dayofmonth(const T x) { return static_cast<int>(day(fromRDate(x))); }
+    static const int month(const T x)  { return static_cast<int>(month(fromRDate(x))); }
+    static const int year(const T x)   { return static_cast<int>(year(fromRDate(x))); }
+    static const int last_day_of_month(const T x) { toRDate(end_of_month(fromRDate(x))); }
+    static const T AddYears(const T x, const int n) { toRDate(fromRDate(x) + boost::gregorian::years(n)); }
+    static const T AddMonths(const T x, const int n) { toRDate(fromRDate(x) + boost::gregorian::months(n)); }
+    static const T AddDays(const T x, const int n) { toRDate(fromRDate(x) + boost::gregorian::days(n)); }
+    static const double daily_distance(const T x, const T y) { return x - y; }
   };
 
 } // namespace tslib
+
+
 
 #endif // JULIAN_DATE_POLICY_HPP
