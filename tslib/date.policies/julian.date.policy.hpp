@@ -28,8 +28,8 @@ namespace tslib {
     static const boost::gregorian::date fromRDate(const T x) { return boost::gregorian::date(1970,1,1) + boost::gregorian::days(x); }
     static const T toRDate(const boost::gregorian::date x) { return static_cast<int>(boost::gregorian::date_period(boost::gregorian::date(1970,1,1),x).length().days()); }
   public:
-    static const T toDate(const char* date, const char* format);
-    static const T toDate(const int year, const int month, const int day, const int hour = 0, const int minute = 0, const int second = 0, const int millisecond = 0);
+    //static const T toDate(const char* date, const char* format);
+    static const T toDate(const int year, const int month, const int day, const int hour = 0, const int minute = 0, const int second = 0, const int millisecond = 0) { return toRDate(boost::gregorian::date(year, month, day)); }
     static const std::string toString(const T x, const char* format);
     static const int second(const T x) { return 0; }
     static const int minute(const T x) { return 0; }
