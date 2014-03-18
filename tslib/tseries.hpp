@@ -1,3 +1,4 @@
+
 ///////////////////////////////////////////////////////////////////////////
 // Copyright (C) 2008  Whit Armstrong                                    //
 //                                                                       //
@@ -34,6 +35,7 @@
 #include <tslib/utils/breaks.hpp>
 #include <tslib/vector.transform.hpp>
 #include <tslib/date.policies/posix.date.policy.hpp>
+#include <tslib/date.policies/julian.date.policy.hpp>
 #include <tslib/date.policies/date.partition.hpp>
 
 namespace tslib {
