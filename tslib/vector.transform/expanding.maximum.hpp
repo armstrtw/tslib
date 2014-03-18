@@ -31,7 +31,7 @@ namespace tslib {
       // fill with NA until we have values
       while(numeric_traits<typename std::iterator_traits<U>::value_type>::ISNA(*beg) && beg != end) {
         *dest++ = numeric_traits<ReturnType>::NA();
-        *beg++;
+        ++beg;
       }
       
       // init first value
