@@ -106,9 +106,7 @@ namespace tslib {
   public:
     yyyyww() {}
     T operator()(const T date, const int n) {
-      int adj = 6 - DatePolicy<T>::dayofweek(date);
-      int week = DatePolicy<T>::dayofmonth(date) + adj;
-      return DatePolicy<T>::toDate(DatePolicy<T>::year(date), DatePolicy<T>::month(date), week - week % n);
+      return DatePolicy<T>::AddDays(date,6 - DatePolicy<T>::dayofweek(date));
     }
   };
 
