@@ -18,8 +18,6 @@
 #ifndef RANGESPECIFIER_HPP
 #define RANGESPECIFIER_HPP
 
-#include <iostream>
-
 namespace tslib {
 
   // template friend must be pre-declared

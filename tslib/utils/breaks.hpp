@@ -18,8 +18,6 @@
 #ifndef BREAKS_HPP
 #define BREAKS_HPP
 
-#include <iostream>
-
 namespace tslib {
 
   template<typename T, typename U>
