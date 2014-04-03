@@ -25,6 +25,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include <tslib/tseries.hpp>
+#include <tslib/tseries.io.hpp>
 #include <tslib/ts.opps/ts.opps.hpp>
 #include <tslib/utils/window.function.hpp>
 #include <tslib/utils/cbind.hpp>
