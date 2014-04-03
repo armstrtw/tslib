@@ -39,7 +39,6 @@ namespace tslib {
 
       // end is beyond array right now
       --end;
-      //cout << *end << endl;
 
       // set last element to value of end
       *dest-- = *end--;
