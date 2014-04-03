@@ -1,4 +1,3 @@
-
 ///////////////////////////////////////////////////////////////////////////
 // Copyright (C) 2008  Whit Armstrong                                    //
 //                                                                       //
@@ -252,36 +251,6 @@ namespace tslib {
   TDATA& TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::operator() (const TSDIM row, const TSDIM col) {
     TDATA* data = getData();
     return data[offset(row, col)];
-  }
-
-  template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
-  std::ostream& operator<< (std::ostream& os, const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& ts) {
-    std::vector<std::string> cnames(ts.getColnames());
-
-    if(cnames.size()) {
-      // shift out to be in line w/ first column of values (space is for dates column)
-      os << "\t";
-      for(std::vector<std::string>::const_iterator iter = cnames.begin(); iter != cnames.end(); iter++) {
-        os << *iter++ << " ";
-      }
-    }
-
-    TDATE* dates = ts.getDates();
-    TSDIM nr  = ts.nrow();
-    TSDIM nc  = ts.ncol();
-
-    for(TSDIM row = 0; row < nr; row++) {
-      os << DatePolicy<TDATE>::toString(dates[row],"%Y-%m-%d %T") << "\t";
-      for(TSDIM col = 0; col < nc; col++) {
-        if(numeric_traits<TDATA>::ISNA(ts(row,col))) {
-          os << "NA" << " ";
-        } else {
-          os << ts(row,col) << " ";
-        }
-      }
-      os << std::endl;
-    }
-    return os;
   }
 
   template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
