@@ -18,6 +18,8 @@
 #ifndef RANGESPECIFIER_HPP
 #define RANGESPECIFIER_HPP
 
+#include <vector>
+
 namespace tslib {
 
   // template friend must be pre-declared
@@ -27,13 +29,12 @@ namespace tslib {
   template<typename T, typename U>
   class RangeSpecifier {
   private:
-    T* dates_;  // intersection dates_
-    U* index1_;   // index of intersections of index1_
-    U* index2_;   // index of intersections of index2_
+    std::vector<T> dates_;  // intersection dates_
+    std::vector<U> index1_;   // index of intersections of index1_
+    std::vector<U> index2_;   // index of intersections of index2_
     U size_;    // also the length of all the internal vectors: dates_, index1_, index2_
 
   public:
-    ~RangeSpecifier();
     RangeSpecifier(const RangeSpecifier &r); // not allowed!!
     RangeSpecifier(T *dates_1,
 		   T *dates_2,
@@ -48,13 +49,6 @@ namespace tslib {
   };
 
   template<typename T, typename U>
-  RangeSpecifier<T,U>::~RangeSpecifier() {
-    delete [] dates_;
-    delete [] index1_;
-    delete [] index2_;
-  }
-
-  template<typename T, typename U>
   RangeSpecifier<T,U>::RangeSpecifier(T *dates_1,
 				      T *dates_2,
 				      const U length_index1_,
@@ -62,52 +56,50 @@ namespace tslib {
 
     // find size of smaller of the two arguments
     const U bufferSize = length_index1_ < length_index2_ ? length_index1_ : length_index2_;
-    dates_ = new T[bufferSize];
+    dates_.resize(bufferSize);
 
     // find size of date intersection
-    T* dates_end =  std::set_intersection(dates_1, dates_1+length_index1_, dates_2, dates_2+length_index2_, dates_);
+    T* dates_end =  std::set_intersection(dates_1, dates_1+length_index1_, dates_2, dates_2+length_index2_, &dates_[0]);
 
-    size_ = std::distance(dates_,dates_end);
+    size_ = std::distance(&dates_[0],dates_end);
 
     // if there is no intersection then specifier has no size, and elements should be set to null
     // must delete buffer of dates_ that we allocated
     if(size_==0) {
-      delete []dates_;
-      index1_ = NULL;
-      index2_ = NULL;
-      dates_ = NULL;
-    }
+      dates_.clear();
+    } else {
 
-    // since we have some dates_ in the intersection
-    // we can alloc space for the intersection points
-    index1_ = new U[size_];
-    index2_ = new U[size_];
+      // since we have some dates_ in the intersection
+      // we can alloc space for the intersection points
+      index1_.resize(size_);
+      index2_.resize(size_);
 
-    // placeholders to find intersecting dates_
-    U date1_index = 0;
-    U date2_index = 0;
-    U dates_index = 0;
+      // placeholders to find intersecting dates_
+      U date1_index = 0;
+      U date2_index = 0;
+      U dates_index = 0;
 
-    // go through all the dates_ in the intersection
-    while(dates_index < size_) {
+      // go through all the dates_ in the intersection
+      while(dates_index < size_) {
 
-      // catch up arg 1 to dates_ intersection
-      while(dates_[dates_index] != dates_1[date1_index]) {
-	date1_index++;
-      }
+        // catch up arg 1 to dates_ intersection
+        while(dates_[dates_index] != dates_1[date1_index]) {
+          date1_index++;
+        }
 
-      // catch up arg 2 to dates_ intersection
-      while(dates_[dates_index] != dates_2[date2_index]) {
-	date2_index++;
-      }
+        // catch up arg 2 to dates_ intersection
+        while(dates_[dates_index] != dates_2[date2_index]) {
+          date2_index++;
+        }
 
-      // when equal, record position of matching elements
-      if(dates_[dates_index] == dates_1[date1_index] && dates_[dates_index] == dates_2[date2_index]) {
-	index1_[dates_index] = date1_index;
-	index2_[dates_index] = date2_index;
-	dates_index++;
-	date1_index++;
-	date2_index++;
+        // when equal, record position of matching elements
+        if(dates_[dates_index] == dates_1[date1_index] && dates_[dates_index] == dates_2[date2_index]) {
+          index1_[dates_index] = date1_index;
+          index2_[dates_index] = date2_index;
+          dates_index++;
+          date1_index++;
+          date2_index++;
+        }
       }
     }
   }
@@ -119,17 +111,17 @@ namespace tslib {
 
   template<typename T, typename U>
   const T* RangeSpecifier<T,U>::getDates() const {
-    return dates_;
+    return &dates_[0];
   }
 
   template<typename T, typename U>
   const U* RangeSpecifier<T,U>::getArg1() const {
-    return index1_;
+    return &index1_[0];
   }
 
   template<typename T, typename U>
   const U* RangeSpecifier<T,U>::getArg2() const {
-    return index2_;
+    return &index2_[0];
   }
 
 } // namespace tslib
