@@ -35,7 +35,7 @@ namespace tslib {
   template<>
   class prodTraits<int> {
   public:
-    typedef int ReturnType;
+    typedef double ReturnType;
   };
 
 
