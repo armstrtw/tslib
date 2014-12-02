@@ -437,12 +437,11 @@ namespace tslib {
   template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
   template<typename T>
   const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::pad(T beg, T end) const {
-    std::set<TDATE> new_dts;
-    // add existing dates
-    for(TDATE* d = getDates(); d < getDates() + nrow(); d++) { new_dts.insert(*d); }
+    // construct set with existing dates
+    std::set<TDATE> new_dts(getDates(),getDates() + nrow());
 
     // add new dates
-    while(beg!=end) { new_dts.insert(static_cast<TDATE>(*beg++)); }
+    new_dts.insert(beg,end);
 
     // allocate new answer
     TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> ans(new_dts.size(), ncol());
@@ -451,15 +450,10 @@ namespace tslib {
     ans.setColnames(getColnames());
 
     // init dates
-    TDATE* dts = ans.getDates();
-    for(typename std::set<TDATE>::iterator iter = new_dts.begin(); iter != new_dts.end(); iter++) {
-      *dts++ = *iter;
-    }
+    std::copy(new_dts.begin(),new_dts.end(),ans.getDates());
 
     // init to NA
-    for(TSDIM i = 0; i < ans.nrow() * ans.ncol(); i++) {
-      ans.getData()[i] = numeric_traits<TDATA>::NA();
-    }
+    std::fill(ans.getData(),ans.getData()+ans.nrow() * ans.ncol(),numeric_traits<TDATA>::NA());
 
     RangeSpecifier<TDATE,TSDIM> range(getDates(),ans.getDates(),nrow(),ans.nrow());
     const TSDIM* r1 = range.getArg1();
