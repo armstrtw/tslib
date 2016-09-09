@@ -71,7 +71,7 @@ namespace tslib {
     TDATE* getDates() const;
 
     // mutators
-    int setColnames(const std::vector<std::string>& cnames);
+    bool setColnames(const std::vector<std::string>& cnames);
 
     // transforms
     template<typename ReturnType, template<class> class F>
@@ -285,12 +285,12 @@ namespace tslib {
   }
 
   template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
-  int TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::setColnames(const std::vector<std::string>& cnames) {
-    if(static_cast<TSDIM>(cnames.size()) == ncol()) {
+  bool TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::setColnames(const std::vector<std::string>& cnames) {
+    if(cnames.size() > 0 && static_cast<TSDIM>(cnames.size()) == ncol()) {
       tsdata_.setColnames(cnames);
-      return 0; // SUCCESS
+      return true; // success
     } else {
-      return 1; // FAILURE
+      return false; // failure
     }
   }
 
