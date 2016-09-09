@@ -1,8 +1,7 @@
-CFLAGS = -Wall -DGLIBCXX_FORCE_NEW -O0 -g -fpic -I..
+CFLAGS = -Wall -DGLIBCXX_FORCE_NEW -O0 -g -fpic -I.. -I/usr/include/catch
 CXXFLAGS = $(CFLAGS)
 LDFLAGS =
-CXX      = g++
-FXX      = g77
+CXX      = clang++
 
 .PHONY: test
 
