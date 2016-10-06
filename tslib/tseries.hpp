@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// Copyright (C) 2008  Whit Armstrong                                    //
+// Copyright (C) 2016  Whit Armstrong                                    //
 //                                                                       //
 // This program is free software: you can redistribute it and/or modify  //
 // it under the terms of the GNU General Public License as published by  //
@@ -14,479 +14,116 @@
 // You should have received a copy of the GNU General Public License     //
 // along with this program.  If not, see <http://www.gnu.org/licenses/>. //
 ///////////////////////////////////////////////////////////////////////////
-
-#ifndef TSERIES_HPP
-#define TSERIES_HPP
-
-#include <set>
-#include <cstdlib>
-#include <algorithm>
-#include <numeric>
-#include <functional>
+#pragma once
+#include <vector>
+#include <string>
+#include <utility>
 #include <iterator>
-#include <stdexcept>
-
-#include <tslib/tseries.data.hpp>
-#include <tslib/range.specifier/rangeSpecifier.hpp>
-#include <tslib/ts.opps/ts.opps.hpp>
-#include <tslib/utils/window.apply.hpp>
-#include <tslib/utils/window.function.hpp>
-#include <tslib/utils/breaks.hpp>
-#include <tslib/vector.transform.hpp>
-#include <tslib/date.policies/posix.date.policy.hpp>
-#include <tslib/date.policies/julian.date.policy.hpp>
-#include <tslib/date.policies/date.partition.hpp>
+#include <iostream>
+//#include <tslib/range.specifier.hpp>
 
 namespace tslib {
 
-  class TSeriesError : public std::runtime_error {
-  public:
-    TSeriesError(const std::string& msg = "") : std::runtime_error(msg) {}
-  };
+template <typename IDX, typename V, typename DIM, template <typename, typename, typename> class BACKEND,
+          template <typename> class DatePolicy, template <typename> class NumericTraits>
+class TSeries {
+private:
+  BACKEND<IDX, V, DIM> tsdata_;
 
-  template <typename TDATE, typename TDATA,
-            typename TSDIM,
-            template<typename,typename,typename> class TSDATABACKEND,
-            template<typename> class DatePolicy>
-  class TSeries {
-  private:
-    TSDATABACKEND<TDATE,TDATA,TSDIM> tsdata_;
-    const TSDIM offset(const TSDIM row, const TSDIM col) const {
-      return row + col*nrow();
+public:
+  typedef typename BACKEND<IDX, V, DIM>::const_index_iterator const_index_iterator;
+  typedef typename BACKEND<IDX, V, DIM>::index_iterator index_iterator;
+  typedef typename BACKEND<IDX, V, DIM>::const_data_iterator const_data_iterator;
+  typedef typename BACKEND<IDX, V, DIM>::data_iterator data_iterator;
+  typedef typename std::vector<const_data_iterator> const_row_iterator;
+  typedef typename std::vector<data_iterator> row_iterator;
+
+  // ctors
+  TSeries(const TSeries &T) : tsdata_(T.tsdata_) {}
+  TSeries(BACKEND<IDX, V, DIM> &tsdata) : tsdata_{tsdata} {}
+  TSeries(DIM nrow, DIM ncol) : tsdata_{nrow, ncol} {}
+
+  // accessors
+  const BACKEND<IDX, V, DIM> &getBackend() const { return tsdata_; }
+  const std::vector<std::string> getColnames() const { return tsdata_.getColnames(); }
+  const bool setColnames(const std::vector<std::string> &names) { return tsdata_.setColnames(names); }
+  const DIM nrow() const { return tsdata_.nrow(); }
+  const DIM ncol() const { return tsdata_.ncol(); }
+  const_index_iterator index_begin() const { return tsdata_.index_begin(); }
+  index_iterator index_begin() { return tsdata_.index_begin(); }
+  const_index_iterator index_end() const { return tsdata_.index_end(); }
+  index_iterator index_end() { return tsdata_.index_end(); }
+
+  const_data_iterator col_begin(DIM i) const { return tsdata_.col_begin(i); }
+  data_iterator col_begin(DIM i) { return tsdata_.col_begin(i); }
+
+  const_data_iterator col_end(DIM i) const { return tsdata_.col_end(i); }
+  data_iterator col_end(DIM i) { return tsdata_.col_end(i); }
+
+  std::pair<const_data_iterator, const_data_iterator> getColumn(DIM i) const { return tsdata_.getColumn(i); }
+  std::pair<data_iterator, data_iterator> getColumn(DIM i) { return tsdata_.getColumn(i); }
+
+  const_row_iterator getRow(DIM n) const {
+    const_row_iterator ans(ncol());
+    for (DIM i = 0; i < ncol(); ++i) {
+      const_data_iterator this_col = col_begin(i);
+      std::advance(this_col, n);
+      ans[i] = this_col;
     }
-  public:
-    // ctors dtors
-    TSeries();
-    TSeries(TSDATABACKEND<TDATE,TDATA,TSDIM>& tsdata);
-    TSeries(const TSDIM rows, const TSDIM cols);
-    TSeries(const TSeries& T);
-    TSeries(TDATA* external_data, TDATE* external_dates, const TSDIM nrows, const TSDIM ncols, const bool release);
-
-    // accessors
-    const TSDATABACKEND<TDATE,TDATA,TSDIM>* getIMPL() const;
-    std::vector<std::string> getColnames() const;
-    const TSDIM nrow() const;
-    const TSDIM ncol() const;
-    TDATA* getData() const;
-    TDATE* getDates() const;
-
-    // mutators
-    bool setColnames(const std::vector<std::string>& cnames);
-
-    // transforms
-    template<typename ReturnType, template<class> class F>
-    const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> window(const size_t window) const;
-
-    template<typename ReturnType, template<class> class F, template<class, template<typename> class> class PFUNC>
-    const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> time_window(const int n = 1) const;
-
-    template<typename ReturnType, template<class> class F>
-    const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> transform() const;
-
-    template<typename ReturnType, template<class> class F, typename T>
-    const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> transform_1arg(T arg1) const;
-
-    // frequency conversion (only highfreq to lowfreq conversion)
-    template<template<class, template<typename> class> class PFUNC>
-    const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> freq(const int n = 1) const;
-
-    // subsets
-    template<typename T>
-    const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> row_subset(T beg, T end) const;
-
-    // pad
-    template<typename T>
-    const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> pad(T beg, T end) const;
-
-    //operators
-    TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& operator=(const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& x);
-    TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& operator=(const TDATA x);
-
-    // lag lead
-    const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> operator() (const TSDIM n) const;
-    const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> lag(const TSDIM n) const;
-    const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> lead(const TSDIM n) const;
-    const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> diff(const TSDIM n) const;
-
-    // matix index
-    const TDATA operator() (const TSDIM row, const TSDIM col) const;
-    TDATA& operator() (const TSDIM row, const TSDIM col);
-
-    friend std::ostream& operator<< <> (std::ostream& os, const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& ts);
-  };
-
-  template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
-  TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::TSeries() {}
-
-  template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
-  TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::TSeries(TSDATABACKEND<TDATE,TDATA,TSDIM>& tsdata): tsdata_(tsdata) {}
-
-  template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
-  TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::TSeries(const TSDIM rows, const TSDIM cols): tsdata_(rows,cols) {}
-
-  template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
-  TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::TSeries(const TSeries& T): tsdata_(T.tsdata_) {}
-
-  template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
-  TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::TSeries(TDATA* external_data, TDATE* external_dates, const TSDIM nrows, const TSDIM ncols, const bool release):
-    tsdata_(external_data, external_dates, nrows, ncols, release) {}
-
-  template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
-  inline
-  const TSDATABACKEND<TDATE,TDATA,TSDIM>* TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::getIMPL() const {
-    return &tsdata_;
+    return ans;
   }
 
-  template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
-  TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::operator=(const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& rhs) {
-
-    // self assignment
-    if(this == &rhs) {
-      return *this;
-    }
-    // assign to new data
-    tsdata_ = rhs.tsdata_;
-    return *this;
-  }
-
-  template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
-  TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>& TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::operator=(const TDATA rhs) {
-    TDATA* data = getData();
-    for(TSDIM i = 0; i < nrow()*ncol(); i++) {
-      data[i] = rhs;
-    }
-    return *this;
-  }
-
-  template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
-  const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::operator() (const TSDIM n) const {
-    if( n > 0 ) {
-      return lag(n);
-    } else if( n < 0) {
-      return lead(abs(n));
-    }
-    return *this;
-  }
-
-  template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
-  const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::lag(const TSDIM n) const {
-    if(n >= nrow()) { throw std::logic_error("lag: n > nrow of time series."); }
-    const TSDIM new_size = nrow() - n;
-    TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> ans(new_size, ncol());
-    TDATA* ans_data = ans.getData();
-    const TDATA* data = getData();
+  TSeries<IDX, V, DIM, BACKEND, DatePolicy, NumericTraits> lag(DIM n) const {
+    if (n >= nrow()) { throw std::logic_error("lag: n > nrow of time series."); }
+    TSeries<IDX, V, DIM, BACKEND, DatePolicy, NumericTraits> ans(nrow() - n, ncol());
 
     // copy over dates
-    std::copy(getDates() + n, getDates() + n + new_size, ans.getDates());
-
-    // set new colnames
-    ans.setColnames(getColnames());
-
-    for(TSDIM c = 0; c < ncol(); c++) {
-      std::copy(data, data + new_size, ans_data);
-      ans_data += ans.nrow();
-      data += nrow();
-    }
-    return ans;
-  }
-
-  template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
-  const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::lead(const TSDIM n) const {
-    if(n >= nrow()) { throw std::logic_error("lead: n > nrow of time series."); }
-    const TSDIM new_size = nrow() - n;
-    TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> ans(new_size, ncol());
-    TDATA* ans_data = ans.getData();
-    const TDATA* data = getData();
-
-    // copy over dates
-    std::copy(getDates(), getDates() + new_size, ans.getDates());
-
-    // set new colnames
-    ans.setColnames(getColnames());
-
-    for(TSDIM c = 0; c < ncol(); c++) {
-      std::copy(data + n, data + n + new_size, ans_data);
-      ans_data += ans.nrow();
-      data += nrow();
-    }
-    return ans;
-  }
-
-  template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
-  const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::diff(const TSDIM n) const {
-    if(n >= nrow()) { throw std::logic_error("diff: n > nrow of time series."); }
-    const TSDIM new_size = nrow() - n;
-    TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> ans(new_size, ncol());
-    TDATA* ans_data = ans.getData();
-    const TDATA* data = getData();
-
-    // copy over dates
-    std::copy(getDates() + n, getDates() + n + new_size, ans.getDates());
-
-    // set new colnames
-    ans.setColnames(getColnames());
-
-    for(TSDIM c = 0; c < ncol(); c++) {
-      for(TSDIM r = n; r < nrow(); r++) {
-        if(numeric_traits<TDATA>::ISNA(data[r]) || numeric_traits<TDATA>::ISNA(data[r-n])) {
-          ans_data[r-n] = numeric_traits<TDATA>::NA();
-        } else {
-          ans_data[r-n] = data[r] - data[r-n];
-        }
-      }
-      ans_data += ans.nrow();
-      data += nrow();
-    }
-    return ans;
-  }
-
-
-  template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
-  const TDATA TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::operator() (const TSDIM row, const TSDIM col) const {
-    const TDATA* data = getData();
-    return data[offset(row, col)];
-  }
-
-  template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
-  TDATA& TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::operator() (const TSDIM row, const TSDIM col) {
-    TDATA* data = getData();
-    return data[offset(row, col)];
-  }
-
-  template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
-  inline
-  TDATE* TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::getDates() const {
-    return tsdata_.getDates();
-  }
-
-  template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
-  inline
-  TDATA* TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::getData() const {
-    return tsdata_.getData();
-  }
-
-
-  template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
-  inline
-  const TSDIM TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::nrow() const {
-    return tsdata_.nrow();
-  }
-
-  template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
-  inline
-  const TSDIM TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::ncol() const {
-    return tsdata_.ncol();
-  }
-
-  template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
-  inline
-  std::vector<std::string> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::getColnames() const {
-    return tsdata_.getColnames();
-  }
-
-  template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
-  bool TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::setColnames(const std::vector<std::string>& cnames) {
-    if(cnames.size() > 0 && static_cast<TSDIM>(cnames.size()) == ncol()) {
-      tsdata_.setColnames(cnames);
-      return true; // success
-    } else {
-      return false; // failure
-    }
-  }
-
-  template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
-  template<typename ReturnType, template<class> class F>
-  const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::window(const size_t window) const {
-
-    // allocate new answer
-    TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> ans(nrow() - (window - 1), ncol());
-
-    // copy over dates
-    std::copy(getDates() + (window - 1), getDates()+nrow(), ans.getDates());
-
-    // set new colnames
-    ans.setColnames(getColnames());
-
-    ReturnType* ans_data = ans.getData();
-    TDATA* data = getData();
-
-    for(TSDIM col = 0; col < ncol(); col++) {
-      windowApply<ReturnType,F>::apply(ans_data, data, data + nrow(), window);
-      ans_data += ans.nrow();
-      data += nrow();
-    }
-    return ans;
-  }
-
-  template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
-  template<typename ReturnType, template<class> class F, template<class, template<typename> class> class PFUNC>
-  const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::time_window(const int n) const {
-    // pre-allocate vector for transformed dates
-    typename std::vector<TDATE> partitions;
-    partitions.resize(nrow());
-    TDATE* dts = getDates();
-    // transform dates
-    for(TSDIM row = 0; row < nrow(); row++) {
-      partitions[row] = PFUNC<TDATE, DatePolicy>()(dts[row],n);
-    }
-    //std::transform(getDates(), getDates() + nrow(), partitions.begin(), std::bind2nd(PFUNC<TDATE, DatePolicy>(), n));
-    // vector for selected rows
-    std::vector<TSDIM> ans_rows;
-    breaks(partitions.begin(),partitions.end(),std::back_inserter(ans_rows));
-
-    TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> ans(ans_rows.size(), ncol());
-    ans.setColnames(getColnames());
-    TDATE* dates = getDates();
-    TDATE* ans_dates = ans.getDates();
-    for(size_t i = 0; i < ans_rows.size(); i++) {
-      ans_dates[i] = dates[ans_rows[i]];
-    }
-
-    ReturnType* ans_data = ans.getData();
-    TDATA* data = getData();
-    for(TSDIM ans_col = 0; ans_col < ans.ncol(); ans_col++, data+=nrow()) {
-      size_t range_start = 0;
-      for(size_t i = 0; i < ans_rows.size(); i++) {
-        ans_data[ans.offset(i, ans_col)] = F<ReturnType>::apply(data + range_start, data + ans_rows[i] + 1);
-        range_start = ans_rows[i] + 1;
-      }
-    }
-    return ans;
-  }
-
-  template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
-  template<typename ReturnType, template<class> class F>
-  const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::transform() const {
-
-    // allocate new answer
-    TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> ans(nrow(), ncol());
-
-    // copy over dates
-    std::copy(getDates(),getDates()+nrow(),ans.getDates());
-
-    // set new colnames
-    ans.setColnames(getColnames());
-
-    ReturnType* ans_data = ans.getData();
-    TDATA* data = getData();
-
-    for(TSDIM col = 0; col < ncol(); col++) {
-      F<ReturnType>::apply(ans_data, data, data + nrow());
-      ans_data += ans.nrow();
-      data += nrow();
-    }
-    return ans;
-  }
-
-  template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
-  template<typename ReturnType, template<class> class F, typename T>
-  const TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::transform_1arg(T arg1) const {
-
-    // allocate new answer
-    TSeries<TDATE,ReturnType,TSDIM,TSDATABACKEND,DatePolicy> ans(nrow(), ncol());
-
-    // copy over dates
-    std::copy(getDates(),getDates()+nrow(),ans.getDates());
-
-    // set new colnames
-    ans.setColnames(getColnames());
-
-    ReturnType* ans_data = ans.getData();
-    TDATA* data = getData();
-
-    for(TSDIM col = 0; col < ncol(); col++) {
-      F<ReturnType>::apply(ans_data, data, data + nrow(), arg1);
-      ans_data += ans.nrow();
-      data += nrow();
-    }
-    return ans;
-  }
-
-  // this is for a positive row subset (positive and negative rowsets cannot mix)
-  template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
-  template<typename T>
-  const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::row_subset(T beg, T end) const {
-    TSDIM new_nrow = static_cast<TSDIM>( std::distance(beg,end) );
-    TSDIM new_ncol = ncol();
-
-    // allocate new answer
-    TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> ans(new_nrow, new_ncol);
-
-    // copy over colnames
-    ans.setColnames(getColnames());
-
-    TDATE* dates = getDates();
-    TDATA* data = getData();
-    TDATE* ans_dates = ans.getDates();
-    TDATA* ans_data = ans.getData();
-
-    TSDIM ans_index = 0;
-
-    while(beg!=end) {
-      ans_dates[ans_index] = dates[*beg];
-      for(TSDIM c = 0; c < ncol(); c++) {
-        ans_data[ans.offset(ans_index,c)] = data[offset(*beg,c)];
-      }
-      ++beg;
-      ++ans_index;
-    }
-    return ans;
-  }
-
-  // this is for a positive row subset (positive and negative rowsets cannot mix)
-  template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
-  template<typename T>
-  const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::pad(T beg, T end) const {
-    // construct set with existing dates
-    std::set<TDATE> new_dts(getDates(),getDates() + nrow());
-
-    // add new dates
-    new_dts.insert(beg,end);
-
-    // allocate new answer
-    TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> ans(new_dts.size(), ncol());
+    const_index_iterator beg{index_begin()};
+    std::advance(beg, n);
+    std::copy(beg, index_end(), ans.index_begin());
 
     // copy colnames
     ans.setColnames(getColnames());
 
-    // init dates
-    std::copy(new_dts.begin(),new_dts.end(),ans.getDates());
-
-    // init to NA
-    std::fill(ans.getData(),ans.getData()+ans.nrow() * ans.ncol(),numeric_traits<TDATA>::NA());
-
-    RangeSpecifier<TDATE,TSDIM> range(getDates(),ans.getDates(),nrow(),ans.nrow());
-    const TSDIM* r1 = range.getArg1();
-    const TSDIM* r2 = range.getArg2();
-    TDATA* ans_data = ans.getData();
-    TDATA* this_data = getData();
-    for(TSDIM col = 0; col < ans.ncol(); col++) {
-      for(TSDIM i = 0; i < range.getSize(); i++) {
-        ans_data[ans.offset(r2[i],col)] = this_data[offset(r1[i],col)];
-      }
+    for (DIM i = 0; i < ncol(); ++i) {
+      std::pair<const_data_iterator, const_data_iterator> src_col{getColumn(i)};
+      std::pair<data_iterator, data_iterator> dst_col{ans.getColumn(i)};
+      std::advance(src_col.second, -n);
+      std::copy(src_col.first, src_col.second, dst_col.first);
     }
     return ans;
   }
+};
 
+template <typename IDX, typename V, typename DIM, template <typename, typename, typename> class BACKEND,
+          template <typename> class DatePolicy, template <typename> class NumericTraits>
+std::ostream &operator<<(std::ostream &os, const TSeries<IDX, V, DIM, BACKEND, DatePolicy, NumericTraits> &ts) {
+  std::vector<std::string> cnames(ts.getColnames());
 
-  template<typename TDATE, typename TDATA, typename TSDIM, template<typename,typename,typename> class TSDATABACKEND, template<typename> class DatePolicy>
-  template<template<class, template<typename> class> class PFUNC>
-  const TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy> TSeries<TDATE,TDATA,TSDIM,TSDATABACKEND,DatePolicy>::freq(const int n) const {
-
-    // pre-allocate vector for transformed dates
-    typename std::vector<TDATE> partitions;
-    partitions.resize(nrow());
-    // transform dates
-    TDATE* dts = getDates();
-    for(TSDIM row = 0; row < nrow(); row++) {
-      partitions[row] = PFUNC<TDATE, DatePolicy>()(dts[row],n);
-    }
-    //std::transform(getDates(), getDates() + nrow(), partitions.begin(), std::bind2nd(PFUNC<TDATE, DatePolicy>, n));
-    // vector for selected rows
-    std::vector<TSDIM> ans_rows;
-    breaks(partitions.begin(),partitions.end(),std::back_inserter(ans_rows));
-    return row_subset(ans_rows.begin(), ans_rows.end());
+  if (cnames.size()) {
+    // shift out to be in line w/ first column of values (space is for dates column)
+    os << "\t";
+    for (auto name : cnames) { os << name << " "; }
   }
-}  // namespace tslib
 
-#endif // TSERIES_HPP
+  typename TSeries<IDX, V, DIM, BACKEND, DatePolicy, NumericTraits>::const_index_iterator idx{ts.index_begin()};
+  typename TSeries<IDX, V, DIM, BACKEND, DatePolicy, NumericTraits>::const_index_iterator idx_end{ts.index_end()};
+  typename TSeries<IDX, V, DIM, BACKEND, DatePolicy, NumericTraits>::const_row_iterator row_iter(ts.getRow(0));
+
+  for (; idx != idx_end; ++idx) {
+    os << DatePolicy<IDX>::toString(*idx, "%Y-%m-%d %T") << "\t";
+    for (auto &value : row_iter) {
+      if (NumericTraits<V>::ISNA(*value)) {
+        os << "NA";
+      } else {
+        os << *value << " ";
+      }
+      os << " ";
+      ++value; // next row
+    }
+    os << "\n"; // no flush
+  }
+  return os;
+}
+
+} // namespace tslib

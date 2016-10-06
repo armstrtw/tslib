@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// Copyright (C) 2008  Whit Armstrong                                    //
+// Copyright (C) 2016  Whit Armstrong                                    //
 //                                                                       //
 // This program is free software: you can redistribute it and/or modify  //
 // it under the terms of the GNU General Public License as published by  //
@@ -15,38 +15,49 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>. //
 ///////////////////////////////////////////////////////////////////////////
 
-#ifndef MAX_HPP
-#define MAX_HPP
+#pragma once
+#include <limits>
+#include <cmath>
 
-#include <iterator>
-#include <tslib/utils/numeric.traits.hpp>
+template <typename T> class RNT;
 
-namespace tslib {
+template <> class RNT<double> {
+private:
+  // to be conformant to R's NA value
+  static double calculate_NA() {
+    union {
+      double value;
+      unsigned int word[2];
+    };
+    // do this b/c don't have a good way to determine
+    // endianness at compile time
+    value = std::numeric_limits<double>::quiet_NaN();
 
-  template<typename T>
-  class maxTraits {
-  public:
-    typedef T ReturnType;
-  };
-
-  template<typename ReturnType>
-  class Max {
-  public:
-    template<typename T>
-    static inline ReturnType apply(T beg, T end) {
-      ReturnType ans = *beg++;
-
-      while(beg != end) {
-	if(numeric_traits<typename std::iterator_traits<T>::value_type>::ISNA(*beg)) {
-	  return numeric_traits<ReturnType>::NA();
-	}
-	ans = *beg > ans ? *beg : ans;
-	++beg;
-      }
-      return ans;
+    if (word[0] == 0) {
+      word[0] = 1954;
+    } else {
+      word[1] = 1954;
     }
-  };
 
-} // namespace tslib
+    return value;
+  }
 
-#endif // MAX_HPP
+public:
+  static const bool has_NA = true;
+
+  static inline double NA() {
+    static double na_value = calculate_NA();
+    return na_value;
+  }
+
+  static inline bool ISNA(double x) { return std::isnan(x); }
+};
+
+template <> class RNT<int> {
+public:
+  static const bool has_NA = true;
+
+  static inline int NA() { return std::numeric_limits<int>::min(); }
+
+  static inline bool ISNA(int x) { return x == std::numeric_limits<int>::min() ? true : false; }
+};

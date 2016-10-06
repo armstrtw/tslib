@@ -1,13 +1,14 @@
-CFLAGS = -Wall -DGLIBCXX_FORCE_NEW -O0 -g -fpic -I.. -I/usr/include/catch
-CXXFLAGS = $(CFLAGS)
-LDFLAGS =
-CXX      = clang++
+##CFLAGS = -Wall --std=c++11 -DGLIBCXX_FORCE_NEW -O0 -g -fpic -I. -I..  -I/usr/include/catch
+CXXFLAGS = -Weffc++ -Wall --std=c++11 -O0 -g -fpic
+INC = -I. -I.. -I/usr/include/catch
+LIBS = -lstdc++ -lboost_date_time
+##CXX  = clang++
+CXX  = g++
 
-.PHONY: test
+bin/% : %.cpp
+	$(CXX) $(CXXFLAGS) $(INC) $< -o $@ $(LIBS)
 
-test:
-	$(CXX) $(CXXFLAGS) test.cpp -o $@
-	./test
+all: $(patsubst %.cpp, bin/%, $(wildcard *.cpp))
 
 clean:
-	rm -f ./test
+	rm -f bin/*
