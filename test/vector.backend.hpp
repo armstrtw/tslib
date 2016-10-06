@@ -40,32 +40,11 @@ public:
 
   VectorBackend() = delete;
   VectorBackend(const VectorBackend &t) : ncol_{t.ncol_}, index_{t.index_}, data_{t.data_}, colnames_{t.colnames_} {}
-  VectorBackend(DIM nrow, DIM ncol) : ncol_{ncol}, index_(nrow), data_(nrow * ncol), colnames_{} {
-    // std::iota(data_.begin(), data_.end(), 1);
-  }
-
+  VectorBackend(DIM nrow, DIM ncol) : ncol_{ncol}, index_(nrow), data_(nrow * ncol), colnames_{} {}
   VectorBackend &operator=(const VectorBackend &rhs) = delete;
 
   DIM nrow() const { return static_cast<DIM>(index_.size()); }
   DIM ncol() const { return ncol_; }
-
-  /*
-  std::pair<const_data_iterator, const_data_iterator> getColumn(DIM i) const {
-    const_data_iterator beg{data_.begin() + i * nrow()};       // head of column
-    const_data_iterator end{data_.begin() + (i + 1) * nrow()}; // head of next column
-    return std::make_pair(beg, end);
-  }
-  std::pair<data_iterator, data_iterator> getColumn(DIM i) {
-    data_iterator beg{data_.begin() + i * nrow()};       // head of column
-    data_iterator end{data_.begin() + (i + 1) * nrow()}; // head of next column
-    return std::make_pair(beg, end);
-  }
-  */
-
-  std::pair<const_data_iterator, const_data_iterator> getColumn(DIM i) const {
-    return std::make_pair(col_begin(i), col_end(i));
-  }
-  std::pair<data_iterator, data_iterator> getColumn(DIM i) { return std::make_pair(col_begin(i), col_end(i)); }
 
   const_index_iterator index_begin() const { return index_.begin(); }
   index_iterator index_begin() { return index_.begin(); }
@@ -74,7 +53,6 @@ public:
 
   const_data_iterator col_begin(DIM i) const { return data_.begin() + column_offset(i); } // head of column
   data_iterator col_begin(DIM i) { return data_.begin() + column_offset(i); }
-
   const_data_iterator col_end(DIM i) const { return data_.begin() + column_offset(i + 1L); } // head of next column
   data_iterator col_end(DIM i) { return data_.begin() + column_offset(i + 1L); }
 

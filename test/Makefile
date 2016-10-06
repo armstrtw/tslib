@@ -2,8 +2,8 @@
 CXXFLAGS = -Weffc++ -Wall --std=c++11 -O0 -g -fpic
 INC = -I. -I.. -I/usr/include/catch
 LIBS = -lstdc++ -lboost_date_time
-##CXX  = clang++
-CXX  = g++
+CXX  = clang++
+##CXX  = g++
 
 bin/% : %.cpp
 	$(CXX) $(CXXFLAGS) $(INC) $< -o $@ $(LIBS)

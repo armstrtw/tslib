@@ -47,8 +47,10 @@ public:
   const BACKEND<IDX, V, DIM> &getBackend() const { return tsdata_; }
   const std::vector<std::string> getColnames() const { return tsdata_.getColnames(); }
   const bool setColnames(const std::vector<std::string> &names) { return tsdata_.setColnames(names); }
+
   const DIM nrow() const { return tsdata_.nrow(); }
   const DIM ncol() const { return tsdata_.ncol(); }
+
   const_index_iterator index_begin() const { return tsdata_.index_begin(); }
   index_iterator index_begin() { return tsdata_.index_begin(); }
   const_index_iterator index_end() const { return tsdata_.index_end(); }
@@ -59,9 +61,6 @@ public:
 
   const_data_iterator col_end(DIM i) const { return tsdata_.col_end(i); }
   data_iterator col_end(DIM i) { return tsdata_.col_end(i); }
-
-  std::pair<const_data_iterator, const_data_iterator> getColumn(DIM i) const { return tsdata_.getColumn(i); }
-  std::pair<data_iterator, data_iterator> getColumn(DIM i) { return tsdata_.getColumn(i); }
 
   const_row_iterator getRow(DIM n) const {
     const_row_iterator ans(ncol());
@@ -86,10 +85,11 @@ public:
     ans.setColnames(getColnames());
 
     for (DIM i = 0; i < ncol(); ++i) {
-      std::pair<const_data_iterator, const_data_iterator> src_col{getColumn(i)};
-      std::pair<data_iterator, data_iterator> dst_col{ans.getColumn(i)};
-      std::advance(src_col.second, -n);
-      std::copy(src_col.first, src_col.second, dst_col.first);
+      const_data_iterator src_beg{col_begin(i)};
+      const_data_iterator src_end{col_end(i)};
+      data_iterator dst_beg{ans.col_begin(i)};
+      std::advance(src_end, -n);
+      std::copy(src_beg, src_end, dst_beg);
     }
     return ans;
   }
