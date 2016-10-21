@@ -27,21 +27,17 @@ template <typename T> std::vector<std::pair<size_t, size_t>> intersection_map(T 
       std::min(std::distance(xbeg, xend), std::distance(ybeg, yend))};
   std::vector<std::pair<size_t, size_t>> res;
   res.reserve(max_size);
-  size_t xpos{0}, ypos{0};
+  T xp{xbeg}, yp{ybeg};
 
-  while (xbeg != xend && ybeg != yend) {
-    if (*xbeg < *ybeg) {
-      ++xbeg;
-      ++xpos;
-    } else if (*ybeg < *xbeg) {
-      ++ybeg;
-      ++ypos;
+  while (xp != xend && yp != yend) {
+    if (*xp < *yp) {
+      ++xp;
+    } else if (*yp < *xp) {
+      ++yp;
     } else {
-      res.push_back(std::make_pair(xpos, ypos));
-      ++xbeg;
-      ++xpos;
-      ++ybeg;
-      ++ypos;
+      res.push_back(std::make_pair(std::distance(xbeg, xp), std::distance(ybeg, yp)));
+      ++xp;
+      ++yp;
     }
   }
   return res;
