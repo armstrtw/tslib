@@ -56,13 +56,14 @@ TEST_CASE("Constructors.") {
     int n = {0};
     std::generate(v.begin(), v.end(), [&n] { return n += 2; });
 
-    std::pair<std::vector<size_t>, std::vector<size_t>> xymap{intersection_map(u.begin(), u.end(), v.begin(), v.end())};
-    REQUIRE(xymap.first.size() == xymap.second.size());
+    std::vector<std::pair<size_t, size_t>> xymap{intersection_map(u.begin(), u.end(), v.begin(), v.end())};
 
     // extract values at intersection points from u and v
     std::vector<int> uvals, vvals;
-    std::transform(xymap.first.begin(), xymap.first.end(), std::back_inserter(uvals), [&u](size_t i) { return u[i]; });
-    std::transform(xymap.second.begin(), xymap.second.end(), std::back_inserter(vvals), [&v](size_t i) { return v[i]; });
+    for (auto m : xymap) {
+      uvals.push_back(u[m.first]);
+      vvals.push_back(v[m.second]);
+    }
     REQUIRE(std::equal(uvals.begin(), uvals.begin(), vvals.begin()));
   }
 

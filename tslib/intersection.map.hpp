@@ -15,19 +15,18 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>. //
 ///////////////////////////////////////////////////////////////////////////
 #pragma once
-#include <vector>
-#include <utility>
 #include <algorithm>
+#include <utility>
+#include <vector>
 
 namespace tslib {
 
-template <typename T>
-std::pair<std::vector<size_t>, std::vector<size_t>> intersection_map(T xbeg, T xend, T ybeg, T yend) {
+template <typename T> std::vector<std::pair<size_t, size_t>> intersection_map(T xbeg, T xend, T ybeg, T yend) {
+  // max size of intersection is the smaller of the two series
   typename std::iterator_traits<T>::difference_type max_size{
       std::min(std::distance(xbeg, xend), std::distance(ybeg, yend))};
-  std::vector<size_t> xmap, ymap;
-  xmap.reserve(max_size);
-  ymap.reserve(max_size);
+  std::vector<std::pair<size_t, size_t>> res;
+  res.reserve(max_size);
   size_t xpos{0}, ypos{0};
 
   while (xbeg != xend && ybeg != yend) {
@@ -38,15 +37,14 @@ std::pair<std::vector<size_t>, std::vector<size_t>> intersection_map(T xbeg, T x
       ++ybeg;
       ++ypos;
     } else {
-      xmap.push_back(xpos);
-      ymap.push_back(ypos);
+      res.push_back(std::make_pair(xpos, ypos));
       ++xbeg;
       ++xpos;
       ++ybeg;
       ++ypos;
     }
   }
-  return make_pair(xmap, ymap);
+  return res;
 }
 
 } // namespace tslib

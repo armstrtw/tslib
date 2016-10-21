@@ -187,13 +187,13 @@ auto binary_opp(const TSeries<IDX, U, DIM, BACKEND, DatePolicy, NumericTraits> &
     throw std::logic_error("Number of colums must match. or one time series must be a single column.");
   }
 
-  auto rowmap{intersection_map(lhs.index_begin(), lhs.index_end(), rhs.index_begin(), rhs.index_end())};
-  std::cout << rowmap.first.size() << std::endl;
-  for (std::size_t i = 0; i < rowmap.first.size(); ++i) {
-    std::cout << rowmap.first[i] << ":" << rowmap.second[i] << std::endl;
-  }
+  const auto rowmap{intersection_map(lhs.index_begin(), lhs.index_end(), rhs.index_begin(), rhs.index_end())};
+  std::cout << rowmap.size() << std::endl;
+  for (auto m : rowmap) { std::cout << m.first << ":" << m.second << std::endl; }
+
+  // FIXME: use Pred<U,V>::RT to define the return type
   TSeries<IDX, typename std::common_type<U, V>::type, DIM, BACKEND, DatePolicy, NumericTraits> res(
-      rowmap.first.size(), std::max(lhs.ncol(), rhs.ncol()));
+      rowmap.size(), std::max(lhs.ncol(), rhs.ncol()));
 
   // set colnames from larger of two args but prefer lhs
   if (lhs.getColnamesSize() >= rhs.getColnamesSize()) {
@@ -205,16 +205,20 @@ auto binary_opp(const TSeries<IDX, U, DIM, BACKEND, DatePolicy, NumericTraits> &
   // set index from lhs
   auto idx{res.index_begin()};
   const auto lhs_idx{lhs.index_begin()};
-  // for (auto i : rowmap.first) { *idx = lhs_idx[rowmap.first[i]]; }
-  for (auto i : rowmap.first) { *idx = lhs_idx[i]; }
+  for (auto m : rowmap) {
+    *idx = lhs_idx[m.first];
+    idx++;
+  }
+
   for (DIM nc = 0; nc < res.ncol(); ++nc) {
     const auto lhs_col{lhs.col_begin(nc)}, rhs_col{rhs.col_begin(nc)};
     auto res_col{res.col_begin(nc)};
-    for (DIM nr = 0; nr < res.nrow(); ++nr) {
-      U lhs_val{lhs_col[rowmap.first[nr]]};
-      V rhs_val{rhs_col[rowmap.second[nr]]};
-      res_col[nr] = NumericTraits<V>::ISNA(lhs_val) || NumericTraits<U>::ISNA(rhs_val) ? NumericTraits<RV>::NA()
-                                                                                       : pred(lhs_val, rhs_val);
+    for (auto m : rowmap) {
+      U lhs_val{lhs_col[m.first]};
+      V rhs_val{rhs_col[m.second]};
+      *res_col = NumericTraits<V>::ISNA(lhs_val) || NumericTraits<U>::ISNA(rhs_val) ? NumericTraits<RV>::NA()
+                                                                                    : pred(lhs_val, rhs_val);
+      ++res_col;
     }
   }
   return res;
