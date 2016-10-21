@@ -16,9 +16,9 @@
 ///////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include <vector>
-#include <string>
 #include <iterator>
+#include <string>
+#include <vector>
 
 namespace tslib {
 
@@ -42,6 +42,7 @@ public:
   VectorBackend(const VectorBackend &t) : ncol_{t.ncol_}, index_{t.index_}, data_{t.data_}, colnames_{t.colnames_} {}
   VectorBackend(DIM nrow, DIM ncol) : ncol_{ncol}, index_(nrow), data_(nrow * ncol), colnames_{} {}
   VectorBackend &operator=(const VectorBackend &rhs) = delete;
+  VectorBackend(VectorBackend &&)                    = default;
 
   DIM nrow() const { return static_cast<DIM>(index_.size()); }
   DIM ncol() const { return ncol_; }
@@ -56,6 +57,8 @@ public:
   const_data_iterator col_end(DIM i) const { return data_.begin() + column_offset(i + 1L); } // head of next column
   data_iterator col_end(DIM i) { return data_.begin() + column_offset(i + 1L); }
 
+  const std::vector<std::string> getColnames() const { return colnames_; }
+  const DIM getColnamesSize() const { return static_cast<DIM>(colnames_.size()); }
   const bool setColnames(const std::vector<std::string> &names) {
     if (static_cast<DIM>(names.size()) == ncol_) {
       colnames_ = names;
@@ -63,9 +66,6 @@ public:
     }
     return false;
   }
-
-  const std::vector<std::string> getColnames() const { return colnames_; }
-  const bool hasColnames() const { return colnames_.size() > 0 ? true : false; }
 };
 
 } // namespace tslib
