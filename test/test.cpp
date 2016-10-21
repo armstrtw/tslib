@@ -18,12 +18,13 @@
 #define CATCH_CONFIG_MAIN
 #include <catch.hpp>
 
-#include <vector>
+#include <gregorian.date.policy.hpp>
 #include <iostream>
+#include <numeric.traits.hpp>
+#include <numeric>
 #include <tslib/tseries.hpp>
 #include <vector.backend.hpp>
-#include <gregorian.date.policy.hpp>
-#include <numeric.traits.hpp>
+#include <vector>
 
 using namespace tslib;
 
@@ -63,5 +64,19 @@ TEST_CASE("Constructors.") {
     std::transform(xymap.first.begin(), xymap.first.end(), std::back_inserter(uvals), [&u](size_t i) { return u[i]; });
     std::transform(xymap.second.begin(), xymap.second.end(), std::back_inserter(vvals), [&v](size_t i) { return v[i]; });
     REQUIRE(std::equal(uvals.begin(), uvals.begin(), vvals.begin()));
+  }
+
+  SECTION("op+") {
+    size_t NR{10};
+    LDL_ts x(NR, 1);
+    std::iota(x.index_begin(), x.index_end(), 0);
+    LDL_ts y(NR, 1);
+    int n = {0};
+    std::generate(y.index_begin(), y.index_end(), [&n] { return n += 2; });
+    // LDL_ts z{x + y};
+    LDL_ts z{x += 1.};
+    std::cout << z << std::endl;
+
+    std::cout << (x + y) << std::endl;
   }
 }
