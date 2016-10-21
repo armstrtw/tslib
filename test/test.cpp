@@ -64,7 +64,7 @@ TEST_CASE("Constructors.") {
       uvals.push_back(u[m.first]);
       vvals.push_back(v[m.second]);
     }
-    REQUIRE(std::equal(uvals.begin(), uvals.begin(), vvals.begin()));
+    REQUIRE(std::equal(uvals.begin(), uvals.end(), vvals.begin()));
   }
 
   SECTION("op+") {
