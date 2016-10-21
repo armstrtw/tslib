@@ -15,11 +15,14 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>. //
 ///////////////////////////////////////////////////////////////////////////
 #pragma once
-#include <vector>
-#include <string>
-#include <utility>
-#include <iterator>
 #include <iostream>
+#include <iterator>
+#include <string>
+#include <type_traits>
+#include <utility>
+#include <vector>
+
+#include <tslib/functors.hpp>
 #include <tslib/intersection.map.hpp>
 
 namespace tslib {
@@ -42,10 +45,14 @@ public:
   TSeries(const TSeries &T) : tsdata_(T.tsdata_) {}
   TSeries(BACKEND<IDX, V, DIM> &tsdata) : tsdata_{tsdata} {}
   TSeries(DIM nrow, DIM ncol) : tsdata_{nrow, ncol} {}
+  TSeries(TSeries &&) = default;
 
   // accessors
   const BACKEND<IDX, V, DIM> &getBackend() const { return tsdata_; }
+
   const std::vector<std::string> getColnames() const { return tsdata_.getColnames(); }
+  const DIM getColnamesSize() const { return tsdata_.getColnamesSize(); }
+  const bool hasColnames() const { return getColnamesSize() > 0 ? true : false; }
   const bool setColnames(const std::vector<std::string> &names) { return tsdata_.setColnames(names); }
 
   const DIM nrow() const { return tsdata_.nrow(); }
@@ -93,6 +100,47 @@ public:
     }
     return ans;
   }
+
+  /* compound ops only for scalar ops, self-assignment doesn't make sense when nrow is changing */
+  template <typename S>
+  TSeries<IDX, typename std::common_type<V, S>::type, DIM, BACKEND, DatePolicy, NumericTraits> &operator+=(S rhs) {
+    for (DIM i = 0; i < ncol(); ++i) {
+      for (auto iter = col_begin(i); iter != col_end(i); ++iter) {
+        if (!NumericTraits<V>::ISNA(*iter)) { *iter += rhs; }
+      }
+    }
+    return *this;
+  }
+
+  template <typename S>
+  TSeries<IDX, typename std::common_type<V, S>::type, DIM, BACKEND, DatePolicy, NumericTraits> &operator-=(S rhs) {
+    for (DIM i = 0; i < ncol(); ++i) {
+      for (auto iter = col_begin(i); iter != col_end(i); ++iter) {
+        if (!NumericTraits<V>::ISNA(*iter)) { *iter -= rhs; }
+      }
+    }
+    return *this;
+  }
+
+  template <typename S>
+  TSeries<IDX, typename std::common_type<V, S>::type, DIM, BACKEND, DatePolicy, NumericTraits> &operator*=(S rhs) {
+    for (DIM i = 0; i < ncol(); ++i) {
+      for (auto iter = col_begin(i); iter != col_end(i); ++iter) {
+        if (!NumericTraits<V>::ISNA(*iter)) { *iter *= rhs; }
+      }
+    }
+    return *this;
+  }
+
+  template <typename S>
+  TSeries<IDX, typename std::common_type<V, S>::type, DIM, BACKEND, DatePolicy, NumericTraits> &operator/=(S rhs) {
+    for (DIM i = 0; i < ncol(); ++i) {
+      for (auto iter = col_begin(i); iter != col_end(i); ++iter) {
+        if (!NumericTraits<V>::ISNA(*iter)) { *iter /= rhs; }
+      }
+    }
+    return *this;
+  }
 };
 
 template <typename IDX, typename V, typename DIM, template <typename, typename, typename> class BACKEND,
@@ -124,6 +172,60 @@ std::ostream &operator<<(std::ostream &os, const TSeries<IDX, V, DIM, BACKEND, D
     os << "\n"; // no flush
   }
   return os;
+}
+
+template <template <typename, typename> class Pred, typename IDX, typename U, typename V, typename DIM,
+          template <typename, typename, typename> class BACKEND, template <typename> class DatePolicy,
+          template <typename> class NumericTraits>
+auto binary_opp(const TSeries<IDX, U, DIM, BACKEND, DatePolicy, NumericTraits> &lhs,
+                const TSeries<IDX, V, DIM, BACKEND, DatePolicy, NumericTraits> &rhs) {
+
+  typedef typename std::common_type<U, V>::type RV;
+  Pred<U, V> pred;
+
+  if (lhs.ncol() != rhs.ncol() && lhs.ncol() != 1 && rhs.ncol() != 1) {
+    throw std::logic_error("Number of colums must match. or one time series must be a single column.");
+  }
+
+  auto rowmap{intersection_map(lhs.index_begin(), lhs.index_end(), rhs.index_begin(), rhs.index_end())};
+  std::cout << rowmap.first.size() << std::endl;
+  for (std::size_t i = 0; i < rowmap.first.size(); ++i) {
+    std::cout << rowmap.first[i] << ":" << rowmap.second[i] << std::endl;
+  }
+  TSeries<IDX, typename std::common_type<U, V>::type, DIM, BACKEND, DatePolicy, NumericTraits> res(
+      rowmap.first.size(), std::max(lhs.ncol(), rhs.ncol()));
+
+  // set colnames from larger of two args but prefer lhs
+  if (lhs.getColnamesSize() >= rhs.getColnamesSize()) {
+    res.setColnames(lhs.getColnames());
+  } else if (rhs.hasColnames()) {
+    res.setColnames(rhs.getColnames());
+  }
+
+  // set index from lhs
+  auto idx{res.index_begin()};
+  const auto lhs_idx{lhs.index_begin()};
+  // for (auto i : rowmap.first) { *idx = lhs_idx[rowmap.first[i]]; }
+  for (auto i : rowmap.first) { *idx = lhs_idx[i]; }
+  for (DIM nc = 0; nc < res.ncol(); ++nc) {
+    const auto lhs_col{lhs.col_begin(nc)}, rhs_col{rhs.col_begin(nc)};
+    auto res_col{res.col_begin(nc)};
+    for (DIM nr = 0; nr < res.nrow(); ++nr) {
+      U lhs_val{lhs_col[rowmap.first[nr]]};
+      V rhs_val{rhs_col[rowmap.second[nr]]};
+      res_col[nr] = NumericTraits<V>::ISNA(lhs_val) || NumericTraits<U>::ISNA(rhs_val) ? NumericTraits<RV>::NA()
+                                                                                       : pred(lhs_val, rhs_val);
+    }
+  }
+  return res;
+}
+
+template <typename IDX, typename V, typename U, typename DIM, template <typename, typename, typename> class BACKEND,
+          template <typename> class DatePolicy, template <typename> class NumericTraits>
+TSeries<IDX, typename std::common_type<V, U>::type, DIM, BACKEND, DatePolicy, NumericTraits>
+operator+(const TSeries<IDX, V, DIM, BACKEND, DatePolicy, NumericTraits> &lhs,
+          const TSeries<IDX, U, DIM, BACKEND, DatePolicy, NumericTraits> &rhs) {
+  return binary_opp<PlusFunctor>(lhs, rhs);
 }
 
 } // namespace tslib
