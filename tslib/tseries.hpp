@@ -28,7 +28,7 @@
 namespace tslib {
 
 template <typename IDX, typename V, typename DIM, template <typename, typename, typename> class BACKEND,
-          template <typename> class DatePolicy, template <typename> class NumericTraits>
+          template <typename> class DatePolicy, template <typename> class NT>
 class TSeries {
 private:
   BACKEND<IDX, V, DIM> tsdata_;
@@ -79,9 +79,9 @@ public:
     return ans;
   }
 
-  TSeries<IDX, V, DIM, BACKEND, DatePolicy, NumericTraits> lag(DIM n) const {
+  TSeries<IDX, V, DIM, BACKEND, DatePolicy, NT> lag(DIM n) const {
     if (n >= nrow()) { throw std::logic_error("lag: n > nrow of time series."); }
-    TSeries<IDX, V, DIM, BACKEND, DatePolicy, NumericTraits> ans(nrow() - n, ncol());
+    TSeries<IDX, V, DIM, BACKEND, DatePolicy, NT> ans(nrow() - n, ncol());
 
     // copy over dates
     const_index_iterator beg{index_begin()};
@@ -103,40 +103,40 @@ public:
 
   /* compound ops only for scalar ops, self-assignment doesn't make sense when nrow is changing */
   template <typename S>
-  TSeries<IDX, typename std::common_type<V, S>::type, DIM, BACKEND, DatePolicy, NumericTraits> &operator+=(S rhs) {
+  TSeries<IDX, typename std::common_type<V, S>::type, DIM, BACKEND, DatePolicy, NT> &operator+=(S rhs) {
     for (DIM i = 0; i < ncol(); ++i) {
       for (auto iter = col_begin(i); iter != col_end(i); ++iter) {
-        if (!NumericTraits<V>::ISNA(*iter)) { *iter += rhs; }
+        if (!NT<V>::ISNA(*iter)) { *iter += rhs; }
       }
     }
     return *this;
   }
 
   template <typename S>
-  TSeries<IDX, typename std::common_type<V, S>::type, DIM, BACKEND, DatePolicy, NumericTraits> &operator-=(S rhs) {
+  TSeries<IDX, typename std::common_type<V, S>::type, DIM, BACKEND, DatePolicy, NT> &operator-=(S rhs) {
     for (DIM i = 0; i < ncol(); ++i) {
       for (auto iter = col_begin(i); iter != col_end(i); ++iter) {
-        if (!NumericTraits<V>::ISNA(*iter)) { *iter -= rhs; }
+        if (!NT<V>::ISNA(*iter)) { *iter -= rhs; }
       }
     }
     return *this;
   }
 
   template <typename S>
-  TSeries<IDX, typename std::common_type<V, S>::type, DIM, BACKEND, DatePolicy, NumericTraits> &operator*=(S rhs) {
+  TSeries<IDX, typename std::common_type<V, S>::type, DIM, BACKEND, DatePolicy, NT> &operator*=(S rhs) {
     for (DIM i = 0; i < ncol(); ++i) {
       for (auto iter = col_begin(i); iter != col_end(i); ++iter) {
-        if (!NumericTraits<V>::ISNA(*iter)) { *iter *= rhs; }
+        if (!NT<V>::ISNA(*iter)) { *iter *= rhs; }
       }
     }
     return *this;
   }
 
   template <typename S>
-  TSeries<IDX, typename std::common_type<V, S>::type, DIM, BACKEND, DatePolicy, NumericTraits> &operator/=(S rhs) {
+  TSeries<IDX, typename std::common_type<V, S>::type, DIM, BACKEND, DatePolicy, NT> &operator/=(S rhs) {
     for (DIM i = 0; i < ncol(); ++i) {
       for (auto iter = col_begin(i); iter != col_end(i); ++iter) {
-        if (!NumericTraits<V>::ISNA(*iter)) { *iter /= rhs; }
+        if (!NT<V>::ISNA(*iter)) { *iter /= rhs; }
       }
     }
     return *this;
@@ -144,8 +144,8 @@ public:
 };
 
 template <typename IDX, typename V, typename DIM, template <typename, typename, typename> class BACKEND,
-          template <typename> class DatePolicy, template <typename> class NumericTraits>
-std::ostream &operator<<(std::ostream &os, const TSeries<IDX, V, DIM, BACKEND, DatePolicy, NumericTraits> &ts) {
+          template <typename> class DatePolicy, template <typename> class NT>
+std::ostream &operator<<(std::ostream &os, const TSeries<IDX, V, DIM, BACKEND, DatePolicy, NT> &ts) {
   std::vector<std::string> cnames(ts.getColnames());
 
   if (cnames.size()) {
@@ -154,14 +154,14 @@ std::ostream &operator<<(std::ostream &os, const TSeries<IDX, V, DIM, BACKEND, D
     for (auto name : cnames) { os << name << " "; }
   }
 
-  typename TSeries<IDX, V, DIM, BACKEND, DatePolicy, NumericTraits>::const_index_iterator idx{ts.index_begin()};
-  typename TSeries<IDX, V, DIM, BACKEND, DatePolicy, NumericTraits>::const_index_iterator idx_end{ts.index_end()};
-  typename TSeries<IDX, V, DIM, BACKEND, DatePolicy, NumericTraits>::const_row_iterator row_iter(ts.getRow(0));
+  typename TSeries<IDX, V, DIM, BACKEND, DatePolicy, NT>::const_index_iterator idx{ts.index_begin()};
+  typename TSeries<IDX, V, DIM, BACKEND, DatePolicy, NT>::const_index_iterator idx_end{ts.index_end()};
+  typename TSeries<IDX, V, DIM, BACKEND, DatePolicy, NT>::const_row_iterator row_iter(ts.getRow(0));
 
   for (; idx != idx_end; ++idx) {
     os << DatePolicy<IDX>::toString(*idx, "%Y-%m-%d %T") << "\t";
     for (auto &value : row_iter) {
-      if (NumericTraits<V>::ISNA(*value)) {
+      if (NT<V>::ISNA(*value)) {
         os << "NA";
       } else {
         os << *value << " ";
@@ -176,9 +176,9 @@ std::ostream &operator<<(std::ostream &os, const TSeries<IDX, V, DIM, BACKEND, D
 
 template <template <typename, typename> class Pred, typename IDX, typename U, typename V, typename DIM,
           template <typename, typename, typename> class BACKEND, template <typename> class DatePolicy,
-          template <typename> class NumericTraits>
-auto binary_opp(const TSeries<IDX, U, DIM, BACKEND, DatePolicy, NumericTraits> &lhs,
-                const TSeries<IDX, V, DIM, BACKEND, DatePolicy, NumericTraits> &rhs) {
+          template <typename> class NT>
+auto binary_opp(const TSeries<IDX, U, DIM, BACKEND, DatePolicy, NT> &lhs,
+                const TSeries<IDX, V, DIM, BACKEND, DatePolicy, NT> &rhs) {
 
   typedef typename std::common_type<U, V>::type RV;
   Pred<U, V> pred;
@@ -192,8 +192,8 @@ auto binary_opp(const TSeries<IDX, U, DIM, BACKEND, DatePolicy, NumericTraits> &
   for (auto m : rowmap) { std::cout << m.first << ":" << m.second << std::endl; }
 
   // FIXME: use Pred<U,V>::RT to define the return type
-  TSeries<IDX, typename std::common_type<U, V>::type, DIM, BACKEND, DatePolicy, NumericTraits> res(
-      rowmap.size(), std::max(lhs.ncol(), rhs.ncol()));
+  TSeries<IDX, typename std::common_type<U, V>::type, DIM, BACKEND, DatePolicy, NT> res(rowmap.size(),
+                                                                                        std::max(lhs.ncol(), rhs.ncol()));
 
   // set colnames from larger of two args but prefer lhs
   if (lhs.getColnamesSize() >= rhs.getColnamesSize()) {
@@ -216,8 +216,7 @@ auto binary_opp(const TSeries<IDX, U, DIM, BACKEND, DatePolicy, NumericTraits> &
     for (auto m : rowmap) {
       U lhs_val{lhs_col[m.first]};
       V rhs_val{rhs_col[m.second]};
-      *res_col = NumericTraits<V>::ISNA(lhs_val) || NumericTraits<U>::ISNA(rhs_val) ? NumericTraits<RV>::NA()
-                                                                                    : pred(lhs_val, rhs_val);
+      *res_col = NT<V>::ISNA(lhs_val) || NT<U>::ISNA(rhs_val) ? NT<RV>::NA() : pred(lhs_val, rhs_val);
       ++res_col;
     }
   }
@@ -225,10 +224,10 @@ auto binary_opp(const TSeries<IDX, U, DIM, BACKEND, DatePolicy, NumericTraits> &
 }
 
 template <typename IDX, typename V, typename U, typename DIM, template <typename, typename, typename> class BACKEND,
-          template <typename> class DatePolicy, template <typename> class NumericTraits>
-TSeries<IDX, typename std::common_type<V, U>::type, DIM, BACKEND, DatePolicy, NumericTraits>
-operator+(const TSeries<IDX, V, DIM, BACKEND, DatePolicy, NumericTraits> &lhs,
-          const TSeries<IDX, U, DIM, BACKEND, DatePolicy, NumericTraits> &rhs) {
+          template <typename> class DatePolicy, template <typename> class NT>
+TSeries<IDX, typename std::common_type<V, U>::type, DIM, BACKEND, DatePolicy, NT>
+operator+(const TSeries<IDX, V, DIM, BACKEND, DatePolicy, NT> &lhs,
+          const TSeries<IDX, U, DIM, BACKEND, DatePolicy, NT> &rhs) {
   return binary_opp<PlusFunctor>(lhs, rhs);
 }
 
