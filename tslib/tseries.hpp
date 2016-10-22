@@ -192,8 +192,7 @@ auto binary_opp(const TSeries<IDX, U, DIM, BACKEND, DatePolicy, NT> &lhs,
   for (auto m : rowmap) { std::cout << m.first << ":" << m.second << std::endl; }
 
   // FIXME: use Pred<U,V>::RT to define the return type
-  TSeries<IDX, typename std::common_type<U, V>::type, DIM, BACKEND, DatePolicy, NT> res(rowmap.size(),
-                                                                                        std::max(lhs.ncol(), rhs.ncol()));
+  TSeries<IDX, typename Pred<U, V>::RT, DIM, BACKEND, DatePolicy, NT> res(rowmap.size(), std::max(lhs.ncol(), rhs.ncol()));
 
   // set colnames from larger of two args but prefer lhs
   if (lhs.getColnamesSize() >= rhs.getColnamesSize()) {
@@ -229,6 +228,30 @@ TSeries<IDX, typename std::common_type<V, U>::type, DIM, BACKEND, DatePolicy, NT
 operator+(const TSeries<IDX, V, DIM, BACKEND, DatePolicy, NT> &lhs,
           const TSeries<IDX, U, DIM, BACKEND, DatePolicy, NT> &rhs) {
   return binary_opp<PlusFunctor>(lhs, rhs);
+}
+
+template <typename IDX, typename V, typename U, typename DIM, template <typename, typename, typename> class BACKEND,
+          template <typename> class DatePolicy, template <typename> class NT>
+TSeries<IDX, typename std::common_type<V, U>::type, DIM, BACKEND, DatePolicy, NT>
+operator-(const TSeries<IDX, V, DIM, BACKEND, DatePolicy, NT> &lhs,
+          const TSeries<IDX, U, DIM, BACKEND, DatePolicy, NT> &rhs) {
+  return binary_opp<MinusFunctor>(lhs, rhs);
+}
+
+template <typename IDX, typename V, typename U, typename DIM, template <typename, typename, typename> class BACKEND,
+          template <typename> class DatePolicy, template <typename> class NT>
+TSeries<IDX, typename std::common_type<V, U>::type, DIM, BACKEND, DatePolicy, NT>
+operator*(const TSeries<IDX, V, DIM, BACKEND, DatePolicy, NT> &lhs,
+          const TSeries<IDX, U, DIM, BACKEND, DatePolicy, NT> &rhs) {
+  return binary_opp<MultiplyFunctor>(lhs, rhs);
+}
+
+template <typename IDX, typename V, typename U, typename DIM, template <typename, typename, typename> class BACKEND,
+          template <typename> class DatePolicy, template <typename> class NT>
+TSeries<IDX, typename std::common_type<V, U>::type, DIM, BACKEND, DatePolicy, NT>
+operator/(const TSeries<IDX, V, DIM, BACKEND, DatePolicy, NT> &lhs,
+          const TSeries<IDX, U, DIM, BACKEND, DatePolicy, NT> &rhs) {
+  return binary_opp<DivideFunctor>(lhs, rhs);
 }
 
 } // namespace tslib

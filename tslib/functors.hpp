@@ -16,8 +16,30 @@
 ///////////////////////////////////////////////////////////////////////////
 #pragma once
 
+namespace tslib {
+
 template <typename X, typename Y> class PlusFunctor {
 public:
   typedef typename std::common_type<X, Y>::type RT;
   RT operator()(const X &x, const Y &y) { return x + y; }
 };
+
+template <typename X, typename Y> class MinusFunctor {
+public:
+  typedef typename std::common_type<X, Y>::type RT;
+  RT operator()(const X &x, const Y &y) { return x - y; }
+};
+
+template <typename X, typename Y> class MultiplyFunctor {
+public:
+  typedef typename std::common_type<X, Y>::type RT;
+  RT operator()(const X &x, const Y &y) { return x * y; }
+};
+
+template <typename X, typename Y> class DivideFunctor {
+public:
+  typedef typename std::common_type<X, Y>::type RT;
+  RT operator()(const X &x, const Y &y) { return x / y; }
+};
+
+} // namespace tslib
